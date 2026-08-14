@@ -1,47 +1,53 @@
-# caw-agent-hub
+# caw-agent
 
-[![downloads](https://img.shields.io/github/downloads/noxrick91/caw-agent-hub/total)](https://github.com/noxrick91/caw-agent-hub/releases)
+[官网](https://agent.noxcaw.com) · [文档](https://agent.noxcaw.com/docs.html) · [![downloads](https://img.shields.io/github/downloads/noxrick91/caw-agent-hub/total)](https://github.com/noxrick91/caw-agent-hub/releases)
 
-[caw-agent](https://github.com/noxrick91/caw-agent) 的公开主页与发布通道：下载预编译包、阅读手册。
+你的终端里多了一个会改代码的搭档。
 
-**使用手册（对外唯一维护处）：** [`content/README.md`](content/README.md)，站点上是 [docs.html](docs.html)。
+读代码、改文件、跑测试，都在你打开的这个项目里完成。每次写盘或执行命令前，它都会停下来等你确认。
 
-源码仓保持私有。访客只从**本仓库的 GitHub Release** 取二进制和 `SHA256SUMS`，不访问私有 API。
+## 安装
 
-下载量：GitHub 给每个 Release 资产记 `download_count`。官网首页汇总本版与累计（不含 `install` 脚本本身）。仓库页也可用 [shields.io](https://img.shields.io/github/downloads/noxrick91/caw-agent-hub/total) 徽章。
-
-## 本地预览
-
-不要用 `file://`（文档用 `fetch` 加载 Markdown）。
-
-```bash
-python3 -m http.server 8080
-# http://127.0.0.1:8080
-```
-
-## 发布站点
-
-GitHub Pages：Settings → Pages → `master` / `/ (root)`。本仓需为 **public**。
-
-## 发布二进制
-
-私有 `caw-agent` 在 `v*` 标签上编好后，把五个平台资产和 `SHA256SUMS` 上传到 **本仓同名 tag 的 Release**（CI 用 secret `HUB_RELEASE_TOKEN`）。官网读 `noxrick91/caw-agent-hub` 的 `releases/latest`。`caw-agent upgrade` 的默认仓库也应指向这里。
-
-一键安装（自定义域名，Cloudflare DNS → GitHub Pages）：
+Linux / macOS：
 
 ```bash
 curl -fsS https://agent.noxcaw.com/install | bash
 ```
 
-Windows：`irm https://agent.noxcaw.com/install.ps1 | iex`
+Windows PowerShell：
 
-Cloudflare：`agent` CNAME → `noxrick91.github.io`，先灰云。仓库根 `CNAME` 为 `agent.noxcaw.com`。Pages 勾选 Enforce HTTPS。
+```powershell
+irm https://agent.noxcaw.com/install.ps1 | iex
+```
 
-## 相关
+把 `~/.caw-agent/bin` 加进 PATH 之后：
 
-| 项目 | 可见性 | 说明 |
-|------|--------|------|
-| `caw-agent` | 私有 | 源码与 CI |
-| `caw-agent-hub` | 公开 | 官网、手册、Release 资产、官方 MCP 包 |
+```bash
+caw-agent --workdir .
+```
 
-官方 MCP 在 [`mcp/`](mcp/)。用户在 agent 里 `/mcp install browser`（或 `owner/repo`）即可，不必克隆本仓。
+用 `/model add` 配置模型，或设置 `OPENAI_API_KEY` / `ANTHROPIC_API_KEY`。升级：
+
+```text
+caw-agent upgrade now
+```
+
+完整说明见 [文档](https://agent.noxcaw.com/docs.html)。
+
+## 它做什么
+
+- **动手干活** — 在你的项目里读代码、改文件、跑测试
+- **安全可控** — 只访问你打开的目录；写盘和命令都会先问你
+- **过程透明** — 每一步都显示在终端里，随时可以介入
+
+支持 Linux（x64 / arm64）、macOS（Apple Silicon / Intel）、Windows x64。
+
+## 扩展
+
+官方 MCP 可在 agent 里直接安装，例如：
+
+```text
+/mcp install browser
+```
+
+也提供 `doc`、`image`、`ocr`、`speech`、`freecad`、`blender`。

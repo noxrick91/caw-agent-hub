@@ -79,6 +79,30 @@ async function loadGithubReleases() {
   return data;
 }
 
+function embeddedLatest() {
+  const tag = "v0.1.2";
+  return [
+    {
+      tag_name: tag,
+      published_at: "2026-08-14T06:47:38Z",
+      assets: [
+        ...ASSETS.map((a) => ({
+          name: a.file,
+          size: 0,
+          browser_download_url: assetUrl(tag, a.file),
+          download_count: 0,
+        })),
+        {
+          name: "SHA256SUMS",
+          size: 0,
+          browser_download_url: assetUrl(tag, "SHA256SUMS"),
+          download_count: 0,
+        },
+      ],
+    },
+  ];
+}
+
 async function loadRelease() {
   const local = await loadLocalLatest().catch(() => null);
   if (isReleaseList(local)) {
@@ -91,7 +115,7 @@ async function loadRelease() {
   }
   const remote = await loadGithubReleases().catch(() => null);
   if (isReleaseList(remote)) return remote;
-  throw new Error("no releases");
+  return embeddedLatest();
 }
 
 function byName(release, name) {
@@ -132,7 +156,16 @@ function pickLatest(releases) {
   );
 }
 
+let lastReleases = null;
+
+function claimDynamic(el) {
+  if (!el) return;
+  el.removeAttribute("data-i18n");
+  el.removeAttribute("data-i18n-html");
+}
+
 async function renderHome(releases) {
+  lastReleases = releases;
   const release = pickLatest(releases);
   if (!release) throw new Error("no releases");
   const tag = release.tag_name || "latest";
@@ -149,6 +182,8 @@ async function renderHome(releases) {
   const d = typeof dict === "function" ? dict() : null;
   const recBtn = document.getElementById("dl-recommended");
   const recMeta = document.getElementById("dl-meta");
+  claimDynamic(recBtn);
+  claimDynamic(recMeta);
   recBtn.href = recAsset ? recAsset.browser_download_url : assetUrl(tag, rec.file);
   recBtn.textContent = `${(d?.dl?.prefix) || "下载"} ${rec.label}`;
   recBtn.removeAttribute("aria-disabled");
@@ -177,7 +212,7 @@ async function renderHome(releases) {
     const a = byName(release, item.file);
     const tr = document.createElement("tr");
     const href = a ? a.browser_download_url : assetUrl(tag, item.file);
-    const size = a ? `${(a.size / 1024 / 1024).toFixed(1)} MB` : "—";
+    const size = a && a.size ? `${(a.size / 1024 / 1024).toFixed(1)} MB` : "—";
     const latest = a ? a.download_count || 0 : null;
     const all = assetDownloads(releases, item.file);
     tr.innerHTML = `
@@ -208,10 +243,13 @@ async function renderHome(releases) {
 function showError(err) {
   const d = typeof dict === "function" ? dict() : null;
   const recBtn = document.getElementById("dl-recommended");
+  const recMeta = document.getElementById("dl-meta");
+  claimDynamic(recBtn);
+  claimDynamic(recMeta);
   recBtn.href = "#install";
   recBtn.textContent = d?.dl?.releases || "用安装命令";
   recBtn.removeAttribute("aria-disabled");
-  document.getElementById("dl-meta").innerHTML =
+  recMeta.innerHTML =
     `<span class="err">${d?.dl?.error || "暂时读不到 latest。请到 Releases 手动下载。"}</span>`;
 }
 
@@ -257,6 +295,9 @@ detectPlatform().then((p) => {
   detectedPlatform = p;
   applyInstall(p);
 });
-document.addEventListener("caw-lang", () => applyInstall(detectedPlatform));
+document.addEventListener("caw-lang", () => {
+  applyInstall(detectedPlatform);
+  if (lastReleases) renderHome(lastReleases);
+});
 
 loadRelease().then(renderHome).catch(showError);

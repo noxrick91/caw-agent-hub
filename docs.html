@@ -10,39 +10,62 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/style.css">
+  <link rel="stylesheet" href="./assets/docs.css">
 </head>
-<body>
-  <div class="wrap">
-    <header class="top">
-      <a class="brand" href="./">
+<body class="docs">
+  <header class="docs-top">
+    <div class="docs-top-inner">
+      <a class="brand" href="./" data-keep-lang>
         <img src="./assets/favicon.svg" alt="">
         caw-agent
       </a>
       <nav class="nav">
         <a href="./" data-keep-lang data-i18n="nav.download">下载</a>
-        <a href="./docs.html" aria-current="page" data-keep-lang data-i18n="nav.docs">文档</a>
+        <a href="./docs.html#/安装" aria-current="page" data-keep-lang data-i18n="nav.docs">文档</a>
         <span class="lang">
           <button type="button" data-lang="zh">中文</button>
           <button type="button" data-lang="en">EN</button>
         </span>
       </nav>
-    </header>
+    </div>
+  </header>
 
-    <div class="docs-shell">
-      <nav class="toc" id="toc" aria-label="toc">
-        <p class="toc-title" data-i18n="docs.toc">目录</p>
-        <div id="toc-list"></div>
-      </nav>
+  <div class="docs-layout">
+    <aside class="docs-side" id="docs-side">
+      <p class="docs-side-label" data-i18n="nav.docs">文档</p>
+      <p class="docs-product">caw-agent</p>
+      <nav class="docs-nav" id="docs-nav" aria-label="docs"></nav>
+    </aside>
+
+    <main class="docs-main">
+      <div class="docs-mobile-bar">
+        <button class="docs-contents-btn" id="docs-contents-btn" type="button" data-i18n="docs.contents">目录</button>
+        <button class="docs-search docs-search-compact" id="docs-search-btn-mobile" type="button" data-i18n="docs.search">搜索文档…</button>
+      </div>
+      <button class="docs-search" id="docs-search-btn" type="button">
+        <span data-i18n="docs.search">搜索文档…</span>
+        <kbd id="docs-search-kbd">Ctrl K</kbd>
+      </button>
+      <p class="docs-crumb" id="docs-crumb"></p>
       <article class="prose" id="prose">
         <p class="meta" data-i18n="docs.loading">正在加载文档…</p>
       </article>
-    </div>
+      <nav class="docs-pager" id="docs-pager"></nav>
+    </main>
 
-    <footer>
-      <span><a href="./" data-keep-lang data-i18n="nav.download">下载</a></span>
-      <span data-i18n="footer">预编译发行，不开放源代码。</span>
-    </footer>
+    <aside class="docs-right" id="docs-right">
+      <p class="docs-right-label" data-i18n="docs.onpage">本页目录</p>
+      <nav id="toc-list" aria-label="on this page"></nav>
+    </aside>
   </div>
+
+  <div class="docs-modal" id="docs-modal" hidden>
+    <div class="docs-modal-box">
+      <input id="docs-search-input" type="search" autocomplete="off" data-i18n-placeholder="docs.search" placeholder="搜索文档…">
+      <div id="docs-search-hits"></div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
   <script src="./assets/i18n.js"></script>
   <script src="./assets/docs.js"></script>

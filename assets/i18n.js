@@ -37,7 +37,18 @@ const I18N = {
       seeT: "过程透明",
       see: "读、改、跑，每一步都实时显示在眼前。想介入或叫停，随时都可以。",
     },
-    docs: { loading: "正在加载文档…", fail: "文档加载失败。请用本地 HTTP 服务打开，不要用 file://。", toc: "目录" },
+    docs: {
+      loading: "正在加载文档…",
+      fail: "文档加载失败。请用本地 HTTP 服务打开，不要用 file://。",
+      toc: "目录",
+      onpage: "本页目录",
+      search: "搜索文档…",
+      product: "caw-agent",
+      prev: "上一页",
+      next: "下一页",
+      nohits: "没有匹配的页面。",
+      contents: "目录",
+    },
     table: {
       platform: "平台",
       build: "版本",
@@ -110,7 +121,18 @@ const I18N = {
       seeT: "Everything in plain sight",
       see: "Reads, edits, and runs happen live on screen. Jump in or stop it whenever you want.",
     },
-    docs: { loading: "Loading docs…", fail: "Could not load the docs. Serve this site over HTTP, not file://.", toc: "Contents" },
+    docs: {
+      loading: "Loading docs…",
+      fail: "Could not load the docs. Serve this site over HTTP, not file://.",
+      toc: "Contents",
+      onpage: "On this page",
+      search: "Search the docs…",
+      product: "caw-agent",
+      prev: "Previous",
+      next: "Next",
+      nohits: "No matching pages.",
+      contents: "Contents",
+    },
     table: {
       platform: "Platform",
       build: "Version",
@@ -198,12 +220,21 @@ function applyI18n(root = document) {
     const val = lookup(d, el.getAttribute("data-i18n-html"));
     if (val != null) el.innerHTML = String(val).replace(/\n/g, "<br>");
   });
+  root.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    const val = lookup(d, el.getAttribute("data-i18n-placeholder"));
+    if (val != null) el.setAttribute("placeholder", val);
+  });
   root.querySelectorAll("[data-lang]").forEach((btn) => {
-    btn.setAttribute("aria-current", btn.getAttribute("data-lang") === getLang() ? "true" : "false");
+    if (btn.getAttribute("data-lang") === getLang()) btn.setAttribute("aria-current", "true");
+    else btn.removeAttribute("aria-current");
   });
   root.querySelectorAll("a[data-keep-lang]").forEach((a) => {
-    const base = (a.getAttribute("href") || "./").split("?")[0];
-    a.setAttribute("href", `${base}?lang=${getLang()}`);
+    const href = a.getAttribute("href") || "./";
+    const hashAt = href.indexOf("#");
+    const hash = hashAt >= 0 ? href.slice(hashAt) : "";
+    const before = hashAt >= 0 ? href.slice(0, hashAt) : href;
+    const path = before.split("?")[0];
+    a.setAttribute("href", `${path}?lang=${getLang()}${hash}`);
   });
 }
 
