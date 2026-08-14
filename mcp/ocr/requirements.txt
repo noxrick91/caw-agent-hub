@@ -1,0 +1,7 @@
+Pillow>=10.0.0
+pytesseract>=0.3.10
+
+# Optional local engines (pick one)
+# easyocr>=1.7.0
+# paddleocr>=2.7.0
+# paddlepaddle>=2.6.0

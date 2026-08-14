@@ -1,0 +1,7 @@
+Pillow>=10.0.0
+rembg>=2.0.50
+opencv-contrib-python>=4.8.0
+
+# Text-prompt cutout ("the red car") — large (torch)
+# transformers>=4.36.0
+# torch>=2.0.0

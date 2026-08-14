@@ -1,0 +1,13 @@
+{
+  "repo": "noxrick91/caw-agent-hub",
+  "prefix": "mcp",
+  "packs": [
+    { "name": "browser", "description": "Headless Chromium — snapshot, click, type (Playwright)" },
+    { "name": "doc", "description": "Extract text from PDF, Office, and other documents" },
+    { "name": "image", "description": "Cutout, resize, and basic image edits" },
+    { "name": "ocr", "description": "Read text from images and scans" },
+    { "name": "speech", "description": "Speech to text" },
+    { "name": "freecad", "description": "FreeCAD modeling, export, URDF" },
+    { "name": "blender", "description": "Blender modeling, render, CAD handoff" }
+  ]
+}

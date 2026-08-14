@@ -2,3 +2,7 @@
 *.log
 .idea/
 .vscode/
+.caw-agent/
+__pycache__/
+*.py[cod]
+.pytest_cache/

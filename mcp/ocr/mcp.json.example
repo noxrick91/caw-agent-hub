@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "ocr": {
+      "command": "python",
+      "args": ["mcp/ocr/server.py"],
+      "env": {
+        "OCR_BACKEND": "auto",
+        "OCR_LANG": "chi_sim+eng",
+        "OCR_MCP_LOG": ".caw-agent/ocr-mcp.log"
+      },
+      "description": "OCR — extract text from images"
+    }
+  }
+}

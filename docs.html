@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>使用文档 — caw-agent</title>
-  <meta name="description" content="caw-agent 安装、升级、斜杠命令、权限沙箱与无头模式说明。">
+  <title data-i18n-title="docs">文档 — caw-agent</title>
+  <meta name="description" data-i18n-desc="docs" content="安装、升级、斜杠命令、权限沙箱与无头模式。">
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,26 +19,32 @@
         caw-agent
       </a>
       <nav class="nav">
-        <a href="./">下载</a>
-        <a href="./docs.html" aria-current="page">文档</a>
-        <a href="./content/README.md">Markdown</a>
-        <a href="https://github.com/noxrick91/caw-agent">源码</a>
+        <a href="./" data-keep-lang data-i18n="nav.download">下载</a>
+        <a href="./docs.html" aria-current="page" data-keep-lang data-i18n="nav.docs">文档</a>
+        <span class="lang">
+          <button type="button" data-lang="zh">中文</button>
+          <button type="button" data-lang="en">EN</button>
+        </span>
       </nav>
     </header>
 
     <div class="docs-shell">
-      <nav class="toc" id="toc" aria-label="目录"></nav>
+      <nav class="toc" id="toc" aria-label="toc">
+        <p class="toc-title" data-i18n="docs.toc">目录</p>
+        <div id="toc-list"></div>
+      </nav>
       <article class="prose" id="prose">
-        <p class="meta">正在加载手册…</p>
+        <p class="meta" data-i18n="docs.loading">正在加载文档…</p>
       </article>
     </div>
 
     <footer>
-      <span><a href="./">返回下载</a></span>
-      <span>原文 <a href="./content/README.md">content/README.md</a></span>
+      <span><a href="./" data-keep-lang data-i18n="nav.download">下载</a></span>
+      <span data-i18n="footer">预编译发行，不开放源代码。</span>
     </footer>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
+  <script src="./assets/i18n.js"></script>
   <script src="./assets/docs.js"></script>
 </body>
 </html>

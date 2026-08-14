@@ -1,0 +1,2 @@
+# Optional PDF engine (Office/HTML/RTF need nothing extra)
+pypdf>=4.0.0

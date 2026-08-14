@@ -1,8 +1,14 @@
 # caw-agent-hub
 
+[![downloads](https://img.shields.io/github/downloads/noxrick91/caw-agent-hub/total)](https://github.com/noxrick91/caw-agent-hub/releases)
+
 [caw-agent](https://github.com/noxrick91/caw-agent) 的公开主页与发布通道：下载预编译包、阅读手册。
 
+**使用手册（对外唯一维护处）：** [`content/README.md`](content/README.md)，站点上是 [docs.html](docs.html)。
+
 源码仓保持私有。访客只从**本仓库的 GitHub Release** 取二进制和 `SHA256SUMS`，不访问私有 API。
+
+下载量：GitHub 给每个 Release 资产记 `download_count`。官网首页汇总本版与累计（不含 `install` 脚本本身）。仓库页也可用 [shields.io](https://img.shields.io/github/downloads/noxrick91/caw-agent-hub/total) 徽章。
 
 ## 本地预览
 
@@ -19,13 +25,23 @@ GitHub Pages：Settings → Pages → `master` / `/ (root)`。本仓需为 **pub
 
 ## 发布二进制
 
-私有 `caw-agent` 在 `v*` 标签上编好后，把五个平台资产和 `SHA256SUMS` 上传到 **本仓同名 tag 的 Release**。官网读 `noxrick91/caw-agent-hub` 的 `releases/latest`。`caw-agent upgrade` 的默认仓库也应指向这里。
+私有 `caw-agent` 在 `v*` 标签上编好后，把五个平台资产和 `SHA256SUMS` 上传到 **本仓同名 tag 的 Release**（CI 用 secret `HUB_RELEASE_TOKEN`）。官网读 `noxrick91/caw-agent-hub` 的 `releases/latest`。`caw-agent upgrade` 的默认仓库也应指向这里。
 
-安装脚本请放在本仓（或站点内），不要从私有仓的 `raw.githubusercontent.com` 拉。
+一键安装（自定义域名，Cloudflare DNS → GitHub Pages）：
+
+```bash
+curl -fsS https://agent.noxcaw.com/install | bash
+```
+
+Windows：`irm https://agent.noxcaw.com/install.ps1 | iex`
+
+Cloudflare：`agent` CNAME → `noxrick91.github.io`，先灰云。仓库根 `CNAME` 为 `agent.noxcaw.com`。Pages 勾选 Enforce HTTPS。
 
 ## 相关
 
 | 项目 | 可见性 | 说明 |
 |------|--------|------|
 | `caw-agent` | 私有 | 源码与 CI |
-| `caw-agent-hub` | 公开 | 官网、手册、Release 资产 |
+| `caw-agent-hub` | 公开 | 官网、手册、Release 资产、官方 MCP 包 |
+
+官方 MCP 在 [`mcp/`](mcp/)。用户在 agent 里 `/mcp install browser`（或 `owner/repo`）即可，不必克隆本仓。

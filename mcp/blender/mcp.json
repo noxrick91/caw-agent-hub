@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "blender": {
+      "command": "python",
+      "args": ["server.py"],
+      "env": {
+        "BLENDER_BRIDGE_HOST": "127.0.0.1",
+        "BLENDER_BRIDGE_PORT": "54322",
+        "BLENDER_BACKEND": "auto",
+        "BLENDER_MCP_LOG": ".caw-agent/blender-mcp.log"
+      },
+      "description": "Control Blender for organic mesh modeling (bridge / blender --background)"
+    }
+  }
+}

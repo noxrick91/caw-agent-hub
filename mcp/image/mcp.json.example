@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "image": {
+      "command": "python",
+      "args": ["mcp/image/server.py"],
+      "env": {
+        "IMAGE_CUTOUT_BACKEND": "auto",
+        "IMAGE_SR_BACKEND": "auto",
+        "IMAGE_MCP_LOG": ".caw-agent/image-mcp.log"
+      },
+      "description": "Image cutout, resize, and super-resolution"
+    }
+  }
+}

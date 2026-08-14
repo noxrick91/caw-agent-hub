@@ -1,0 +1,2 @@
+# FreeCAD MCP — stdlib only (Content-Length framing matches caw-agent).
+# Optional: none. Run with system Python (bridge/cmd) or FreeCAD's python.exe (in-process).

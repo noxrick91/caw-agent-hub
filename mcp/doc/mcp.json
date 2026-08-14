@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "doc": {
+      "command": "python",
+      "args": ["server.py"],
+      "env": {
+        "DOC_MCP_LOG": ".caw-agent/doc-mcp.log"
+      },
+      "description": "Documents — extract text from PDF / Word / Excel / PowerPoint"
+    }
+  }
+}

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>caw-agent — 沙箱里的终端编程助手</title>
-  <meta name="description" content="下载最新 caw-agent，阅读安装与使用文档。Claude Code 风格 TUI，权限经纪，MCP，会话与记忆。">
+  <title data-i18n-title="home">caw-agent</title>
+  <meta name="description" data-i18n-desc="home" content="在终端里改代码：你的终端里多了一个会改代码的搭档。读、改、测试都在项目内完成，写盘和命令前先征求你的同意。">
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,72 +19,105 @@
         caw-agent
       </a>
       <nav class="nav">
-        <a href="./" aria-current="page">下载</a>
-        <a href="./docs.html">文档</a>
-        <a href="https://github.com/noxrick91/caw-agent">源码</a>
-        <a href="https://github.com/noxrick91/caw-agent/releases">Releases</a>
+        <a href="./" aria-current="page" data-keep-lang data-i18n="nav.download">下载</a>
+        <a href="./docs.html" data-keep-lang data-i18n="nav.docs">文档</a>
+        <span class="lang">
+          <button type="button" data-lang="zh">中文</button>
+          <button type="button" data-lang="en">EN</button>
+        </span>
       </nav>
     </header>
-
-    <section class="hero">
-      <p class="kicker">terminal coding agent</p>
-      <h1>在沙箱里写代码，<br>权限问过再动手。</h1>
-      <p class="lede">
-        Claude Code 风格的 TUI：文件 jail、exec OS 沙箱、MCP、会话记忆，以及从 GitHub Release 自更新。
-        预编译包装到 <code>~/.caw-agent/bin</code>。
-      </p>
-      <div class="row">
-        <a class="btn" id="dl-recommended" href="https://github.com/noxrick91/caw-agent/releases" aria-disabled="true">正在查找最新版…</a>
-        <a class="btn btn-ghost" href="./docs.html">使用文档</a>
-        <span class="meta" id="dl-meta">读取 GitHub releases/latest</span>
-      </div>
-    </section>
-
-    <div class="panel">
-      <header>
-        <span>Linux / macOS 一键安装 · 校验 SHA256</span>
-        <button class="copy" id="copy-install" type="button">复制</button>
-      </header>
-      <pre id="install-cmd">curl -fsSL https://raw.githubusercontent.com/noxrick91/caw-agent/master/scripts/install-release.sh | bash</pre>
-    </div>
-
-    <div class="grid">
-      <article class="card">
-        <h3>按平台选包</h3>
-        <p>首页根据浏览器推荐资产；脚本和 <code>caw-agent upgrade</code> 按本机 OS/ARCH 下载。</p>
-      </article>
-      <article class="card">
-        <h3>指定版本</h3>
-        <p><code>/upgrade v0.1.1</code> 或安装脚本传入标签。空的 <code>/upgrade</code> 只检查，不下载。</p>
-      </article>
-      <article class="card">
-        <h3>无头模式</h3>
-        <p><code>caw-agent --print -w . "…"</code> 适合 CI。权限 / 提问 / 计划可用 <code>--on-*</code> 自动回答。</p>
-      </article>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>平台</th>
-            <th>最新资产 <span id="release-tag" class="meta"></span></th>
-            <th>大小</th>
-          </tr>
-        </thead>
-        <tbody id="asset-rows">
-          <tr><td colspan="3" class="meta">加载中…</td></tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 
   <div class="wrap">
-    <footer>
-      <span>文档与下载站 · 二进制来自 <a href="https://github.com/noxrick91/caw-agent">noxrick91/caw-agent</a></span>
-      <span>本仓库 <a href="https://github.com/noxrick91/caw-agent-hub">caw-agent-hub</a></span>
-    </footer>
+    <section class="hero-split">
+      <div class="hero">
+        <p class="kicker" data-i18n="hero.kicker">你的终端里</p>
+        <h1 data-i18n-html="hero.title">多了一个<br>会改代码的搭档</h1>
+        <p class="lede" data-i18n="hero.lede">
+          读代码、改文件、跑测试，都在你打开的这个项目里完成。每次写盘或执行命令前，它都会停下来等你确认。
+        </p>
+        <div class="row">
+          <a class="btn" id="dl-recommended" href="#install" data-i18n="hero.downloading">加载中…</a>
+          <a class="btn btn-ghost" href="./docs.html" data-keep-lang data-i18n="hero.docs">文档</a>
+        </div>
+        <p class="meta" id="dl-meta" data-i18n="hero.waiting">正在加载最新版</p>
+      </div>
+      <div class="tui" id="stage" aria-hidden="true">
+        <div class="tui-head">
+          <span class="tui-brand">caw-agent</span>
+          <span class="tui-dim">v0.1.2</span>
+          <span class="tui-dim">·</span>
+          <span class="tui-dim">gpt-5.6</span>
+          <span class="tui-dim">·</span>
+          <span class="tui-dim">~/ledger</span>
+        </div>
+        <div class="tui-body" id="stage-body">
+          <div class="tui-log" id="stage-log"></div>
+          <div class="tui-sheet" id="stage-sheet" hidden>
+            <div class="tui-sheet-title" id="stage-sheet-title"></div>
+            <div class="tui-sheet-detail" id="stage-sheet-detail"></div>
+            <div class="tui-sheet-choices" id="stage-sheet-choices"></div>
+            <div class="tui-sheet-hint">↑↓ · 1–5 · esc deny · type to queue</div>
+          </div>
+        </div>
+        <div class="tui-prompt">
+          <div class="tui-box">
+            <span class="tui-gt">&gt;</span>
+            <span class="tui-ph" id="stage-input">Message · @ file · paste · / commands</span>
+          </div>
+          <div class="tui-mode"><span class="tui-dim">·</span> default</div>
+        </div>
+      </div>
+    </section>
+
+    <h2 class="sec" data-i18n="sec.install">安装</h2>
+    <div class="panel" id="install">
+      <header>
+        <span id="install-label">Linux</span>
+        <button class="copy" id="copy-install" type="button" data-i18n="install.copy">复制</button>
+      </header>
+      <pre id="install-cmd">curl -fsS https://agent.noxcaw.com/install | bash</pre>
+    </div>
+
+    <h2 class="sec" data-i18n="sec.why">为什么用它</h2>
+    <div class="grid">
+      <article class="card">
+        <h3 data-i18n="cards.capT">动手干活</h3>
+        <p data-i18n="cards.cap">它在你的项目里读代码、改文件、跑测试。不只是聊天，是真正干活的搭档。</p>
+      </article>
+      <article class="card">
+        <h3 data-i18n="cards.safeT">安全可控</h3>
+        <p data-i18n="cards.safe">它只访问你打开的这个目录。每次写盘、每条命令，都会先停下来征求你的同意。</p>
+      </article>
+      <article class="card">
+        <h3 data-i18n="cards.seeT">过程透明</h3>
+        <p data-i18n="cards.see">读、改、跑，每一步都实时显示在眼前。想介入或叫停，随时都可以。</p>
+      </article>
+    </div>
+
+    <h2 class="sec" data-i18n="sec.download">下载</h2>
+    <div class="table-wrap">
+      <p class="meta" id="dl-stats"></p>
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="table.platform">平台</th>
+            <th><span data-i18n="table.build">版本</span> <span id="release-tag" class="meta"></span></th>
+            <th data-i18n="table.size">大小</th>
+            <th class="num" data-i18n="table.this">本版</th>
+            <th class="num" data-i18n="table.total">累计</th>
+          </tr>
+        </thead>
+        <tbody id="asset-rows">
+          <tr><td colspan="5" class="meta" data-i18n="table.loading">加载中…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
+  <script src="./assets/i18n.js"></script>
+  <script src="./assets/stage.js"></script>
   <script src="./assets/app.js"></script>
 </body>
 </html>

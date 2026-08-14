@@ -1,0 +1,7 @@
+# Pick one local engine (faster-whisper recommended) and/or use the HTTP API.
+faster-whisper>=1.0.0
+# openai-whisper>=20231117
+
+# Microphone capture for record_and_transcribe
+sounddevice>=0.4.6
+numpy>=1.24.0

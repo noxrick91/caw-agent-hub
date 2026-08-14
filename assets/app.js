@@ -1,6 +1,6 @@
-const REPO = "noxrick91/caw-agent";
-const API = `https://api.github.com/repos/${REPO}/releases/latest`;
-const CACHE_KEY = "caw-release-latest";
+const REPO = "noxrick91/caw-agent-hub";
+const API = `https://api.github.com/repos/${REPO}/releases?per_page=100`;
+const CACHE_KEY = "caw-releases-v1";
 const CACHE_MS = 10 * 60 * 1000;
 
 const ASSETS = [
@@ -61,27 +61,79 @@ function byName(release, name) {
   return (release.assets || []).find((a) => a.name === name);
 }
 
-async function renderHome(release) {
+function fmtCount(n) {
+  if (n == null) return "—";
+  const loc = (typeof getLang === "function" && getLang() === "zh") ? "zh-CN" : "en-US";
+  return n.toLocaleString(loc);
+}
+
+function assetDownloads(releases, name) {
+  let n = 0;
+  for (const r of releases) {
+    const a = byName(r, name);
+    if (a) n += a.download_count || 0;
+  }
+  return n;
+}
+
+function binaryTotal(releases) {
+  const names = new Set(ASSETS.map((a) => a.file));
+  let n = 0;
+  for (const r of releases) {
+    for (const a of r.assets || []) {
+      if (names.has(a.name)) n += a.download_count || 0;
+    }
+  }
+  return n;
+}
+
+function pickLatest(releases) {
+  return (
+    releases.find((r) => !r.draft && !r.prerelease) ||
+    releases.find((r) => !r.draft) ||
+    releases[0]
+  );
+}
+
+async function renderHome(releases) {
+  const release = pickLatest(releases);
+  if (!release) throw new Error("no releases");
   const tag = release.tag_name || "latest";
   const date = release.published_at
-    ? new Date(release.published_at).toLocaleDateString("zh-CN")
+    ? new Date(release.published_at).toLocaleDateString(
+        typeof getLang === "function" && getLang() === "en" ? "en-US" : "zh-CN"
+      )
     : "";
   const platform = await detectPlatform();
   const rec = ASSETS.find((a) => a.id === platform) || ASSETS[0];
   const recAsset = byName(release, rec.file);
   const sums = byName(release, "SHA256SUMS");
 
+  const d = typeof dict === "function" ? dict() : null;
   const recBtn = document.getElementById("dl-recommended");
   const recMeta = document.getElementById("dl-meta");
   recBtn.href = recAsset ? recAsset.browser_download_url : assetUrl(tag, rec.file);
-  recBtn.textContent = `下载 ${rec.label}`;
+  recBtn.textContent = `${(d?.dl?.prefix) || "下载"} ${rec.label}`;
   recBtn.removeAttribute("aria-disabled");
-  recMeta.textContent = `${tag} · ${rec.file}${date ? ` · ${date}` : ""}`;
+  const latestBin = binaryTotal([release]);
+  const allBin = binaryTotal(releases);
+  recMeta.textContent = d?.table?.meta
+    ? d.table.meta(tag, rec.file, date, fmtCount(latestBin), fmtCount(allBin))
+    : `${tag} · ${rec.file}${date ? ` · ${date}` : ""} · ${fmtCount(latestBin)} · ${fmtCount(allBin)}`;
+  const stats = document.getElementById("dl-stats");
+  if (stats) {
+    const versions = releases.filter((r) => !r.draft).length;
+    stats.textContent = d?.table?.stats
+      ? d.table.stats(fmtCount(latestBin), fmtCount(allBin), versions)
+      : `${fmtCount(latestBin)} / ${fmtCount(allBin)} (${versions})`;
+  }
 
   document.getElementById("release-tag").textContent = tag;
-  document.getElementById("install-cmd").textContent =
-    "curl -fsSL https://raw.githubusercontent.com/noxrick91/caw-agent/master/scripts/install-release.sh | bash";
+  detectedPlatform = platform;
+  applyInstall(platform);
 
+  const hereLabel = d?.table?.here || "本机";
+  const checksumLabel = d?.table?.checksum || "校验和";
   const body = document.getElementById("asset-rows");
   body.replaceChildren();
   for (const item of ASSETS) {
@@ -89,15 +141,24 @@ async function renderHome(release) {
     const tr = document.createElement("tr");
     const href = a ? a.browser_download_url : assetUrl(tag, item.file);
     const size = a ? `${(a.size / 1024 / 1024).toFixed(1)} MB` : "—";
+    const latest = a ? a.download_count || 0 : null;
+    const all = assetDownloads(releases, item.file);
     tr.innerHTML = `
-      <td>${item.label}${item.id === platform ? " <span class='meta'>本机</span>" : ""}</td>
+      <td>${item.label}${item.id === platform ? ` <span class='meta'>${hereLabel}</span>` : ""}</td>
       <td><a href="${href}">${item.file}</a></td>
-      <td class="meta">${size}</td>`;
+      <td class="meta">${size}</td>
+      <td class="num">${fmtCount(latest)}</td>
+      <td class="num">${fmtCount(all)}</td>`;
     body.appendChild(tr);
   }
   if (sums) {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>校验和</td><td><a href="${sums.browser_download_url}">SHA256SUMS</a></td><td class="meta">—</td>`;
+    tr.innerHTML = `
+      <td>${checksumLabel}</td>
+      <td><a href="${sums.browser_download_url}">SHA256SUMS</a></td>
+      <td class="meta">—</td>
+      <td class="num">${fmtCount(sums.download_count || 0)}</td>
+      <td class="num">${fmtCount(assetDownloads(releases, "SHA256SUMS"))}</td>`;
     body.appendChild(tr);
   }
 
@@ -108,25 +169,57 @@ async function renderHome(release) {
 }
 
 function showError(err) {
+  const d = typeof dict === "function" ? dict() : null;
   const recBtn = document.getElementById("dl-recommended");
-  recBtn.href = `https://github.com/${REPO}/releases`;
-  recBtn.textContent = "打开 GitHub Releases";
+  recBtn.href = "#install";
+  recBtn.textContent = d?.dl?.releases || "用安装命令";
   recBtn.removeAttribute("aria-disabled");
   document.getElementById("dl-meta").innerHTML =
-    `<span class="err">暂时读不到 latest（${err.message}）。请到 Releases 手动下载。</span>`;
+    `<span class="err">${d?.dl?.error || "暂时读不到 latest。请到 Releases 手动下载。"}</span>`;
 }
 
-document.getElementById("copy-install")?.addEventListener("click", async () => {
-  const text = document.getElementById("install-cmd").textContent;
-  try {
-    await navigator.clipboard.writeText(text);
-    document.getElementById("copy-install").textContent = "已复制";
-    setTimeout(() => {
-      document.getElementById("copy-install").textContent = "复制";
-    }, 1400);
-  } catch {
-    /* ignore */
-  }
+const INSTALL_UNIX = "curl -fsS https://agent.noxcaw.com/install | bash";
+const INSTALL_WIN = "irm https://agent.noxcaw.com/install.ps1 | iex";
+
+function installLabel(platform) {
+  const d = typeof dict === "function" ? dict().install : null;
+  if (platform === "win-x64") return d?.win || "Windows";
+  if (platform === "mac-arm64" || platform === "mac-x64") return d?.mac || "macOS";
+  if (platform === "linux-x64" || platform === "linux-arm64") return d?.linux || "Linux";
+  return d?.unix || "Linux / macOS";
+}
+
+function applyInstall(platform) {
+  const win = platform === "win-x64";
+  const cmd = document.getElementById("install-cmd");
+  if (cmd) cmd.textContent = win ? INSTALL_WIN : INSTALL_UNIX;
+  const label = document.getElementById("install-label");
+  if (label) label.textContent = installLabel(platform);
+}
+
+function bindCopy(btnId, preId) {
+  document.getElementById(btnId)?.addEventListener("click", async () => {
+    const text = document.getElementById(preId)?.textContent;
+    if (!text) return;
+    const d = typeof dict === "function" ? dict().install : null;
+    try {
+      await navigator.clipboard.writeText(text);
+      document.getElementById(btnId).textContent = d?.copied || "已复制";
+      setTimeout(() => {
+        document.getElementById(btnId).textContent = d?.copy || "复制";
+      }, 1400);
+    } catch {
+      /* ignore */
+    }
+  });
+}
+bindCopy("copy-install", "install-cmd");
+
+let detectedPlatform = "linux-x64";
+detectPlatform().then((p) => {
+  detectedPlatform = p;
+  applyInstall(p);
 });
+document.addEventListener("caw-lang", () => applyInstall(detectedPlatform));
 
 loadRelease().then(renderHome).catch(showError);

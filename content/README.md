@@ -1,26 +1,40 @@
 # caw-agent 使用手册
 
-沙箱里的终端编程助手：Claude Code 风格 TUI、权限经纪、MCP、会话与记忆。预编译包从 [GitHub Releases](https://github.com/noxrick91/caw-agent/releases) 安装到 `~/.caw-agent/bin`。
-
-源码：<https://github.com/noxrick91/caw-agent>
+沙箱里的终端编程助手：Claude Code 风格 TUI、权限经纪、MCP、会话与记忆。预编译包从本站所属仓库的 [GitHub Releases](https://github.com/noxrick91/caw-agent-hub/releases) 安装到 `~/.caw-agent/bin`。源码仓私有，不对外。
 
 ---
 
 ## 安装
 
-### 一键脚本（Linux / macOS）
+### 一键安装
+
+Linux / macOS / Git Bash：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/noxrick91/caw-agent/master/scripts/install-release.sh | bash
+curl -fsS https://agent.noxcaw.com/install | bash
 ```
 
 指定版本：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/noxrick91/caw-agent/master/scripts/install-release.sh | bash -s -- v0.1.1
+curl -fsS https://agent.noxcaw.com/install | bash -s -- v0.1.1
+# 或
+CAW_TAG=v0.1.1 curl -fsS https://agent.noxcaw.com/install | bash
 ```
 
-脚本按本机 `uname` 选择资产，下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin/caw-agent`。若该路径已有二进制，会转交给 `caw-agent upgrade`。
+Windows PowerShell：
+
+```powershell
+irm https://agent.noxcaw.com/install.ps1 | iex
+```
+
+脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、macOS Apple Silicon/Intel、Windows x64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。已安装且装 latest 时会走 `caw-agent upgrade now`。
+
+Pages 尚未生效时可用：
+
+```bash
+curl -fsS https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install | bash
+```
 
 把目录加入 PATH：
 
@@ -30,7 +44,7 @@ export PATH="$HOME/.caw-agent/bin:$PATH"
 
 ### 官网 / 手动下载
 
-打开本站首页，按平台下载最新资产，放到 `~/.caw-agent/bin`（Windows 为 `%USERPROFILE%\.caw-agent\bin\caw-agent.exe`），并对照 `SHA256SUMS`。
+打开本站首页，按平台下载最新资产，放到 `~/.caw-agent/bin`（Windows 为 `%USERPROFILE%\.caw-agent\bin\caw-agent.exe`），并对照 `SHA256SUMS`。首页表格的「本版 / 累计」来自 GitHub Release 每个资产的 `download_count`：一键安装、`caw-agent upgrade`、浏览器手动下载都会加一。拉 Pages 上的 `install` 脚本本身不计入；`SHA256SUMS` 单独计数（每次安装会先下校验文件）。`upgrade --check` 只打 API，不增加下载量。
 
 | 平台 | 资产 |
 |------|------|
@@ -66,17 +80,16 @@ caw-agent upgrade now
 caw-agent upgrade v0.1.1
 ```
 
-下载时显示字节与百分比；校验 SHA256；装完跑 `--version`，对不上会恢复 `.bak`。仓库可用 `CAW_GITHUB=owner/name` 覆盖，默认 `noxrick91/caw-agent`。API 限额紧张时设 `GH_TOKEN` 或 `CAW_GITHUB_TOKEN`。
+下载时显示字节与百分比；校验 SHA256；装完跑 `--version`，对不上会恢复 `.bak`。默认读公开仓 `noxrick91/caw-agent-hub`。可用 `CAW_GITHUB=owner/name` 覆盖。
 
 Windows 若正在替换自己，会旁路写入并提示重启后再生效。
 
 ### 从源码安装
 
+源码仓不公开。有权限的开发者在私有 `caw-agent` 仓库里：
+
 ```bash
-git clone https://github.com/noxrick91/caw-agent.git
-cd caw-agent
 ./scripts/install.sh          # cargo install → ~/.caw-agent/bin
-# 或
 cargo run -p caw-agent -- --workdir .
 ```
 
@@ -375,7 +388,7 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 }
 ```
 
-树内包装在 `mcp/`：FreeCAD、Blender、image、OCR、speech、doc、**browser**（Playwright Chromium）。`/mcp install browser` 后使用 `mcp__browser__*`。
+官方包装在公开仓 `mcp/`（[目录](https://github.com/noxrick91/caw-agent-hub/tree/master/mcp)）：browser、doc、image、ocr、speech、freecad、blender。`/mcp install <name>` 从 GitHub 下载到 `~/.caw-agent/mcp/<name>/`。也可以装任意 GitHub 包：`/mcp install owner/repo` 或仓库 URL。工作区里的 `./mcp/<name>`、文件夹、zip 仍然可用。`/mcp install browser` 之后用 `mcp__browser__*`。
 
 附加音频只是路径，**不会**自动转写。用户明确要求转写时再用 speech 包。
 
@@ -441,7 +454,7 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 
 | 现象 | 处理 |
 |------|------|
-| 升级 HTTP 404 | 该 tag 还没有 Release，或 workflow 仍在编。看 [Releases](https://github.com/noxrick91/caw-agent/releases) |
+| 升级 HTTP 404 | 该 tag 还没有 Release，或私有仓还没把产物推到 hub。看 [Releases](https://github.com/noxrick91/caw-agent-hub/releases) |
 | 没有本平台资产 | 矩阵只有上表五个目标 |
 | GitHub 403 / 429 | 设置 `GH_TOKEN` 或 `CAW_GITHUB_TOKEN` |
 | SHA256 不符 | 重新下；不要混用不同 tag 的 sums 与二进制 |
@@ -451,4 +464,4 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 | `--print` 退出码 2 | 默认 `fail`：权限 / 提问 / 计划需要人。改 `--on-approval` / `--on-ask` / `--on-plan` |
 | 找不到命令 | `export PATH="$HOME/.caw-agent/bin:$PATH"` |
 
-更多实现细节见源码仓库里的 [`crates/caw-agent/README.md`](https://github.com/noxrick91/caw-agent/blob/master/crates/caw-agent/README.md)。
+本手册是对外使用说明的唯一维护处。实现细节只在私有源码仓里。

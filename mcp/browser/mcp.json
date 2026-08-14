@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "browser": {
+      "command": "python",
+      "args": ["server.py"],
+      "env": {
+        "BROWSER_MCP_LOG": ".caw-agent/browser-mcp.log"
+      },
+      "description": "Headless Chromium — snapshot, click, type, screenshot (Playwright)"
+    }
+  }
+}

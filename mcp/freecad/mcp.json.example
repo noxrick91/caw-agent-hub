@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "freecad": {
+      "command": "python",
+      "args": ["mcp/freecad/server.py"],
+      "env": {
+        "FREECAD_BRIDGE_HOST": "127.0.0.1",
+        "FREECAD_BRIDGE_PORT": "54321",
+        "FREECAD_BACKEND": "auto",
+        "FREECAD_MCP_LOG": ".caw-agent/freecad-mcp.log"
+      },
+      "description": "Control FreeCAD for 3D modeling (bridge / FreeCADCmd / in-process)"
+    }
+  }
+}

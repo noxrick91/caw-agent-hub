@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "speech": {
+      "command": "python",
+      "args": ["server.py"],
+      "env": {
+        "SPEECH_BACKEND": "auto",
+        "SPEECH_MCP_LOG": ".caw-agent/speech-mcp.log"
+      },
+      "description": "Speech-to-text (Whisper local or OpenAI-compatible API)"
+    }
+  }
+}
