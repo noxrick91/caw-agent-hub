@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>caw-agent — 沙箱里的终端编程助手</title>
+  <meta name="description" content="下载最新 caw-agent，阅读安装与使用文档。Claude Code 风格 TUI，权限经纪，MCP，会话与记忆。">
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a class="brand" href="./">
+        <img src="./assets/favicon.svg" alt="">
+        caw-agent
+      </a>
+      <nav class="nav">
+        <a href="./" aria-current="page">下载</a>
+        <a href="./docs.html">文档</a>
+        <a href="https://github.com/noxrick91/caw-agent">源码</a>
+        <a href="https://github.com/noxrick91/caw-agent/releases">Releases</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <p class="kicker">terminal coding agent</p>
+      <h1>在沙箱里写代码，<br>权限问过再动手。</h1>
+      <p class="lede">
+        Claude Code 风格的 TUI：文件 jail、exec OS 沙箱、MCP、会话记忆，以及从 GitHub Release 自更新。
+        预编译包装到 <code>~/.caw-agent/bin</code>。
+      </p>
+      <div class="row">
+        <a class="btn" id="dl-recommended" href="https://github.com/noxrick91/caw-agent/releases" aria-disabled="true">正在查找最新版…</a>
+        <a class="btn btn-ghost" href="./docs.html">使用文档</a>
+        <span class="meta" id="dl-meta">读取 GitHub releases/latest</span>
+      </div>
+    </section>
+
+    <div class="panel">
+      <header>
+        <span>Linux / macOS 一键安装 · 校验 SHA256</span>
+        <button class="copy" id="copy-install" type="button">复制</button>
+      </header>
+      <pre id="install-cmd">curl -fsSL https://raw.githubusercontent.com/noxrick91/caw-agent/master/scripts/install-release.sh | bash</pre>
+    </div>
+
+    <div class="grid">
+      <article class="card">
+        <h3>按平台选包</h3>
+        <p>首页根据浏览器推荐资产；脚本和 <code>caw-agent upgrade</code> 按本机 OS/ARCH 下载。</p>
+      </article>
+      <article class="card">
+        <h3>指定版本</h3>
+        <p><code>/upgrade v0.1.1</code> 或安装脚本传入标签。空的 <code>/upgrade</code> 只检查，不下载。</p>
+      </article>
+      <article class="card">
+        <h3>无头模式</h3>
+        <p><code>caw-agent --print -w . "…"</code> 适合 CI。权限 / 提问 / 计划可用 <code>--on-*</code> 自动回答。</p>
+      </article>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>平台</th>
+            <th>最新资产 <span id="release-tag" class="meta"></span></th>
+            <th>大小</th>
+          </tr>
+        </thead>
+        <tbody id="asset-rows">
+          <tr><td colspan="3" class="meta">加载中…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <footer>
+      <span>文档与下载站 · 二进制来自 <a href="https://github.com/noxrick91/caw-agent">noxrick91/caw-agent</a></span>
+      <span>本仓库 <a href="https://github.com/noxrick91/caw-agent-hub">caw-agent-hub</a></span>
+    </footer>
+  </div>
+  <script src="./assets/app.js"></script>
+</body>
+</html>
