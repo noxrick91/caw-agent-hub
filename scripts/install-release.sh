@@ -140,6 +140,7 @@ step "Detecting platform…"
 os="$(uname -s | tr '[:upper:]' '[:lower:]')"
 arch="$(uname -m)"
 bin_name="caw-agent"
+fallback_asset=""
 case "${os}-${arch}" in
   linux-x86_64 | linux-amd64)
     asset="caw-agent-x86_64-unknown-linux-gnu"
@@ -152,6 +153,11 @@ case "${os}-${arch}" in
     ;;
   darwin-x86_64)
     asset="caw-agent-x86_64-apple-darwin"
+    ;;
+  mingw*-aarch64 | mingw*-arm64 | msys*-aarch64 | msys*-arm64 | cygwin*-aarch64 | cygwin*-arm64 | windows*-aarch64 | windows*-arm64)
+    asset="caw-agent-aarch64-pc-windows-msvc.exe"
+    fallback_asset="caw-agent-x86_64-pc-windows-msvc.exe"
+    bin_name="caw-agent.exe"
     ;;
   mingw* | msys* | cygwin* | windows*)
     asset="caw-agent-x86_64-pc-windows-msvc.exe"
@@ -218,6 +224,11 @@ download "${base}/SHA256SUMS" "${tmp}/SHA256SUMS" "Fetching SHA256SUMS…"
 download "${base}/${asset}" "${tmp}/${asset}" "Downloading ${asset}…"
 
 expect="$(awk -v a="${asset}" '$NF==a || $NF=="*"a {print $1; exit}' "${tmp}/SHA256SUMS")"
+if [ -z "${expect}" ] && [ -n "${fallback_asset}" ]; then
+  step "No ${asset} in this release — using ${fallback_asset}"
+  asset="${fallback_asset}"
+  expect="$(awk -v a="${asset}" '$NF==a || $NF=="*"a {print $1; exit}' "${tmp}/SHA256SUMS")"
+fi
 [ -n "${expect}" ] || die "SHA256SUMS has no entry for ${asset}"
 got="$(sha256_of "${tmp}/${asset}")"
 if [ "${expect}" != "${got}" ]; then

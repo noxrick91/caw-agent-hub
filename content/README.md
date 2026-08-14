@@ -28,7 +28,7 @@ Windows PowerShell：
 irm https://agent.noxcaw.com/install.ps1 | iex
 ```
 
-脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、macOS Apple Silicon/Intel、Windows x64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。已安装且装 latest 时会走 `caw-agent upgrade now`。安装脚本会写入 `~/.caw-agent/env`，并在 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里加上 hook，然后 `source` 该 env。`curl | bash` 改不了你当前已经打开的 shell，新开终端即可，或执行 `source ~/.caw-agent/env`。不想改 rc 时设 `CAW_NO_PATH=1`。
+脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、macOS Apple Silicon/Intel、Windows x64/ARM64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。Windows ARM64 优先装原生包；该 Release 没有时回退到 x64（系统模拟运行）。已安装且装 latest 时会走 `caw-agent upgrade now`。安装脚本会写入 `~/.caw-agent/env`，并在 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里加上 hook，然后 `source` 该 env。`curl | bash` 改不了你当前已经打开的 shell，新开终端即可，或执行 `source ~/.caw-agent/env`。不想改 rc 时设 `CAW_NO_PATH=1`。
 
 Pages 尚未生效时可用：
 
@@ -47,8 +47,9 @@ curl -fsS https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/insta
 | macOS Apple Silicon | `caw-agent-aarch64-apple-darwin` |
 | macOS Intel | `caw-agent-x86_64-apple-darwin` |
 | Windows x64 | `caw-agent-x86_64-pc-windows-msvc.exe` |
+| Windows ARM64 | `caw-agent-aarch64-pc-windows-msvc.exe`（没有时安装器回退 x64） |
 
-不支持的组合（如 Windows ARM、Linux musl）没有预编译包，需从源码构建。
+不支持的组合（如 Linux musl、32 位 Windows）没有预编译包，需从源码构建。
 
 ### 已安装后升级
 
@@ -449,7 +450,7 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 | 现象 | 处理 |
 |------|------|
 | 升级 HTTP 404 | 该 tag 还没有 Release，或私有仓还没把产物推到 hub。看 [Releases](https://github.com/noxrick91/caw-agent-hub/releases) |
-| 没有本平台资产 | 矩阵只有上表五个目标 |
+| 没有本平台资产 | 矩阵只有上表列出的目标 |
 | GitHub 403 / 429 | 设置 `GH_TOKEN` 或 `CAW_GITHUB_TOKEN` |
 | SHA256 不符 | 重新下；不要混用不同 tag 的 sums 与二进制 |
 | `--version` 对不上 | 安装器会尝试恢复 `.bak` |

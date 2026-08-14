@@ -40,7 +40,7 @@ caw-agent upgrade now
 - **安全可控** — 只访问你打开的目录；写盘和命令都会先问你
 - **过程透明** — 每一步都显示在终端里，随时可以介入
 
-支持 Linux（x64 / arm64）、macOS（Apple Silicon / Intel）、Windows x64。
+支持 Linux（x64 / arm64）、macOS（Apple Silicon / Intel）、Windows（x64 / ARM64）。
 
 ## 扩展
 

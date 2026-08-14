@@ -10,12 +10,35 @@ $Tag = if ($env:CAW_TAG) { $env:CAW_TAG } else { "latest" }
 if ($Tag -eq "now") { $Tag = "latest" }
 if ($Tag -match '^[0-9]') { $Tag = "v$Tag" }
 
-$Arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-if ($Arch -ne "X64") {
-    throw "unsupported Windows architecture $Arch (need x64)"
+function Get-CawWindowsKind {
+    $names = @()
+    try {
+        $names += [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+    } catch { }
+    $names += $env:PROCESSOR_ARCHITECTURE
+    $names += $env:PROCESSOR_ARCHITEW6432
+    foreach ($raw in $names) {
+        if (-not $raw) { continue }
+        switch -Regex ($raw) {
+            '^(X64|AMD64|x64)$' { return "x64" }
+            '^(Arm64|ARM64|aarch64)$' { return "arm64" }
+        }
+    }
+    return ($names | Where-Object { $_ } | Select-Object -First 1)
 }
 
-$Asset = "caw-agent-x86_64-pc-windows-msvc.exe"
+$Kind = Get-CawWindowsKind
+$Fallback = "caw-agent-x86_64-pc-windows-msvc.exe"
+switch ($Kind) {
+    "x64" { $Candidates = @($Fallback) }
+    "arm64" {
+        $Candidates = @("caw-agent-aarch64-pc-windows-msvc.exe", $Fallback)
+    }
+    default {
+        throw "unsupported Windows architecture $Kind (need x64 or arm64)"
+    }
+}
+
 $Dest = Join-Path $BinDir "caw-agent.exe"
 if ($Tag -eq "latest") {
     $Base = "https://github.com/$Repo/releases/latest/download"
@@ -25,7 +48,7 @@ if ($Tag -eq "latest") {
 
 Write-Host ""
 Write-Host "caw-agent installer"
-Write-Host "  $Asset -> $Dest"
+Write-Host "  Windows $Kind"
 
 if ((Test-Path $Dest) -and $Tag -eq "latest") {
     Write-Host "Existing install found — running caw-agent upgrade now"
@@ -54,8 +77,22 @@ $Tmp = Join-Path $env:TEMP ("caw-agent-install-" + [guid]::NewGuid())
 New-Item -ItemType Directory -Force -Path $Tmp | Out-Null
 try {
     $Sums = Join-Path $Tmp "SHA256SUMS"
-    $Bin = Join-Path $Tmp $Asset
     Get-RemoteFile "$Base/SHA256SUMS" $Sums
+    $Asset = $null
+    foreach ($c in $Candidates) {
+        if (Get-Content $Sums | Where-Object { $_ -match [regex]::Escape($c) }) {
+            $Asset = $c
+            break
+        }
+    }
+    if (-not $Asset) {
+        throw "SHA256SUMS has no Windows build for $Kind — https://github.com/$Repo/releases"
+    }
+    if ($Kind -eq "arm64" -and $Asset -eq $Fallback) {
+        Write-Host "No native ARM64 build in this release — using x64 (Windows emulation)"
+    }
+    Write-Host "  $Asset -> $Dest"
+    $Bin = Join-Path $Tmp $Asset
     Get-RemoteFile "$Base/$Asset" $Bin
     $Expect = (Get-Content $Sums | Where-Object { $_ -match [regex]::Escape($Asset) } | Select-Object -First 1) `
         -split '\s+' | Select-Object -First 1

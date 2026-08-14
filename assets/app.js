@@ -10,6 +10,7 @@ const ASSETS = [
   { id: "mac-arm64", label: "macOS Apple Silicon", file: "caw-agent-aarch64-apple-darwin" },
   { id: "mac-x64", label: "macOS Intel", file: "caw-agent-x86_64-apple-darwin" },
   { id: "win-x64", label: "Windows x64", file: "caw-agent-x86_64-pc-windows-msvc.exe" },
+  { id: "win-arm64", label: "Windows ARM64", file: "caw-agent-aarch64-pc-windows-msvc.exe" },
 ];
 
 async function detectPlatform() {
@@ -19,7 +20,7 @@ async function detectPlatform() {
       const extra = await uaData.getHighEntropyValues(["architecture"]);
       const plat = `${uaData.platform || ""} ${extra.architecture || ""}`.toLowerCase();
       const arm = /arm/.test(plat);
-      if (/win/.test(plat)) return "win-x64";
+      if (/win/.test(plat)) return arm ? "win-arm64" : "win-x64";
       if (/mac/.test(plat)) return arm ? "mac-arm64" : "mac-x64";
       if (/linux/.test(plat)) return arm ? "linux-arm64" : "linux-x64";
     } catch {
@@ -32,7 +33,7 @@ async function detectPlatform() {
   const isMac = /Mac/i.test(plat) || /Mac OS/i.test(ua);
   const isLinux = /Linux/i.test(plat) || /Linux/i.test(ua);
   const isArm = /aarch64|arm64/i.test(ua);
-  if (isWin) return "win-x64";
+  if (isWin) return isArm ? "win-arm64" : "win-x64";
   if (isMac) return isArm ? "mac-arm64" : "mac-arm64";
   if (isLinux) return isArm ? "linux-arm64" : "linux-x64";
   return "linux-x64";
@@ -258,14 +259,14 @@ const INSTALL_WIN = "irm https://agent.noxcaw.com/install.ps1 | iex";
 
 function installLabel(platform) {
   const d = typeof dict === "function" ? dict().install : null;
-  if (platform === "win-x64") return d?.win || "Windows";
+  if (platform === "win-x64" || platform === "win-arm64") return d?.win || "Windows";
   if (platform === "mac-arm64" || platform === "mac-x64") return d?.mac || "macOS";
   if (platform === "linux-x64" || platform === "linux-arm64") return d?.linux || "Linux";
   return d?.unix || "Linux / macOS";
 }
 
 function applyInstall(platform) {
-  const win = platform === "win-x64";
+  const win = platform === "win-x64" || platform === "win-arm64";
   const cmd = document.getElementById("install-cmd");
   if (cmd) cmd.textContent = win ? INSTALL_WIN : INSTALL_UNIX;
   const label = document.getElementById("install-label");
