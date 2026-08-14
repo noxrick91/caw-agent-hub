@@ -28,18 +28,12 @@ Windows PowerShell：
 irm https://agent.noxcaw.com/install.ps1 | iex
 ```
 
-脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、macOS Apple Silicon/Intel、Windows x64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。已安装且装 latest 时会走 `caw-agent upgrade now`。
+脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、macOS Apple Silicon/Intel、Windows x64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。已安装且装 latest 时会走 `caw-agent upgrade now`。安装脚本会写入 `~/.caw-agent/env`，并在 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里加上 hook，然后 `source` 该 env。`curl | bash` 改不了你当前已经打开的 shell，新开终端即可，或执行 `source ~/.caw-agent/env`。不想改 rc 时设 `CAW_NO_PATH=1`。
 
 Pages 尚未生效时可用：
 
 ```bash
 curl -fsS https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install | bash
-```
-
-把目录加入 PATH：
-
-```bash
-export PATH="$HOME/.caw-agent/bin:$PATH"
 ```
 
 ### 官网 / 手动下载
@@ -462,6 +456,6 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 | 原生 Windows `run` 沙箱失败 | 预期行为；用 WSL2 或 `/settings sandbox` 关掉 jail |
 | macOS 截图黑屏 / 空图 | 给终端「屏幕录制」权限后重启终端 |
 | `--print` 退出码 2 | 默认 `fail`：权限 / 提问 / 计划需要人。改 `--on-approval` / `--on-ask` / `--on-plan` |
-| 找不到命令 | `export PATH="$HOME/.caw-agent/bin:$PATH"` |
+| 找不到命令 | `source ~/.caw-agent/env` 或新开终端；安装器会写 rc hook |
 
 本手册是对外使用说明的唯一维护处。实现细节只在私有源码仓里。

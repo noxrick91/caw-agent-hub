@@ -20,7 +20,7 @@ Windows PowerShell：
 irm https://agent.noxcaw.com/install.ps1 | iex
 ```
 
-把 `~/.caw-agent/bin` 加进 PATH 之后：
+安装脚本会把 `~/.caw-agent/bin` 写进 shell rc（并 `source ~/.caw-agent/env`）。之后：
 
 ```bash
 caw-agent --workdir .
