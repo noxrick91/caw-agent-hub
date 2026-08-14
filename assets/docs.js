@@ -223,7 +223,22 @@ function showCurrent() {
   const page = pageByHash(state.ordered);
   renderNav(state.nav, state.pages, page);
   renderPage(page, state.ordered);
+  closeNav();
+}
+
+function closeNav() {
   document.getElementById("docs-side")?.classList.remove("open");
+  const back = document.getElementById("docs-backdrop");
+  if (back) back.hidden = true;
+}
+
+function toggleNav() {
+  const side = document.getElementById("docs-side");
+  const back = document.getElementById("docs-backdrop");
+  if (!side) return;
+  const open = !side.classList.contains("open");
+  side.classList.toggle("open", open);
+  if (back) back.hidden = !open;
 }
 
 async function main() {
@@ -262,9 +277,8 @@ function bindSearch(id) {
 bindSearch("docs-search-btn");
 bindSearch("docs-search-btn-mobile");
 
-document.getElementById("docs-contents-btn")?.addEventListener("click", () => {
-  document.getElementById("docs-side")?.classList.toggle("open");
-});
+document.getElementById("docs-contents-btn")?.addEventListener("click", toggleNav);
+document.getElementById("docs-backdrop")?.addEventListener("click", closeNav);
 document.getElementById("docs-modal")?.addEventListener("click", (e) => {
   if (e.target.id === "docs-modal") closeSearch();
 });

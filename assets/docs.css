@@ -222,19 +222,40 @@ body.docs {
 .docs-hit.on { background: rgba(255, 140, 48, 0.12); }
 .docs-hit small { display: block; color: var(--muted); font-size: 12px; }
 .docs-empty { padding: 16px; color: var(--muted); font-size: 14px; }
+.docs-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 10, 0.5);
+  z-index: 24;
+}
+.docs-backdrop[hidden] { display: none; }
 
 @media (max-width: 1100px) {
   .docs-layout { grid-template-columns: 240px minmax(0, 1fr); }
   .docs-right { display: none; }
 }
 @media (max-width: 800px) {
+  .docs-top-inner {
+    padding: 12px 14px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .docs-top .nav { gap: 12px; font-size: 13px; }
+  .docs-top .lang { margin-left: 4px; padding-left: 10px; }
   .docs-layout { grid-template-columns: 1fr; }
   .docs-side {
     display: none;
-    position: static;
-    height: auto;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: min(300px, 86vw);
+    height: 100vh;
+    height: 100dvh;
+    z-index: 25;
+    padding-top: 72px;
+    background: #121418;
+    border-right: 1px solid var(--line);
+    box-shadow: 18px 0 40px rgba(0, 0, 0, 0.45);
   }
   .docs-side.open { display: block; }
   .docs-mobile-bar {
@@ -259,6 +280,13 @@ body.docs {
   }
   .docs-search-compact { flex: 1; }
   #docs-search-btn { display: none; }
-  .docs-main { padding: 20px 18px 64px; }
+  .docs-main { padding: 16px 14px 56px; }
+  .docs-main .prose h1 { font-size: 28px; margin-bottom: 16px; }
+  .docs-main .prose h2 { font-size: 1.15rem; }
+  .docs-main .prose pre { white-space: pre-wrap; word-break: break-all; }
   .docs-pager { grid-template-columns: 1fr; }
+  .docs-modal { padding: 10vh 10px 10px; }
+}
+@media (max-width: 420px) {
+  .docs-top .nav { width: 100%; justify-content: flex-end; }
 }
