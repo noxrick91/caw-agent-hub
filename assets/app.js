@@ -1,6 +1,7 @@
 const REPO = "noxrick91/caw-agent-hub";
 const API = `https://api.github.com/repos/${REPO}/releases?per_page=100`;
-const CACHE_KEY = "caw-releases-v1";
+const LOCAL_LATEST = "./latest.json";
+const CACHE_KEY = "caw-releases-v2";
 const CACHE_MS = 10 * 60 * 1000;
 
 const ASSETS = [
@@ -41,20 +42,56 @@ function assetUrl(tag, file) {
   return `https://github.com/${REPO}/releases/download/${tag}/${file}`;
 }
 
-async function loadRelease() {
+function isReleaseList(data) {
+  return Array.isArray(data) && data.length > 0 && data[0] && data[0].tag_name;
+}
+
+function cacheReleases(data) {
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data }));
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
+
+async function loadLocalLatest() {
+  const res = await fetch(LOCAL_LATEST, { cache: "no-cache" });
+  if (!res.ok) return null;
+  const one = await res.json();
+  if (!one || !one.tag_name) return null;
+  return [one];
+}
+
+async function loadGithubReleases() {
   try {
     const cached = JSON.parse(sessionStorage.getItem(CACHE_KEY) || "null");
-    if (cached && Date.now() - cached.at < CACHE_MS) return cached.data;
+    if (cached && Date.now() - cached.at < CACHE_MS && isReleaseList(cached.data)) {
+      return cached.data;
+    }
   } catch {
     /* ignore */
   }
-  const res = await fetch(API, {
-    headers: { Accept: "application/vnd.github+json" },
-  });
-  if (!res.ok) throw new Error(`GitHub ${res.status}`);
+  const res = await fetch(API);
+  if (!res.ok) return null;
   const data = await res.json();
-  sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data }));
+  if (!isReleaseList(data)) return null;
+  cacheReleases(data);
   return data;
+}
+
+async function loadRelease() {
+  const local = await loadLocalLatest().catch(() => null);
+  if (isReleaseList(local)) {
+    loadGithubReleases()
+      .then((remote) => {
+        if (isReleaseList(remote)) renderHome(remote);
+      })
+      .catch(() => {});
+    return local;
+  }
+  const remote = await loadGithubReleases().catch(() => null);
+  if (isReleaseList(remote)) return remote;
+  throw new Error("no releases");
 }
 
 function byName(release, name) {
