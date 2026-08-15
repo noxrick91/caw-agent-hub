@@ -75,8 +75,10 @@
     log.textContent = "Full changelog";
     const sep = document.createTextNode(" · ");
     const docs = document.createElement("a");
-    docs.href = "./docs.html#/what-s-new";
+    docs.setAttribute("data-keep-lang", "");
+    docs.href = "./docs.html#/whats-new";
     docs.textContent = "Release notes";
+    if (typeof applyI18n === "function") applyI18n(more);
     more.append(log, sep, docs);
     panel.append(ul, more);
     el.replaceChildren(h, panel);
