@@ -1,0 +1,21 @@
+{
+  "tag": "v0.1.7",
+  "version": "0.1.7",
+  "date": "2026-08-15",
+  "title": "What's new in v0.1.7",
+  "notes": [
+    "Local model router (`/router`): send simple turns to a fast model and harder work to a stronger one (`heuristic`, `hybrid`, or `llm` classifier; pin / unpin a provider).",
+    "`caw-agent serve`: localhost REST/SSE control plane (`127.0.0.1:4150`) for health, models, sessions, prompt, and cancel. Non-loopback listen requires `--token` or `CAW_SERVE_TOKEN`.",
+    "Infra tools: `db` (sqlite / postgres / mysql), `docker` (compose-aware), `ssh` (allowlisted hosts), `cloud` (`aws` / `gcloud` / `az` / `kubectl`).",
+    "Hugging Face tool (`hf`): whoami, download, upload, repo create, cache scan/rm. Tokens stay in `HF_TOKEN` / `hf auth login`.",
+    "Broader GitHub tool (`gh`): issues, releases, workflow runs, and `repo_view`, in addition to PR inspect/create/comment. Still no merge, close, delete, force-push, or raw `gh api`.",
+    "Tasks and agents chrome above the prompt: independent expand/collapse, content-sized height, shared scrollbars, newest-first agents, top-to-bottom todos.",
+    "Verify gate after writes, hung-watch for stuck tools, and clearer todo ownership (the model writes the list; the agent marks items done with `todo_complete`).",
+    "`/help` and `caw-agent --help` document serve, router, tasks/agents chrome, and the newer tools.",
+    "Public usage manual on caw-agent-hub covers the same surface.",
+    "Terminal image thumbs use half-block pixels (Linux/macOS) and a larger default size so screenshots stay readable.",
+    "The plan ready sheet body scrolls (PageUp/PageDown, wheel, Alt+↑↓) so long plans are no longer clipped."
+  ],
+  "body": "### Added\n\n- Local model router (`/router`): send simple turns to a fast model and harder work to a stronger one (`heuristic`, `hybrid`, or `llm` classifier; pin / unpin a provider).\n- `caw-agent serve`: localhost REST/SSE control plane (`127.0.0.1:4150`) for health, models, sessions, prompt, and cancel. Non-loopback listen requires `--token` or `CAW_SERVE_TOKEN`.\n- Infra tools: `db` (sqlite / postgres / mysql), `docker` (compose-aware), `ssh` (allowlisted hosts), `cloud` (`aws` / `gcloud` / `az` / `kubectl`).\n- Hugging Face tool (`hf`): whoami, download, upload, repo create, cache scan/rm. Tokens stay in `HF_TOKEN` / `hf auth login`.\n- Broader GitHub tool (`gh`): issues, releases, workflow runs, and `repo_view`, in addition to PR inspect/create/comment. Still no merge, close, delete, force-push, or raw `gh api`.\n- Tasks and agents chrome above the prompt: independent expand/collapse, content-sized height, shared scrollbars, newest-first agents, top-to-bottom todos.\n- Verify gate after writes, hung-watch for stuck tools, and clearer todo ownership (the model writes the list; the agent marks items done with `todo_complete`).\n\n### Changed\n\n- `/help` and `caw-agent --help` document serve, router, tasks/agents chrome, and the newer tools.\n- Public usage manual on caw-agent-hub covers the same surface.\n- Terminal image thumbs use half-block pixels (Linux/macOS) and a larger default size so screenshots stay readable.\n\n### Fixed\n\n- The plan ready sheet body scrolls (PageUp/PageDown, wheel, Alt+↑↓) so long plans are no longer clipped.",
+  "url": "./CHANGELOG.md"
+}

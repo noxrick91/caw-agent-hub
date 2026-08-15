@@ -4,6 +4,26 @@
 
 ---
 
+## What's new
+
+This page is English-only. It lists changes in the **current public release**.
+
+**What's new in v0.1.7** — 2026-08-15
+
+- Local model router (`/router`): send simple turns to a fast model and harder work to a stronger one (`heuristic`, `hybrid`, or `llm` classifier; pin / unpin a provider).
+- `caw-agent serve`: localhost REST/SSE control plane (`127.0.0.1:4150`) for health, models, sessions, prompt, and cancel. Non-loopback listen requires `--token` or `CAW_SERVE_TOKEN`.
+- Infra tools: `db` (sqlite / postgres / mysql), `docker` (compose-aware), `ssh` (allowlisted hosts), `cloud` (`aws` / `gcloud` / `az` / `kubectl`).
+- Hugging Face tool (`hf`): whoami, download, upload, repo create, cache scan/rm. Tokens stay in `HF_TOKEN` / `hf auth login`.
+- Broader GitHub tool (`gh`): issues, releases, workflow runs, and `repo_view`, in addition to PR inspect/create/comment. Still no merge, close, delete, force-push, or raw `gh api`.
+- Tasks and agents chrome above the prompt: independent expand/collapse, content-sized height, shared scrollbars, newest-first agents, top-to-bottom todos.
+- Verify gate after writes, hung-watch for stuck tools, and clearer todo ownership (the model writes the list; the agent marks items done with `todo_complete`).
+- `/help` and `caw-agent --help` document serve, router, tasks/agents chrome, and the newer tools.
+- Public usage manual on caw-agent-hub covers the same surface.
+- Terminal image thumbs use half-block pixels (Linux/macOS) and a larger default size so screenshots stay readable.
+- The plan ready sheet body scrolls (PageUp/PageDown, wheel, Alt+↑↓) so long plans are no longer clipped.
+
+Full history: [CHANGELOG.md](./CHANGELOG.md).
+
 ## 安装
 
 ### 一键安装
@@ -106,7 +126,7 @@ caw-agent -w .
 
 首次进入未完成引导的工作区会打开向导：选主题，确认工作区。之后可用 `/theme` 再改。
 
-配置模型（二选一即可）：
+配置模型（任选其一）：
 
 ```text
 /model add openai
@@ -114,11 +134,15 @@ caw-agent -w .
 
 /model add anthropic
 /model key anthropic sk-ant-...
+
+/model add ollama
 ```
 
-或环境变量：`OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `CAW_API_KEY`。
+或环境变量：`OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `CAW_API_KEY`。Ollama 本机模型**不需要** API 密钥。
 
-没有密钥时仍可用演示启发式（如 `read Cargo.toml`、`grep fn `、`git status`）。
+没有云端密钥时仍可用演示启发式（如 `read Cargo.toml`、`grep fn `、`git status`）。
+
+多模型时可用 `/router`：简单回合走 fast，难的走 default / strong。`/help` 列出全部斜杠命令。
 
 ---
 
@@ -127,11 +151,14 @@ caw-agent -w .
 ```text
 caw-agent [选项] [--print 提示词…]
 caw-agent upgrade [--check] [now|latest|vX.Y.Z]
+caw-agent rewind
+caw-agent serve [--listen 127.0.0.1:4150] [--token TOKEN] [--workdir DIR]
 ```
 
 | 选项 | 说明 |
 |------|------|
 | `-w, --workdir` | 工作区根目录，默认当前目录 |
+| `--add-dir` | 额外工作目录（可重复；Claude `--add-dir`） |
 | `--no-mcp` | 不自动启动 MCP |
 | `--base-url` / `CAW_BASE_URL` | OpenAI 兼容 API |
 | `--model` / `CAW_MODEL` | 模型 id |
@@ -161,6 +188,22 @@ caw-agent --print --continue -w . "keep going"
 
 `--print` 会把会话写到 `.caw-agent/sessions/`（含 `/cost` 用的 token 合计），并在 stderr 打印 resume id。Ctrl+C / SIGTERM 先保存再退出（130）。本工作区没有已存会话时 `--continue` 会报错。
 
+### `caw-agent serve`
+
+本机 REST / SSE 控制面，默认 `http://127.0.0.1:4150`。非回环监听必须 `--token` 或环境变量 `CAW_SERVE_TOKEN`（`Authorization: Bearer …`）。
+
+| 路径 | 说明 |
+|------|------|
+| `GET /v1/health` | 探活 |
+| `GET /v1/models` | 已配置供应商与 router |
+| `GET /v1/sessions` | 会话列表 |
+| `POST /v1/sessions` | 新建会话 |
+| `GET /v1/sessions/{id}` | 会话摘要 |
+| `POST /v1/sessions/{id}/prompt` | 投递提示（`{"prompt":"…","stream":true}` 可 SSE） |
+| `POST /v1/sessions/{id}/cancel` | 取消进行中的回合 |
+
+`--on-approval` / `--on-ask` / `--on-plan` 与 `--print` 相同。权限提示在无人值守时默认失败。
+
 ---
 
 ## 斜杠命令
@@ -171,13 +214,14 @@ caw-agent --print --continue -w . "keep going"
 /settings · /config      控制面板
 /permissions             模式与授权摘要
 /model                   供应商与密钥
+/router                  按复杂度选模型（on|off|pin|heuristic|hybrid|llm|fast|…）
 /theme                   主题（dark light midnight forest ember ocean noir dusk dawn ansi）
 /compact [focus]         压缩较早轮次
 /context                 上下文用量估计
 /cost                    本会话花费估计（随会话持久化）
 /cost limit <usd>|off    达到上限则在下一次 LLM 前停住
 /export [md|json] [path] 脱敏笔录（默认 .caw-agent/exports/）
-/upgrade [now|vX.Y.Z]    检查或安装 GitHub Release
+/upgrade [now|vX.Y.Z]    检查或安装 GitHub Release + hub MCP
 /notify on|off           后台标签或 --print 结束时桌面通知
 /copy [N]                复制倒数第 N 条助手回复
 /diff                    git diff --stat
@@ -194,20 +238,24 @@ caw-agent --print --continue -w . "keep going"
 /pause [note]            暂停并打印 resume id
 /new · /clear            新会话
 /save · /sessions        保存 / 列出
-/export                  导出笔录
 /cd [path]               切换工作区（缺目录会创建）
-/rewind                  文件检查点
+/add-dir [path]          额外工作目录
+/rewind                  文件检查点（undo · last · redo）
 /plan                    计划模式
-/train                   从会话训练学生模型
+/debug                   调试器会话
+/init                    探测技术栈并写 CAW.md
 /skills · /skill <name>  技能
-/mcp                     MCP 包
+/mcp                     MCP 包（list / install NAME）
 /plugin enable|disable   插件
 /worktrees               Task worktree 列表
+/todos [expand|collapse] 提示词上方的任务列表
 /agents · /tasks         子代理与后台任务
 /exit                    保存并退出（exit / quit / 退出 同样）
 ```
 
 权限模式用 **Shift+Tab**（或 **Alt+M** / **Alt+Shift+M**）循环：default → accept edits → plan → auto → full access。
+
+任务与子代理共用提示词上方一行：两边都有时宽屏并排、窄屏上下叠。点标题 `▾` / `▸` 可单独折叠。`← →` 切换主 / 子代理；`Alt+↑↓` 滚动任务列表。
 
 ---
 
@@ -239,6 +287,10 @@ caw-agent --print --continue -w . "keep going"
 
 可选：`OPENAI_ORG_ID`、`OPENAI_PROJECT_ID`。
 
+**Ollama：** `/model add ollama` 后可在菜单里挑本机已拉的模型，**不需要** API 密钥。空的 `config.json` 不会挡住启动。
+
+**Router：** `/router on` 按回合复杂度在 fast / default / strong 三档之间选模型。分类器可以是 `heuristic`（规则）、`llm`（另一次短调用）或 `hybrid`。`/router pin` 钉死当前 `/model`，不再自动换。档位用 `/router fast|default|strong [provider] [model]` 指定。
+
 ---
 
 ## 工作区与全局目录
@@ -253,8 +305,7 @@ caw-agent --print --continue -w . "keep going"
 | `secrets.json` | API 密钥（`/model key` 写这里） |
 | `rules/*.md` | 你写的全局规则 |
 | `memory/` | 全局自动记忆（OS / 工具链坑） |
-| `train/` | SFT 导出、权重、训练日志 |
-| `models/` | 训练出的 LoRA / student |
+| `hf/` | `hf` 工具默认下载目录 |
 | `skills/` | 技能覆盖（默认技能打在二进制里） |
 | `tools/` | 便携安装与 winget `--location` |
 | `bin/` | 发布二进制与 shim（会 prepend 到 `run` / debug 的 PATH） |
@@ -354,7 +405,12 @@ caw-agent --print --continue -w . "keep going"
 | `analyze` | 跑检查/测试并解析 `file:line` | Exec |
 | `debug` | gdb / lldb / cdb / pdb / node / dlv / jdb 等 | Exec |
 | `git_*` | status / diff / log / commit / fetch / pull / push / conflicts / stash | 检查只读；变更要 Exec。commit 拒 Cursor 署名。push 从不用 `--force` |
-| `gh` | `status` / `pr_view` / `pr_list` / `pr_checks` / `pr_create` / `pr_comment` | 不提供 merge |
+| `gh` | PR / issue / release / run / `repo_view`；可创建与评论 | 不提供 merge / close / `gh api` |
+| `hf` | Hugging Face：whoami / download / upload / cache | 下载走网络；upload 要 Exec。令牌用 `HF_TOKEN` |
+| `db` | sqlite（工作区路径）或 postgres / mysql（DSN） | 只读 query；`exec` 要问。非 localhost 需白名单 |
+| `docker` | `ps` / images / logs / build / compose | 无 `--privileged`。jail 挡 socket 时可 unsandbox |
+| `ssh` | 白名单主机 `exec` / upload / download | 新主机要批准；不用 `ssh-copy-id` |
+| `cloud` | `aws` / `gcloud` / `az` / `kubectl` | 只读检查自动；变更要问。无 destroy / login |
 | `web_search` / `web_fetch` / `download_file` | 搜索与下载 | Network；禁 localhost / 私网 |
 | `screenshot` / `computer` | 截图与键鼠 | Screen。computer-use **默认关**，`/settings computer-use` |
 | `extract_archive` | zip / tar / gz… | Write |
@@ -402,7 +458,9 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 
 多标签：每个标签独立回合与队列。`ctrl+t` 新标签，`ctrl+tab` 切换，`ctrl+w` 关闭。后台跑完的标签会标 `•`。
 
-子代理用 `Task` 拉起，显示在提示词上方。`← →` 切换主 / 子；`/worktrees` 处理隔离树。
+提示词上方是 **tasks / agents** 条：有待办或子代理时出现。两边都展开且够宽时并排等高；窄屏上下叠，高度跟着内容走。点 `▾` / `▸` 单独折叠。任务按文档顺序从上往下推进；子代理按开始时间新的在上（`main` 钉在顶部）。
+
+`← →` / `↓` 切换主 / 子；`/agents` 打开列表；`/todos expand|collapse` 折任务。滚轮落在对应面板上滚动；`Alt+↑↓` 滚任务。`/worktrees` 处理隔离树。
 
 忙碌时 Enter **入队**，不打断。Esc：先清草稿；空且忙碌则中断。**Ctrl+C** 退出（有后台任务会先确认）。**Ctrl+Shift+C** 复制拖选的笔录。
 
@@ -422,26 +480,16 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
   "auto_compact_enabled": true,
   "compact_token_threshold": 80000,
   "cost_limit_usd": 5.0,
-  "notify_on_idle": false
+  "notify_on_idle": false,
+  "router": {
+    "enabled": false,
+    "classifier": "heuristic",
+    "fast": { "provider": "ollama", "model": "qwen2.5-coder:7b" }
+  }
 }
 ```
 
 `/settings notify-on-idle` 或 `/notify on`：后台标签结束或 `--print` 完成时发桌面通知（默认关）。
-
----
-
-## 训练（可选）
-
-日常会话可导出为带质量权重的 SFT 语料：
-
-```text
-/train
-/train export
-/train start
-/train status
-```
-
-数据在 `~/.caw-agent/train/`，适配器在 `~/.caw-agent/models/`。导出默认脱敏。请遵守模型供应商条款，仅限本地自用。
 
 ---
 
@@ -458,5 +506,7 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 | macOS 截图黑屏 / 空图 | 给终端「屏幕录制」权限后重启终端 |
 | `--print` 退出码 2 | 默认 `fail`：权限 / 提问 / 计划需要人。改 `--on-approval` / `--on-ask` / `--on-plan` |
 | 找不到命令 | `source ~/.caw-agent/env` 或新开终端；安装器会写 rc hook |
+| `serve` 拒绝监听 | 非 `127.0.0.1` / `::1` 必须 `--token` 或 `CAW_SERVE_TOKEN` |
+| Ollama 仍要密钥 | 用 `/model add ollama`，不要走需要 key 的 OpenAI 兼容网关 |
 
 本手册是对外使用说明的唯一维护处。实现细节只在私有源码仓里。
