@@ -11,6 +11,10 @@ and shows the current version on https://agent.noxcaw.com.
 
 ## [Unreleased]
 
+### Fixed
+
+- Docs language switch now updates sidebar page titles, crumbs, and pager. Those labels were frozen in the language from the first page load.
+
 ## [0.1.8] - 2026-08-15
 
 ### Changed
