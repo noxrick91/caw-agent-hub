@@ -34,9 +34,25 @@ function navEntry(raw) {
   return { key: slug(title), zh: title, en: title };
 }
 
-function displayTitle(entry) {
+function displayTitle(entry, code = lang()) {
   const e = navEntry(entry);
-  return e[lang()] || e.zh || e.en || e.key;
+  return e[code] || e.zh || e.en || e.key;
+}
+
+function groupTitle(group, code = lang()) {
+  const t = group && group.title;
+  if (t && typeof t === "object") return t[code] || t.zh || t.en || "";
+  return String(t || "");
+}
+
+function liveTitle(page) {
+  if (page && page.label) return page.label[lang()] || page.title;
+  return page ? page.title : "";
+}
+
+function liveGroup(page) {
+  if (page && page.groups) return page.groups[lang()] || page.group || "";
+  return page ? page.group || "" : "";
 }
 
 function splitPages(md, introTitle) {
@@ -89,7 +105,7 @@ function aliasMap(nav) {
   return map;
 }
 
-function flattenNav(nav, pages) {
+function flattenNav(nav, pages, code = lang()) {
   const aliases = aliasMap(nav);
   const out = [];
   const seen = new Set();
@@ -102,8 +118,10 @@ function flattenNav(nav, pages) {
       out.push({
         ...p,
         key,
-        title: displayTitle(e),
-        group: g.title[lang()] || g.title.zh || "",
+        title: displayTitle(e, code),
+        label: { zh: e.zh || p.title, en: e.en || p.title },
+        group: groupTitle(g, code),
+        groups: { zh: groupTitle(g, "zh"), en: groupTitle(g, "en") },
       });
       seen.add(p.id);
       aliases[p.id] = key;
@@ -111,7 +129,14 @@ function flattenNav(nav, pages) {
   }
   for (const p of pages) {
     if (seen.has(p.id)) continue;
-    out.push({ ...p, key: p.id, title: p.title, group: "" });
+    out.push({
+      ...p,
+      key: p.id,
+      title: p.title,
+      label: { zh: p.title, en: p.title },
+      group: "",
+      groups: { zh: "", en: "" },
+    });
   }
   return { ordered: out, aliases };
 }
@@ -136,7 +161,7 @@ function renderNav(nav, ordered, current) {
     wrap.className = "docs-group";
     const h = document.createElement("p");
     h.className = "docs-group-title";
-    h.textContent = g.title[lang()] || g.title.zh || "";
+    h.textContent = groupTitle(g);
     wrap.append(h);
     for (const raw of g.pages || []) {
       const e = navEntry(raw);
@@ -144,7 +169,7 @@ function renderNav(nav, ordered, current) {
       if (!p) continue;
       const a = document.createElement("a");
       a.href = `#/${p.key}`;
-      a.textContent = p.title;
+      a.textContent = displayTitle(e);
       if (p.key === current.key) a.className = "active";
       wrap.append(a);
     }
@@ -153,8 +178,10 @@ function renderNav(nav, ordered, current) {
 }
 
 function renderPage(page, ordered) {
+  const title = liveTitle(page);
+  const group = liveGroup(page);
   const prose = document.getElementById("prose");
-  prose.innerHTML = renderMarkdown(`# ${page.title}\n\n${page.md}`);
+  prose.innerHTML = renderMarkdown(`# ${title}\n\n${page.md}`);
 
   const toc = document.getElementById("toc-list");
   const right = document.getElementById("docs-right");
@@ -176,9 +203,9 @@ function renderPage(page, ordered) {
   right.classList.toggle("empty", !toc.childElementCount);
 
   const crumb = document.getElementById("docs-crumb");
-  crumb.innerHTML = page.group
-    ? `${page.group} <span class="sep">/</span> <span>${page.title}</span>`
-    : `<span>${page.title}</span>`;
+  crumb.innerHTML = group
+    ? `${group} <span class="sep">/</span> <span>${title}</span>`
+    : `<span>${title}</span>`;
 
   const idx = ordered.findIndex((p) => p.key === page.key);
   const pager = document.getElementById("docs-pager");
@@ -188,7 +215,7 @@ function renderPage(page, ordered) {
   if (prev) {
     const a = document.createElement("a");
     a.href = `#/${prev.key}`;
-    a.innerHTML = `<span class="dir">${t("docs.prev", "上一页")}</span>${prev.title}`;
+    a.innerHTML = `<span class="dir">${t("docs.prev", "上一页")}</span>${liveTitle(prev)}`;
     pager.append(a);
   } else {
     pager.append(document.createElement("span"));
@@ -197,11 +224,11 @@ function renderPage(page, ordered) {
     const a = document.createElement("a");
     a.className = "next";
     a.href = `#/${next.key}`;
-    a.innerHTML = `<span class="dir">${t("docs.next", "下一页")}</span>${next.title}`;
+    a.innerHTML = `<span class="dir">${t("docs.next", "下一页")}</span>${liveTitle(next)}`;
     pager.append(a);
   }
 
-  document.title = `${page.title} — caw-agent`;
+  document.title = `${title} — caw-agent`;
   watchHeadings();
   window.scrollTo(0, 0);
 }
@@ -245,7 +272,7 @@ function openSearch(pages) {
     const found = pages
       .filter((p) => {
         if (!q) return true;
-        return (p.title + "\n" + p.md).toLowerCase().includes(q);
+        return (liveTitle(p) + "\n" + p.md).toLowerCase().includes(q);
       })
       .slice(0, 12);
     if (!found.length) {
@@ -259,7 +286,7 @@ function openSearch(pages) {
       const a = document.createElement("a");
       a.className = "docs-hit" + (i === 0 ? " on" : "");
       a.href = `#/${p.key}`;
-      a.innerHTML = `${p.title}<small>${(p.group || "").trim()}</small>`;
+      a.innerHTML = `${liveTitle(p)}<small>${liveGroup(p).trim()}</small>`;
       a.addEventListener("click", closeSearch);
       hits.append(a);
     });
@@ -311,9 +338,9 @@ function toggleNav() {
   if (back) back.hidden = !open;
 }
 
-function buildLang(md, nav, introTitle) {
+function buildLang(md, nav, introTitle, code) {
   const pages = splitPages(md, introTitle);
-  const { ordered, aliases } = flattenNav(nav, pages);
+  const { ordered, aliases } = flattenNav(nav, pages, code);
   return { pages, ordered, aliases };
 }
 
@@ -333,8 +360,8 @@ async function main() {
     const zhMd = await zhRes.text();
     const enMd = enRes.ok ? await enRes.text() : zhMd;
     state.nav = navRes.ok ? await navRes.json() : { groups: [] };
-    state.byLang.zh = buildLang(zhMd, state.nav, "介绍");
-    state.byLang.en = buildLang(enMd, state.nav, "Introduction");
+    state.byLang.zh = buildLang(zhMd, state.nav, "介绍", "zh");
+    state.byLang.en = buildLang(enMd, state.nav, "Introduction", "en");
     state.aliases = { ...state.byLang.zh.aliases, ...state.byLang.en.aliases };
     if (!location.hash) {
       location.hash = "#/install";
