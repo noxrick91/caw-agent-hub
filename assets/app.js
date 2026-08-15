@@ -270,8 +270,6 @@ function installLabel(platform) {
 
 function applyHowto(platform) {
   const win = platform === "win-x64" || platform === "win-arm64";
-  const os = document.getElementById("howto-os");
-  if (os) os.textContent = installLabel(platform);
   const installCmd = document.getElementById("install-cmd");
   if (installCmd) installCmd.textContent = win ? INSTALL_WIN : INSTALL_UNIX;
   const updateCmd = document.getElementById("update-cmd");

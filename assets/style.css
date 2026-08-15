@@ -269,59 +269,43 @@ h1 {
   min-width: 0;
 }
 .howto-item {
-  padding: 16px 18px 18px;
-  border-bottom: 1px solid var(--line);
+  padding: 22px 24px 24px;
 }
-.howto-item:last-child { border-bottom: 0; }
+.howto-item + .howto-item {
+  border-top: 1px solid var(--line);
+}
 .howto-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   color: var(--muted);
   font-size: 13px;
-}
-.howto-desc {
-  margin: -2px 0 10px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.45;
-}
-.howto-well {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.howto-prompt {
-  flex-shrink: 0;
-  color: var(--egg);
-  font: 500 13px/1.5 var(--mono);
-  user-select: none;
 }
 .howto-cmd {
-  flex: 1 1 auto;
+  display: block;
   min-width: 0;
   margin: 0;
   padding: 0;
   background: none;
-  font: 13px/1.5 var(--mono);
+  font: 14px/1.55 var(--mono);
   color: var(--ivory);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
+.howto-desc {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
 .howto .copy {
-  min-width: 4.5em;
-  padding: 3px 8px;
-  border-radius: 6px;
+  min-width: 3.5em;
+  padding: 0;
   text-align: right;
 }
-.howto .copy:hover { background: rgba(255, 140, 48, 0.1); }
 .howto-more {
   margin: 10px 0 4px;
   font-size: 13px;
@@ -512,7 +496,7 @@ footer {
   .row .btn { justify-content: center; }
   .grid { grid-template-columns: 1fr; margin-top: 20px; }
   .sec { margin: 36px 0 12px; font-size: 18px; }
-  .howto-item { padding: 14px 14px 16px; }
+  .howto-item { padding: 18px 16px 20px; }
   .howto-cmd { font-size: 12px; }
   .panel pre, .cmd { font-size: 12px; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 }
