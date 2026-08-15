@@ -1,4 +1,5 @@
-const SRC = "./content/README.md";
+const SRC_ZH = "./content/README.md";
+const SRC_EN = "./content/README.en.md";
 const NAV_SRC = "./content/nav.json";
 
 function slug(text) {
@@ -27,12 +28,23 @@ function renderMarkdown(md) {
   return `<pre>${md.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]))}</pre>`;
 }
 
-function splitPages(md) {
+function navEntry(raw) {
+  if (raw && typeof raw === "object") return raw;
+  const title = String(raw || "");
+  return { key: slug(title), zh: title, en: title };
+}
+
+function displayTitle(entry) {
+  const e = navEntry(entry);
+  return e[lang()] || e.zh || e.en || e.key;
+}
+
+function splitPages(md, introTitle) {
   const pages = [];
   const intro = md.split(/^## /m)[0].trim();
   if (intro) {
     pages.push({
-      title: "介绍",
+      title: introTitle,
       md: intro.replace(/^#\s+.+\n+/, ""),
     });
   }
@@ -48,44 +60,92 @@ function splitPages(md) {
   return pages.map((p) => ({ ...p, id: slug(p.title) }));
 }
 
-function pageByHash(pages) {
-  const raw = decodeURIComponent((location.hash || "").replace(/^#\/?/, ""));
-  return pages.find((p) => p.id === raw) || pages.find((p) => p.title === "安装") || pages[1] || pages[0];
+function matchPage(pages, entry) {
+  const e = navEntry(entry);
+  const titles = [e.zh, e.en, e.key].filter(Boolean);
+  return (
+    pages.find((p) => titles.includes(p.title)) ||
+    pages.find((p) => p.id === e.key || p.id === slug(e.zh || "") || p.id === slug(e.en || ""))
+  );
+}
+
+function aliasMap(nav) {
+  const map = Object.create(null);
+  const add = (from, key) => {
+    if (!from || !key) return;
+    map[from] = key;
+    map[slug(from)] = key;
+  };
+  for (const g of nav.groups || []) {
+    for (const raw of g.pages || []) {
+      const e = navEntry(raw);
+      add(e.key, e.key);
+      add(e.zh, e.key);
+      add(e.en, e.key);
+    }
+  }
+  add("what-s-new", "whats-new");
+  add("what's-new", "whats-new");
+  return map;
 }
 
 function flattenNav(nav, pages) {
-  const byTitle = new Map(pages.map((p) => [p.title, p]));
+  const aliases = aliasMap(nav);
   const out = [];
-  for (const g of nav.groups) {
-    for (const title of g.pages) {
-      const p = byTitle.get(title);
-      if (p) out.push({ ...p, group: g.title[lang()] || g.title.zh });
+  const seen = new Set();
+  for (const g of nav.groups || []) {
+    for (const raw of g.pages || []) {
+      const e = navEntry(raw);
+      const p = matchPage(pages, e);
+      if (!p) continue;
+      const key = e.key || p.id;
+      out.push({
+        ...p,
+        key,
+        title: displayTitle(e),
+        group: g.title[lang()] || g.title.zh || "",
+      });
+      seen.add(p.id);
+      aliases[p.id] = key;
     }
   }
   for (const p of pages) {
-    if (!out.some((x) => x.id === p.id)) out.push({ ...p, group: "" });
+    if (seen.has(p.id)) continue;
+    out.push({ ...p, key: p.id, title: p.title, group: "" });
   }
-  return out;
+  return { ordered: out, aliases };
 }
 
-function renderNav(nav, pages, current) {
+function pageByHash(ordered, aliases) {
+  const raw = decodeURIComponent((location.hash || "").replace(/^#\/?/, ""));
+  const key = aliases[raw] || aliases[slug(raw)] || raw;
+  return (
+    ordered.find((p) => p.key === key || p.id === raw || p.id === key) ||
+    ordered.find((p) => p.key === "install") ||
+    ordered[1] ||
+    ordered[0]
+  );
+}
+
+function renderNav(nav, ordered, current) {
   const box = document.getElementById("docs-nav");
   box.replaceChildren();
-  const byTitle = new Map(pages.map((p) => [p.title, p]));
-  for (const g of nav.groups) {
+  const byKey = new Map(ordered.map((p) => [p.key, p]));
+  for (const g of nav.groups || []) {
     const wrap = document.createElement("div");
     wrap.className = "docs-group";
     const h = document.createElement("p");
     h.className = "docs-group-title";
-    h.textContent = g.title[lang()] || g.title.zh;
+    h.textContent = g.title[lang()] || g.title.zh || "";
     wrap.append(h);
-    for (const title of g.pages) {
-      const p = byTitle.get(title);
+    for (const raw of g.pages || []) {
+      const e = navEntry(raw);
+      const p = byKey.get(e.key);
       if (!p) continue;
       const a = document.createElement("a");
-      a.href = `#/${p.id}`;
+      a.href = `#/${p.key}`;
       a.textContent = p.title;
-      if (p.id === current.id) a.className = "active";
+      if (p.key === current.key) a.className = "active";
       wrap.append(a);
     }
     box.append(wrap);
@@ -103,7 +163,7 @@ function renderPage(page, ordered) {
     const id = slug(h.textContent);
     h.id = id;
     const a = document.createElement("a");
-    a.href = `#/${page.id}`;
+    a.href = `#/${page.key}`;
     a.dataset.jump = id;
     a.className = h.tagName === "H3" ? "h3" : "";
     a.textContent = h.textContent;
@@ -120,14 +180,14 @@ function renderPage(page, ordered) {
     ? `${page.group} <span class="sep">/</span> <span>${page.title}</span>`
     : `<span>${page.title}</span>`;
 
-  const idx = ordered.findIndex((p) => p.id === page.id);
+  const idx = ordered.findIndex((p) => p.key === page.key);
   const pager = document.getElementById("docs-pager");
   pager.replaceChildren();
   const prev = ordered[idx - 1];
   const next = ordered[idx + 1];
   if (prev) {
     const a = document.createElement("a");
-    a.href = `#/${prev.id}`;
+    a.href = `#/${prev.key}`;
     a.innerHTML = `<span class="dir">${t("docs.prev", "上一页")}</span>${prev.title}`;
     pager.append(a);
   } else {
@@ -136,7 +196,7 @@ function renderPage(page, ordered) {
   if (next) {
     const a = document.createElement("a");
     a.className = "next";
-    a.href = `#/${next.id}`;
+    a.href = `#/${next.key}`;
     a.innerHTML = `<span class="dir">${t("docs.next", "下一页")}</span>${next.title}`;
     pager.append(a);
   }
@@ -182,10 +242,12 @@ function openSearch(pages) {
   const render = () => {
     const q = input.value.trim().toLowerCase();
     hits.replaceChildren();
-    const found = pages.filter((p) => {
-      if (!q) return true;
-      return (p.title + "\n" + p.md).toLowerCase().includes(q);
-    }).slice(0, 12);
+    const found = pages
+      .filter((p) => {
+        if (!q) return true;
+        return (p.title + "\n" + p.md).toLowerCase().includes(q);
+      })
+      .slice(0, 12);
     if (!found.length) {
       const empty = document.createElement("p");
       empty.className = "docs-empty";
@@ -196,7 +258,7 @@ function openSearch(pages) {
     found.forEach((p, i) => {
       const a = document.createElement("a");
       a.className = "docs-hit" + (i === 0 ? " on" : "");
-      a.href = `#/${p.id}`;
+      a.href = `#/${p.key}`;
       a.innerHTML = `${p.title}<small>${(p.group || "").trim()}</small>`;
       a.addEventListener("click", closeSearch);
       hits.append(a);
@@ -216,13 +278,21 @@ function moveHit(delta) {
   next.scrollIntoView({ block: "nearest" });
 }
 
-const state = { pages: [], nav: null, ordered: [] };
+const state = { nav: null, byLang: {}, aliases: {} };
+
+function bundle() {
+  return state.byLang[lang()] || state.byLang.zh || { pages: [], ordered: [] };
+}
 
 function showCurrent() {
-  if (!state.ordered.length) return;
-  const page = pageByHash(state.ordered);
-  renderNav(state.nav, state.pages, page);
-  renderPage(page, state.ordered);
+  const { ordered } = bundle();
+  if (!ordered.length) return;
+  const page = pageByHash(ordered, state.aliases);
+  if (page && location.hash !== `#/${page.key}`) {
+    history.replaceState(null, "", `${location.pathname}${location.search}#/${page.key}`);
+  }
+  renderNav(state.nav, ordered, page);
+  renderPage(page, ordered);
   closeNav();
 }
 
@@ -241,6 +311,12 @@ function toggleNav() {
   if (back) back.hidden = !open;
 }
 
+function buildLang(md, nav, introTitle) {
+  const pages = splitPages(md, introTitle);
+  const { ordered, aliases } = flattenNav(nav, pages);
+  return { pages, ordered, aliases };
+}
+
 async function main() {
   const prose = document.getElementById("prose");
   const kbd = document.getElementById("docs-search-kbd");
@@ -248,31 +324,35 @@ async function main() {
     kbd.textContent = "⌘K";
   }
   try {
-    const [mdRes, navRes] = await Promise.all([fetch(SRC), fetch(NAV_SRC)]);
-    if (!mdRes.ok) throw new Error(String(mdRes.status));
-    const md = await mdRes.text();
+    const [zhRes, enRes, navRes] = await Promise.all([
+      fetch(SRC_ZH),
+      fetch(SRC_EN),
+      fetch(NAV_SRC),
+    ]);
+    if (!zhRes.ok) throw new Error(String(zhRes.status));
+    const zhMd = await zhRes.text();
+    const enMd = enRes.ok ? await enRes.text() : zhMd;
     state.nav = navRes.ok ? await navRes.json() : { groups: [] };
-    state.pages = splitPages(md);
-    state.ordered = flattenNav(state.nav, state.pages);
+    state.byLang.zh = buildLang(zhMd, state.nav, "介绍");
+    state.byLang.en = buildLang(enMd, state.nav, "Introduction");
+    state.aliases = { ...state.byLang.zh.aliases, ...state.byLang.en.aliases };
     if (!location.hash) {
-      const first = state.ordered.find((p) => p.title === "安装") || state.ordered[0];
-      location.hash = `#/${first.id}`;
+      location.hash = "#/install";
     }
     showCurrent();
   } catch (err) {
     prose.innerHTML = `<p class="err">${t("docs.fail", "文档加载失败。")}（${err.message}）</p>
-      <p><a href="${SRC}">Markdown</a></p>`;
+      <p><a href="${SRC_ZH}">Markdown</a></p>`;
   }
 }
 
 window.addEventListener("hashchange", showCurrent);
 document.addEventListener("caw-lang", () => {
-  state.ordered = flattenNav(state.nav || { groups: [] }, state.pages);
   showCurrent();
 });
 
 function bindSearch(id) {
-  document.getElementById(id)?.addEventListener("click", () => openSearch(state.ordered));
+  document.getElementById(id)?.addEventListener("click", () => openSearch(bundle().ordered));
 }
 bindSearch("docs-search-btn");
 bindSearch("docs-search-btn-mobile");
@@ -287,7 +367,7 @@ document.addEventListener("keydown", (e) => {
   const open = modal && !modal.hidden;
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
     e.preventDefault();
-    openSearch(state.ordered);
+    openSearch(bundle().ordered);
   }
   if (!open) return;
   if (e.key === "Escape") closeSearch();
