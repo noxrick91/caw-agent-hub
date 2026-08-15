@@ -16,7 +16,10 @@ function t(key, fallback) {
   return val != null ? val : fallback;
 }
 
+let forcedLang = null;
+
 function lang() {
+  if (forcedLang === "zh" || forcedLang === "en") return forcedLang;
   return typeof getLang === "function" ? getLang() : "zh";
 }
 
@@ -351,10 +354,11 @@ async function main() {
     kbd.textContent = "⌘K";
   }
   try {
+    const fetchOpts = { cache: "no-store" };
     const [zhRes, enRes, navRes] = await Promise.all([
-      fetch(SRC_ZH),
-      fetch(SRC_EN),
-      fetch(NAV_SRC),
+      fetch(SRC_ZH, fetchOpts),
+      fetch(SRC_EN, fetchOpts),
+      fetch(NAV_SRC, fetchOpts),
     ]);
     if (!zhRes.ok) throw new Error(String(zhRes.status));
     const zhMd = await zhRes.text();
@@ -374,7 +378,9 @@ async function main() {
 }
 
 window.addEventListener("hashchange", showCurrent);
-document.addEventListener("caw-lang", () => {
+document.addEventListener("caw-lang", (e) => {
+  const next = e && e.detail;
+  if (next === "zh" || next === "en") forcedLang = next;
   showCurrent();
 });
 
