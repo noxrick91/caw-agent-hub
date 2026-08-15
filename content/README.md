@@ -1,26 +1,44 @@
 # caw-agent 使用手册
 
-沙箱里的终端编程助手：Claude Code 风格 TUI、权限经纪、MCP、会话与记忆。预编译包从本站所属仓库的 [GitHub Releases](https://github.com/noxrick91/caw-agent-hub/releases) 安装到 `~/.caw-agent/bin`。源码仓私有，不对外。
+caw-agent 是跑在你终端里的编程助手：读代码、改文件、跑测试，都在你打开的这个项目里完成。每次写盘或执行命令前，它会停下来等你确认。界面是 Claude Code 风格的 TUI，带权限经纪、沙箱、MCP、会话与记忆。
+
+预编译包从本站 [GitHub Releases](https://github.com/noxrick91/caw-agent-hub/releases) 装到 `~/.caw-agent/bin`。源码仓私有，不对外。
+
+### 它做什么
+
+- 只碰你打开的工作区；读、改、跑的每一步都显示在终端里
+- 写文件和跑命令默认先征求同意，权限可以按项目收紧或放宽
+- 记住跨会话的项目习惯；需要时接 MCP 服务器和技能
+- 官方 API、本地 Ollama，以及第三方 OpenAI 兼容中转，都可以用
+
+### 模型从哪来
+
+官方供应商用 `/model add <预设>`，例如 `openai`、`anthropic`、`deepseek`、`qwen`。本地模型用 `/model add ollama`，不需要云端密钥。
+
+中转站（NewAPI、OneAPI 等「OpenAI 兼容」网关）**不要改官方预设的地址**。单独加一个供应商，用控制台里的 Base URL、密钥和模型名。步骤见 [模型与密钥](#/models)。
+
+### 怎么读这份手册
+
+从 [安装](#/install) 和 [快速开始](#/quick-start) 上手。斜杠命令、权限、会话、MCP 在后面几章。右上角 **中文 / EN** 切换整本手册；换语言会停在同一页。
 
 ---
 
 ## What's new
 
-This page is English-only. It lists changes in the **current public release**.
+This page lists changes in the **current public release**.
 
-**What's new in v0.1.7** — 2026-08-15
+**What's new in v0.1.8** — 2026-08-15
 
-- Local model router (`/router`): send simple turns to a fast model and harder work to a stronger one (`heuristic`, `hybrid`, or `llm` classifier; pin / unpin a provider).
-- `caw-agent serve`: localhost REST/SSE control plane (`127.0.0.1:4150`) for health, models, sessions, prompt, and cancel. Non-loopback listen requires `--token` or `CAW_SERVE_TOKEN`.
-- Infra tools: `db` (sqlite / postgres / mysql), `docker` (compose-aware), `ssh` (allowlisted hosts), `cloud` (`aws` / `gcloud` / `az` / `kubectl`).
-- Hugging Face tool (`hf`): whoami, download, upload, repo create, cache scan/rm. Tokens stay in `HF_TOKEN` / `hf auth login`.
-- Broader GitHub tool (`gh`): issues, releases, workflow runs, and `repo_view`, in addition to PR inspect/create/comment. Still no merge, close, delete, force-push, or raw `gh api`.
-- Tasks and agents chrome above the prompt: independent expand/collapse, content-sized height, shared scrollbars, newest-first agents, top-to-bottom todos.
-- Verify gate after writes, hung-watch for stuck tools, and clearer todo ownership (the model writes the list; the agent marks items done with `todo_complete`).
-- `/help` and `caw-agent --help` document serve, router, tasks/agents chrome, and the newer tools.
-- Public usage manual on caw-agent-hub covers the same surface.
-- Terminal image thumbs use half-block pixels (Linux/macOS) and a larger default size so screenshots stay readable.
-- The plan ready sheet body scrolls (PageUp/PageDown, wheel, Alt+↑↓) so long plans are no longer clipped.
+- Code blocks use a deeper well on every theme, with 1-cell side inset and a single row of air under the language header (no extra top/bottom pad).
+- Diff cards share that well, use a 1-cell inset, and put one row of air between the path header and hunks. Sign and hunk labels are tighter.
+- Tasks / agents chrome headers use a dedicated `chrome_bg` bar so they no longer look like code panels.
+- Public docs ship a full English manual. The 中文 / EN control switches sidebar titles, page bodies, and hashes (`#/install` works in both languages; old `#/安装` links still resolve).
+- Docs intro now explains what the agent does, where models come from (including third-party gateways), and how to read the manual. The models page has a dedicated gateway section.
+- Docs page scrollbars match the site: thin, warm, rounded; sidebars fade until hover.
+- Third-party OpenAI-compatible gateways are documented as a separate named provider (`/model add <name> <url> [model]`), not by rewriting official preset URLs.
+- `/model key` no longer treats the in-memory keyring mock as a real store. Linux/macOS/Windows now compile a platform backend, and a mock write cannot wipe `~/.caw-agent/secrets.json`. Saving a key also rebinds the client immediately so the next turn does not race the disk write.
+- Missing-key errors name the provider's real env var (`OPENROUTER_API_KEY` for OpenRouter, not `OPENAI_API_KEY`). `CAW_API_KEY` is accepted as a last-resort fallback for every provider.
+- Native Anthropic Messages API is used only for `api.anthropic.com`. A provider named `anthropic` / `claude` pointed at another host uses `/v1/chat/completions` (typical third-party relays). OpenAI org/project headers are sent only to `api.openai.com`.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
@@ -270,7 +288,7 @@ caw-agent --print --continue -w . "keep going"
 /model add openai              官方 GPT（别名 gpt / chatgpt）
 /model add anthropic           Claude Messages API（别名 claude）
 /model add deepseek            以及 qwen、qwen-intl、glm、glm-coding、ollama
-/model add myapi https://…/v1 mid    自定义 OpenAI 兼容端点
+/model add myapi https://…/v1 mid    第三方 / OpenAI 兼容网关
 /model key openai sk-...       写入 ~/.caw-agent/secrets.json（所有工作区）
 /model key <provider> clear
 /model url https://.../v1
@@ -281,9 +299,26 @@ caw-agent --print --continue -w . "keep going"
 
 菜单里 Enter 切换，→ 管理，Esc / ← 返回。
 
-**Anthropic：** 供应商为 `anthropic` / `claude` 或主机为 `api.anthropic.com` 时走原生 `/v1/messages`。OpenRouter、DashScope、URL 含 `compatible` 或 `/chat/completions` 的网关仍走 `/v1/chat/completions`。密钥：`ANTHROPIC_API_KEY` 或 `/model key anthropic`。
+### 第三方中转 / OpenAI 兼容网关
 
-查找顺序（当前供应商）：环境变量（`api_key_env` / `OPENAI_API_KEY` / `ANTHROPIC_API_KEY`）→ 可选的项目 `.caw-agent/secrets.json` → **`~/.caw-agent/secrets.json`** → 配置里的内联密钥。`use_keyring` 为 true 时（全局配置默认）优先系统钥匙串。
+NewAPI、OneAPI 以及各类「OpenAI 兼容」中转站，不要改 `openai` / `anthropic` 等官方预设的地址。单独加一个供应商，三样都从中转站控制台抄：
+
+| 填什么 | 从哪抄 |
+|--------|--------|
+| Base URL | OpenAI 兼容地址，一般以 `/v1` 结尾 |
+| 密钥 | 中转站发的 `sk-…`，不是官方 Anthropic / OpenAI key |
+| 模型名 | 它文档里的 id（`gpt-4o`、`claude-sonnet-4`，或 `openai/gpt-4o` 这种带前缀的都常见） |
+
+```text
+/model add relay https://your-gateway.example/v1 claude-sonnet-4
+/model key relay sk-...
+```
+
+请求走 `/v1/chat/completions`。官方 Claude 仍用 `/model add anthropic`（`api.anthropic.com` + 原生 Messages）。OpenRouter 是一等预设：`/model add openrouter`，密钥用 `OPENROUTER_API_KEY`。若你把已有的 `anthropic` 用 `/model url` 指到中转站，也会改走兼容接口，避免把 Messages 请求打到网关。
+
+**Anthropic：** 仅当主机是 `api.anthropic.com` 时走原生 `/v1/messages`。供应商名叫 `anthropic` / `claude` 但 URL 指向别的主机时，按 OpenAI 兼容处理。OpenRouter、DashScope、URL 含 `compatible` 或 `/chat/completions` 的网关同样走 `/v1/chat/completions`。官方密钥：`ANTHROPIC_API_KEY` 或 `/model key anthropic`。
+
+查找顺序（当前供应商）：环境变量（该供应商的 `api_key_env`，例如 OpenRouter 用 `OPENROUTER_API_KEY`；`CAW_API_KEY` 作为兜底）→ 可选的项目 `.caw-agent/secrets.json` → **`~/.caw-agent/secrets.json`** → 配置里的内联密钥。`use_keyring` 为 true 时（全局配置默认）优先系统钥匙串；钥匙串不可用时密钥会留在 `secrets.json`，不会被内存 mock 清掉。
 
 可选：`OPENAI_ORG_ID`、`OPENAI_PROJECT_ID`。
 
@@ -508,5 +543,6 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 | 找不到命令 | `source ~/.caw-agent/env` 或新开终端；安装器会写 rc hook |
 | `serve` 拒绝监听 | 非 `127.0.0.1` / `::1` 必须 `--token` 或 `CAW_SERVE_TOKEN` |
 | Ollama 仍要密钥 | 用 `/model add ollama`，不要走需要 key 的 OpenAI 兼容网关 |
+| 中转站 401 / 模型不存在 | 用中转站自己的 Base URL、密钥和模型名；不要改 `openai` / `anthropic` 预设地址。见 [模型与密钥](#/models) |
 
 本手册是对外使用说明的唯一维护处。实现细节只在私有源码仓里。
