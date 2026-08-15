@@ -2,7 +2,8 @@
 # caw-agent one-line installer.
 #   curl -fsS https://agent.noxcaw.com/install | bash
 #   curl -fsS https://agent.noxcaw.com/install | bash -s -- v0.1.1
-# Env: CAW_TAG  CAW_GITHUB  PREFIX  BIN_DIR  GH_TOKEN  CAW_GITHUB_TOKEN  NO_COLOR  CAW_NO_PATH
+# Windows PowerShell: irm https://agent.noxcaw.com/install.txt | iex
+# Env: CAW_TAG  CAW_GITHUB  PREFIX  BIN_DIR  GH_TOKEN  CAW_GITHUB_TOKEN  NO_COLOR  CAW_NO_PATH  CAW_FORCE
 set -euo pipefail
 
 REPO="${CAW_GITHUB:-noxrick91/caw-agent-hub}"
@@ -170,7 +171,7 @@ esac
 ok "Detected ${os}/${arch} → ${asset}"
 
 dest="${BIN_DIR}/${bin_name}"
-if [ -x "${dest}" ] && [ "${TAG}" = "latest" ]; then
+if [ -z "${CAW_FORCE:-}" ] && [ -x "${dest}" ] && [ "${TAG}" = "latest" ] && "${dest}" --version >/dev/null 2>&1; then
   step "Existing install found — running caw-agent upgrade now"
   ensure_shell_path
   exec "${dest}" upgrade now
@@ -192,7 +193,7 @@ download() {
   local url="$1" out="$2" label="$3"
   step "${label}"
   local code
-  code="$(curl -L --progress-bar "${auth[@]}" -o "${out}" -w "%{http_code}" "${url}" || true)"
+  code="$(curl -L --progress-bar -A "caw-agent-installer" "${auth[@]}" -o "${out}" -w "%{http_code}" "${url}" || true)"
   if [ "${code}" = "404" ]; then
     die "not found: ${url}
   no public Release yet — https://github.com/${REPO}/releases"
@@ -221,15 +222,22 @@ trap cleanup EXIT
 
 mkdir -p "${BIN_DIR}"
 download "${base}/SHA256SUMS" "${tmp}/SHA256SUMS" "Fetching SHA256SUMS…"
-download "${base}/${asset}" "${tmp}/${asset}" "Downloading ${asset}…"
+# Release workflows on Windows may write CRLF; $NF would then be "name\\r".
+tr -d '\r' <"${tmp}/SHA256SUMS" >"${tmp}/SHA256SUMS.lf"
+mv "${tmp}/SHA256SUMS.lf" "${tmp}/SHA256SUMS"
 
-expect="$(awk -v a="${asset}" '$NF==a || $NF=="*"a {print $1; exit}' "${tmp}/SHA256SUMS")"
+sum_for() {
+  awk -v a="$1" '$NF==a || $NF=="*"a {print $1; exit}' "${tmp}/SHA256SUMS"
+}
+
+expect="$(sum_for "${asset}")"
 if [ -z "${expect}" ] && [ -n "${fallback_asset}" ]; then
   step "No ${asset} in this release — using ${fallback_asset}"
   asset="${fallback_asset}"
-  expect="$(awk -v a="${asset}" '$NF==a || $NF=="*"a {print $1; exit}' "${tmp}/SHA256SUMS")"
+  expect="$(sum_for "${asset}")"
 fi
 [ -n "${expect}" ] || die "SHA256SUMS has no entry for ${asset}"
+download "${base}/${asset}" "${tmp}/${asset}" "Downloading ${asset}…"
 got="$(sha256_of "${tmp}/${asset}")"
 if [ "${expect}" != "${got}" ]; then
   die "SHA256 mismatch for ${asset}

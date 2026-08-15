@@ -20,7 +20,7 @@
       </a>
       <nav class="nav">
         <a href="./" aria-current="page" data-keep-lang data-i18n="nav.download">下载</a>
-        <a href="./docs.html#/安装" data-keep-lang data-i18n="nav.docs">文档</a>
+        <a href="./docs.html#/install" data-keep-lang data-i18n="nav.docs">文档</a>
         <span class="lang">
           <button type="button" data-lang="zh">中文</button>
           <button type="button" data-lang="en">EN</button>
@@ -39,7 +39,7 @@
         </p>
         <div class="row">
           <a class="btn" id="dl-recommended" href="#install" data-i18n="hero.downloading">加载中…</a>
-          <a class="btn btn-ghost" href="./docs.html#/安装" data-keep-lang data-i18n="hero.docs">文档</a>
+          <a class="btn btn-ghost" href="./docs.html#/install" data-keep-lang data-i18n="hero.docs">文档</a>
         </div>
         <p class="meta" id="dl-meta" data-i18n="hero.waiting">正在加载最新版</p>
       </div>
@@ -71,14 +71,34 @@
       </div>
     </section>
 
-    <h2 class="sec" data-i18n="sec.install">安装</h2>
-    <div class="panel" id="install">
-      <header>
-        <span id="install-label">Linux</span>
-        <button class="copy" id="copy-install" type="button" data-i18n="install.copy">复制</button>
-      </header>
-      <pre id="install-cmd">curl -fsS https://agent.noxcaw.com/install | bash</pre>
+    <h2 class="sec" data-i18n="sec.howto">安装 · 更新 · 卸载</h2>
+    <div class="howto" id="howto">
+      <div class="panel" id="install">
+        <header>
+          <span><span data-i18n="howto.install">安装</span> · <span id="install-label">Linux</span></span>
+          <button class="copy" id="copy-install" type="button" data-i18n="install.copy">复制</button>
+        </header>
+        <pre id="install-cmd">curl -fsS https://agent.noxcaw.com/install | bash</pre>
+        <p class="note" id="install-note">装到 ~/.caw-agent/bin，并写入 shell PATH。当前终端请 source ~/.caw-agent/env，或新开一个。</p>
+      </div>
+      <div class="panel" id="update">
+        <header>
+          <span data-i18n="howto.update">更新</span>
+          <button class="copy" id="copy-update" type="button" data-i18n="install.copy">复制</button>
+        </header>
+        <pre id="update-cmd">caw-agent upgrade now</pre>
+        <p class="note" id="update-note">只检查、不下载用 caw-agent upgrade。指定版本：caw-agent upgrade v0.1.8。</p>
+      </div>
+      <div class="panel" id="uninstall">
+        <header>
+          <span><span data-i18n="howto.uninstall">卸载</span> · <span id="uninstall-label">Linux</span></span>
+          <button class="copy" id="copy-uninstall" type="button" data-i18n="install.copy">复制</button>
+        </header>
+        <pre id="uninstall-cmd">rm -rf ~/.caw-agent</pre>
+        <p class="note" id="uninstall-note">会删掉二进制、配置、密钥和 MCP。shell rc 里 # &gt;&gt;&gt; caw-agent &gt;&gt;&gt; 到 # &lt;&lt;&lt; caw-agent &lt;&lt;&lt; 那几行请手动删。</p>
+      </div>
     </div>
+    <p class="howto-more"><a href="./docs.html#/install" data-keep-lang data-i18n="howto.docs">完整说明见文档</a></p>
 
     <h2 class="sec" data-i18n="sec.why">为什么用它</h2>
     <div class="grid">

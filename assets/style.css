@@ -233,7 +233,25 @@ h1 {
   height: 1px;
   background: var(--line);
 }
-.sec + .panel, .sec + .grid, .sec + .table-wrap { margin-top: 0; }
+.sec + .panel, .sec + .grid, .sec + .table-wrap, .sec + .howto { margin-top: 0; }
+.howto {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 8px;
+}
+.howto .panel { margin: 0; }
+.howto .note {
+  margin: 0;
+  padding: 0 16px 14px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.howto-more {
+  margin: 4px 0 8px;
+  font-size: 13px;
+}
 .panel {
   margin: 28px 0 8px;
   background: var(--bg-2);
@@ -392,6 +410,7 @@ footer {
   .row .btn { justify-content: center; }
   .grid { grid-template-columns: 1fr; margin-top: 20px; }
   .sec { margin: 36px 0 12px; font-size: 18px; }
+  .howto { grid-template-columns: 1fr; }
   .panel pre, .cmd { font-size: 12px; padding: 12px; white-space: pre-wrap; word-break: break-all; }
 }
 

@@ -17,7 +17,7 @@ curl -fsS https://agent.noxcaw.com/install | bash
 Windows PowerShell：
 
 ```powershell
-irm https://agent.noxcaw.com/install.ps1 | iex
+irm https://agent.noxcaw.com/install.txt | iex
 ```
 
 安装脚本会把 `~/.caw-agent/bin` 写进 shell rc（并 `source ~/.caw-agent/env`）。之后：

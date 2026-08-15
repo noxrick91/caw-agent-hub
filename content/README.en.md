@@ -1,0 +1,551 @@
+# caw-agent user guide
+
+caw-agent is a coding partner that lives in your terminal. It reads code, edits files, and runs tests in the project you opened. Before every write or command, it stops and waits for your OK. The UI is a Claude Code–style TUI, with a permission broker, a sandbox, MCP, sessions, and memory.
+
+Prebuilt binaries install from this site’s [GitHub Releases](https://github.com/noxrick91/caw-agent-hub/releases) into `~/.caw-agent/bin`. The source repo is private.
+
+### What it does
+
+- Stays inside the workspace you opened; every read, edit, and run shows up in the terminal
+- Asks before writing files or running commands; you can tighten or loosen permissions per project
+- Remembers project habits across sessions; MCP servers and skills plug in when you need them
+- Works with official APIs, local Ollama, and third-party OpenAI-compatible gateways
+
+### Where models come from
+
+Official providers are `/model add <preset>` — `openai`, `anthropic`, `deepseek`, `qwen`, and the others in the menu. Local models are `/model add ollama`; no cloud key.
+
+Relays (NewAPI, OneAPI, and other “OpenAI-compatible” hosts) should **not** overwrite an official preset URL. Add a separate named provider with the gateway’s base URL, key, and model id. See [Models and keys](#/models).
+
+### How to read this guide
+
+Start with [Install](#/install) and [Quick start](#/quick-start). Slash commands, permissions, sessions, and MCP come later. The **中文 / EN** control switches the whole manual and keeps you on the same page.
+
+---
+
+## What's new
+
+This page lists changes in the **current public release**. CI replaces this section from `CHANGELOG.md`.
+
+Full history: [CHANGELOG.md](./CHANGELOG.md).
+
+---
+
+## Install
+
+### One-line install
+
+Linux / macOS / Git Bash:
+
+```bash
+curl -fsS https://agent.noxcaw.com/install | bash
+```
+
+Pin a version:
+
+```bash
+curl -fsS https://agent.noxcaw.com/install | bash -s -- v0.1.1
+# or
+CAW_TAG=v0.1.1 curl -fsS https://agent.noxcaw.com/install | bash
+```
+
+Windows PowerShell:
+
+```powershell
+irm https://agent.noxcaw.com/install.txt | iex
+```
+
+The script picks the asset for your OS/ARCH (Linux x64/arm64, macOS Apple Silicon/Intel, Windows x64/ARM64), checks `SHA256SUMS` from the same Release, and installs into `~/.caw-agent/bin`. Windows ARM64 prefers the native build; if that Release has none, it falls back to x64 (system emulation). When a copy is already installed and you ask for latest, it runs `caw-agent upgrade now`. The installer writes `~/.caw-agent/env` and adds a hook in `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`, then `source`s that env. `curl | bash` cannot update the shell you already have open — open a new terminal, or run `source ~/.caw-agent/env`. Set `CAW_NO_PATH=1` to skip the rc hook.
+
+If Pages is not live yet:
+
+```bash
+curl -fsS https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install | bash
+```
+
+### Website / manual download
+
+Open the homepage, download the latest asset for your platform, put it in `~/.caw-agent/bin` (Windows: `%USERPROFILE%\.caw-agent\bin\caw-agent.exe`), and check `SHA256SUMS`. The homepage “this build / all time” counts come from each GitHub Release asset’s `download_count`: one-line install, `caw-agent upgrade`, and browser downloads all increment it. Fetching the `install` script from Pages does not; `SHA256SUMS` is counted separately (each install downloads the checksum file first). `upgrade --check` only hits the API.
+
+| Platform | Asset |
+|----------|--------|
+| Linux x86_64 | `caw-agent-x86_64-unknown-linux-gnu` |
+| Linux aarch64 | `caw-agent-aarch64-unknown-linux-gnu` |
+| macOS Apple Silicon | `caw-agent-aarch64-apple-darwin` |
+| macOS Intel | `caw-agent-x86_64-apple-darwin` |
+| Windows x64 | `caw-agent-x86_64-pc-windows-msvc.exe` |
+| Windows ARM64 | `caw-agent-aarch64-pc-windows-msvc.exe` (installer falls back to x64 if missing) |
+
+Unsupported combos (Linux musl, 32-bit Windows) have no prebuilt — build from source.
+
+### Upgrade after install
+
+A bare command **only checks**; it does not download:
+
+```text
+/upgrade
+caw-agent upgrade
+caw-agent upgrade --check
+```
+
+Install latest (only when newer than the current binary):
+
+```text
+/upgrade now
+caw-agent upgrade now
+```
+
+Pin a tag (can install an older build):
+
+```text
+/upgrade v0.1.1
+caw-agent upgrade v0.1.1
+```
+
+Downloads show bytes and percent, verify SHA256, then run `--version`. A mismatch restores the `.bak`. Default hub is `noxrick91/caw-agent-hub`. Override with `CAW_GITHUB=owner/name`.
+
+On Windows, replacing a running binary writes beside it and asks you to restart.
+
+### Uninstall
+
+There is no separate uninstaller. Delete the install directory; that also removes config, keys, and MCP packs:
+
+```bash
+rm -rf ~/.caw-agent
+```
+
+```powershell
+Remove-Item -Recurse -Force $HOME\.caw-agent
+```
+
+Then clean PATH by hand: on Linux / macOS remove the `# >>> caw-agent >>>` … `# <<< caw-agent <<<` block from `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`; on Windows remove `%USERPROFILE%\.caw-agent\bin` from the user PATH. Per-project `.caw-agent/` folders are left alone.
+
+### Install from source
+
+The source repo is not public. Developers with access, in the private `caw-agent` repo:
+
+```bash
+./scripts/install.sh          # cargo install → ~/.caw-agent/bin
+cargo run -p caw-agent -- --workdir .
+```
+
+**Linux build deps:** `pkg-config`, `libxcb1-dev`, `libxrandr-dev` (X11 screenshots). Wayland screenshots prefer `grim`; computer-use prefers `ydotool`.
+
+**Windows:** MSVC. Native Windows has **no** exec OS jail — use WSL2 for sandboxed `run`.
+
+**macOS:** screenshot / computer-use need Screen Recording and Accessibility; `cliclick` is recommended.
+
+---
+
+## Quick start
+
+```bash
+caw-agent --workdir .
+# short
+caw-agent -w .
+```
+
+The first visit to a workspace that has not finished onboarding opens a wizard: pick a theme, confirm the workspace. Change the theme later with `/theme`.
+
+Configure a model (any one):
+
+```text
+/model add openai
+/model key openai sk-...
+
+/model add anthropic
+/model key anthropic sk-ant-...
+
+/model add ollama
+```
+
+Or env vars: `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `OPENROUTER_API_KEY` / `CAW_API_KEY`. Local Ollama models **do not** need an API key.
+
+Without a cloud key you can still try the demo heuristics (`read Cargo.toml`, `grep fn `, `git status`).
+
+With several models, `/router` sends simple turns to fast and harder work to default / strong. `/help` lists every slash command.
+
+---
+
+## CLI
+
+```text
+caw-agent [options] [--print prompt…]
+caw-agent upgrade [--check] [now|latest|vX.Y.Z]
+caw-agent rewind
+caw-agent serve [--listen 127.0.0.1:4150] [--token TOKEN] [--workdir DIR]
+```
+
+| Option | Meaning |
+|--------|---------|
+| `-w, --workdir` | Workspace root (default: current directory) |
+| `--add-dir` | Extra work directory (repeatable; Claude `--add-dir`) |
+| `--no-mcp` | Do not auto-start MCP |
+| `--base-url` / `CAW_BASE_URL` | OpenAI-compatible API |
+| `--model` / `CAW_MODEL` | Model id |
+| `--api-key` / `CAW_API_KEY` | Key for this process |
+| `-c, --continue` | Resume the last session in this workspace |
+| `-r, --resume <id>` | Resume by full UUID or unique prefix |
+| `--permission-mode` | `default` \| `acceptEdits` \| `plan` \| `auto` \| `bypassPermissions` |
+| `--dangerously-skip-permissions` | Enter full access |
+| `-p, --print` | No TUI; assistant reply on stdout |
+| `--output-format` | `text` (default) \| `json` \| `stream-json` |
+| `--on-approval` | Permission prompt: `fail` (default, exit 2) \| `deny` \| `allow` |
+| `--on-ask` | `AskUserQuestion`: `fail` \| `skip` \| `first` \| `all` |
+| `--on-plan` | `ExitPlanMode`: `fail` \| `approve` \| `revise` |
+| `--allowed-tools` / `--allowed-tools-file` | Tool globs auto-approved in `--print` |
+| `--deny-tools` | Tool globs always denied |
+| `--max-turns` | Max LLM rounds in `--print` |
+| `-V, --version` | Print `caw-agent x.y.z` |
+
+`--print` defaults to permission mode **auto** so unattended runs are not stuck on every write. Pass `--permission-mode default` when you want the gate. Network, screen, and MCP still fail closed unless `--dangerously-skip-permissions`.
+
+```bash
+caw-agent --print -w . "summarize this repo"
+caw-agent --print --output-format stream-json --on-approval deny -w . "list public API"
+caw-agent --print --on-ask first --on-plan approve -w . "propose a plan then implement"
+caw-agent --print --continue -w . "keep going"
+```
+
+`--print` writes the session under `.caw-agent/sessions/` (including token totals for `/cost`) and prints a resume id on stderr. Ctrl+C / SIGTERM save first, then exit 130. `--continue` errors if this workspace has no stored session.
+
+### `caw-agent serve`
+
+Local REST / SSE control plane, default `http://127.0.0.1:4150`. A non-loopback listen requires `--token` or `CAW_SERVE_TOKEN` (`Authorization: Bearer …`).
+
+| Path | Meaning |
+|------|---------|
+| `GET /v1/health` | Liveness |
+| `GET /v1/models` | Configured providers and router |
+| `GET /v1/sessions` | Session list |
+| `POST /v1/sessions` | New session |
+| `GET /v1/sessions/{id}` | Session summary |
+| `POST /v1/sessions/{id}/prompt` | Submit a prompt (`{"prompt":"…","stream":true}` for SSE) |
+| `POST /v1/sessions/{id}/cancel` | Cancel the in-flight turn |
+
+`--on-approval` / `--on-ask` / `--on-plan` match `--print`. Permission prompts fail closed when nobody is there.
+
+---
+
+## Slash commands
+
+`/help` lists built-in commands. Common ones:
+
+```text
+/settings · /config      control panel
+/permissions             mode and grant summary
+/model                   providers and keys
+/router                  pick a model by complexity (on|off|pin|heuristic|hybrid|llm|fast|…)
+/theme                   theme (dark light midnight forest ember ocean noir dusk dawn ansi)
+/compact [focus]         compact older turns
+/context                 context-use estimate
+/cost                    estimated spend this session (persisted)
+/cost limit <usd>|off    stop before the next LLM call at the cap
+/export [md|json] [path] redacted transcript (default .caw-agent/exports/)
+/upgrade [now|vX.Y.Z]    check or install a GitHub Release + hub MCP
+/notify on|off           desktop toast when a background tab or --print finishes
+/copy [N]                copy the Nth last assistant reply
+/diff                    git diff --stat
+/goal <cond>|clear       keep going until the condition
+/loop [5m] <prompt>      re-queue when idle
+/doctor                  dependency and setup checkup
+/hooks                   loaded plugin hooks
+/btw <q>                 side question (not in the main history; Esc cancels)
+/about                   author and pixel animation
+/memory                  memory on/off / list / open the folder
+/dream                   consolidate memory now
+/continue                resume the last session
+/load <id>               resume by id
+/pause [note]            pause and print a resume id
+/new · /clear            new session
+/save · /sessions        save / list
+/cd [path]               switch workspace (creates the dir if missing)
+/add-dir [path]          extra work directory
+/rewind                  file checkpoints (undo · last · redo)
+/plan                    plan mode
+/debug                   debugger session
+/init                    detect the stack and write CAW.md
+/skills · /skill <name>  skills
+/mcp                     MCP packs (list / install NAME)
+/plugin enable|disable   plugins
+/worktrees               Task worktree list
+/todos [expand|collapse] task list above the prompt
+/agents · /tasks         subagents and background tasks
+/exit                    save and quit (exit / quit work too)
+```
+
+Cycle permission modes with **Shift+Tab** (or **Alt+M** / **Alt+Shift+M**): default → accept edits → plan → auto → full access.
+
+Tasks and agents share a row above the prompt: side by side when both are open and the terminal is wide, stacked when it is narrow. Click `▾` / `▸` on a title to fold that panel. `← →` switches main / subagent; `Alt+↑↓` scrolls the task list.
+
+---
+
+## Models and keys
+
+The default provider is `openai` → `https://api.openai.com/v1` (`gpt-5.6`).
+
+```text
+/model                         open the menu
+/model list                    list and key status
+/model <name>                  switch a saved provider
+/model add openai              official GPT (aliases gpt / chatgpt)
+/model add anthropic           Claude Messages API (alias claude)
+/model add deepseek            also qwen, qwen-intl, glm, glm-coding, ollama
+/model add myapi https://…/v1 mid    third-party / OpenAI-compatible gateway
+/model key openai sk-...       write ~/.caw-agent/secrets.json (all workspaces)
+/model key <provider> clear
+/model url https://.../v1
+/model name gpt-4o-mini
+/model env CAW_API_KEY
+/model remove ollama
+```
+
+In the menu: Enter switches, → manages, Esc / ← goes back.
+
+### Third-party / OpenAI-compatible gateways
+
+NewAPI, OneAPI, and other “OpenAI-compatible” relays should be a **separate named provider**. Do not rewrite `openai` / `anthropic` preset URLs. Copy three things from the gateway console:
+
+| Field | Where to get it |
+|-------|-----------------|
+| Base URL | OpenAI-compatible root, usually ending in `/v1` |
+| Key | The `sk-…` the gateway issued — not an official Anthropic / OpenAI key |
+| Model id | Whatever it lists (`gpt-4o`, `claude-sonnet-4`, or prefixed ids like `openai/gpt-4o`) |
+
+```text
+/model add relay https://your-gateway.example/v1 claude-sonnet-4
+/model key relay sk-...
+```
+
+Traffic uses `/v1/chat/completions`. Official Claude stays on `/model add anthropic` (`api.anthropic.com` + native Messages). OpenRouter is a first-class preset: `/model add openrouter`, key `OPENROUTER_API_KEY`. If you point an existing `anthropic` profile at a gateway with `/model url`, that host also uses the compatible API so Messages requests are not sent to the relay.
+
+**Anthropic:** native `/v1/messages` only when the host is `api.anthropic.com`. A provider named `anthropic` / `claude` aimed at any other host uses OpenAI-compatible `/v1/chat/completions`. OpenRouter, DashScope, and URLs containing `compatible` or `/chat/completions` do the same. Official key: `ANTHROPIC_API_KEY` or `/model key anthropic`.
+
+Lookup order (active provider): env (`api_key_env` for that provider — OpenRouter is `OPENROUTER_API_KEY`; `CAW_API_KEY` is a last resort) → optional project `.caw-agent/secrets.json` → **`~/.caw-agent/secrets.json`** → inline key in config. When `use_keyring` is true (the global default), the OS keyring is tried first. If the keyring backend is not durable, the key stays in `secrets.json` instead of being wiped by an in-memory mock.
+
+Optional: `OPENAI_ORG_ID`, `OPENAI_PROJECT_ID`.
+
+**Ollama:** after `/model add ollama`, pick a pulled model in the menu. **No API key.** An empty `config.json` does not block startup.
+
+**Router:** `/router on` picks fast / default / strong from turn complexity. Classifier: `heuristic` (rules), `llm` (a short extra call), or `hybrid`. `/router pin` freezes the current `/model`. Set a tier with `/router fast|default|strong [provider] [model]`.
+
+---
+
+## Workspace and home
+
+Each project has its own `.caw-agent/`; cross-project data lives in `~/.caw-agent/`.
+
+### `~/.caw-agent/`
+
+| Path | Use |
+|------|-----|
+| `config.json` | Global defaults (e.g. theme for new workspaces) |
+| `secrets.json` | API keys (`/model key` writes here) |
+| `rules/*.md` | Global rules you write |
+| `memory/` | Global auto memory (OS / toolchain pitfalls) |
+| `hf/` | Default download dir for the `hf` tool |
+| `skills/` | Skill overrides (default skills are baked into the binary) |
+| `tools/` | Portable installs and winget `--location` |
+| `bin/` | Released binaries and shims (prepended to `run` / debug PATH) |
+| `downloads/` | Default dir for `download_file` |
+| `scoop/` | Isolated Scoop root on Windows |
+| `mcp/` | Installed MCP packs |
+
+### Project `.caw-agent/`
+
+| Path | Use |
+|------|-----|
+| `config.json` | Model, permissions, MCP, `last_session_id`, memory flags |
+| `secrets.json` | Optional project key override (do not commit) |
+| `memory/` | Project auto memory |
+| `sessions/` | Sessions |
+| `exports/` | Redacted `/export` transcripts |
+| `checkpoints/` | `/rewind` file snapshots |
+| `audit.log` | Tool allow/deny audit |
+| `input_history.json` | Prompt history |
+| `rules/*.md` | Project rules |
+| `worktrees/` | Isolated trees for `Task worktree: true` |
+| `media/` | Screenshot output (still inside the jail) |
+| `plan.md` | Plan-mode draft |
+
+Write project notes in `CAW.md` at the workspace root. MCP servers go in `.mcp.json`.
+
+`/cd` switches workspace mid-session: saves the old session, loads config / skills / MCP for the new root, rebinds the file jail, and opens a new session id (on-screen chat text stays). You cannot switch during a turn or a permission prompt.
+
+---
+
+## Permissions and sandbox
+
+### Modes
+
+| Mode | Behavior |
+|------|----------|
+| `default` | Reads may auto-allow; write / exec / MCP / network / screenshot ask |
+| `acceptEdits` | File writes and safe filesystem commands auto-pass; MCP / network / other `run` still ask |
+| `plan` | Research only. After writing `.caw-agent/plan.md`, `ExitPlanMode`; you approve before implement |
+| `auto` | accept-edits + `analyze` / check-test-lint + git **read-only checks**. Mutating git, bare `make`, network, screen, MCP, and installs still ask |
+| `bypassPermissions` (UI: **full access**) | Skip every prompt (including screenshots). Leaving full access clears session grants |
+
+Hard denies (`permissions.deny`, `/settings deny exec:rm *`) apply in every mode, including full access. `/settings clear-grants` clears grants and deny rules.
+
+The first time you enter full access, it confirms and writes `"allow_bypass": true`.
+
+**Full access only skips prompts. It does not turn off the OS jail.** Same as Claude Code.
+
+Permission sheet: `1` / Enter once · `2` this session · `3` write to config · Esc deny.
+
+### File jail
+
+`read_file` / `write_file` / `delete_file` / `list_dir` / `glob` / `grep` / `apply_patch` must land inside the canonicalized workspace. Escaping through intermediate symlinks is denied. `delete_file` only deletes files. `.ipynb` is edited as a cell view.
+
+### OS jail for `run`
+
+| System | Backend | Notes |
+|--------|---------|-------|
+| Linux / WSL2 | bubblewrap + proxy bridge | Needs `bwrap` + `socat`. Blocks `*.exe` / `/mnt/...` |
+| macOS | Seatbelt (`sandbox-exec`) | Built in. Denies `~/.ssh` |
+| Native Windows | **Unavailable** (fail closed) | Default `sandbox: false`; use WSL2 |
+
+Defaults: jail **on** (except Windows), exec network **off**, timeout 120s. `/settings sandbox` turns the jail off. Every sandboxed `run` that fails attaches `<sandbox_violations>`. `dangerouslyDisableSandbox: true` is a one-shot escape (`/settings unsandbox`).
+
+Hard blocks include fork-bombs, `rm -rf /`, piping into a shell, and reading or writing `.caw-agent/secrets.json` / `config.json`.
+
+---
+
+## Sessions, memory, and export
+
+| Layer | Path | Who writes | Use |
+|-------|------|------------|-----|
+| Global rules | `~/.caw-agent/rules/*.md` | you | Fixed notes for every workspace |
+| Global memory | `~/.caw-agent/memory/` | agent + you | Machine-level pitfalls across repos |
+| Project rules | `CAW.md` | you | This repo |
+| Project memory | `.caw-agent/memory/` | agent + you | Architecture, build commands, quirks |
+| Session handoff | session JSON `handoff` | `/pause` or a tool | Where you left off |
+
+After a failed recovery with no memory write, the turn end nags once. Two failures in the same turn without reading memory interrupt and ask you to open the index / `debugging.md` first. Idle loops trip a breaker: after the same error enough times, `run` / edit / install stop and you get continue / change approach / change model.
+
+`/dream` consolidates memory with the current LLM. It also runs when `auto_dream_enabled` and writes since the last dream ≥ `auto_dream_min_writes`.
+
+`/cost` reads persisted tokens; resuming a session **does not** reset spend. `/export md|json` writes a redacted transcript and does not change the on-disk session file. Auto-compact prefers `prompt_tokens` from the API, otherwise chars/4.
+
+`/rewind` or **Esc Esc** on an empty prompt opens checkpoints: restore code, chat, or both. It does not undo `run` / MCP / hand edits — use git for those.
+
+If background tasks are still running, the first `/exit` or Ctrl+C asks you to confirm.
+
+---
+
+## Tools
+
+| Tool | Meaning | Permission |
+|------|---------|------------|
+| File read/write / glob / grep / apply_patch | Workspace jail | Read may auto; write asks |
+| `run` | Command at the workspace root | Exec + optional OS jail |
+| `analyze` | Run checks/tests and parse `file:line` | Exec |
+| `debug` | gdb / lldb / cdb / pdb / node / dlv / jdb / … | Exec |
+| `git_*` | status / diff / log / commit / fetch / pull / push / conflicts / stash | Checks are read-only; mutations need Exec. commit rejects Cursor attribution. push never uses `--force` |
+| `gh` | PR / issue / release / run / `repo_view`; create and comment | No merge / close / `gh api` |
+| `hf` | Hugging Face: whoami / download / upload / cache | Download uses network; upload needs Exec. Token: `HF_TOKEN` |
+| `db` | sqlite (workspace path) or postgres / mysql (DSN) | Read-only query; `exec` asks. Non-localhost needs an allowlist |
+| `docker` | `ps` / images / logs / build / compose | No `--privileged`. Unsandbox if the jail blocks the socket |
+| `ssh` | Allowlisted host `exec` / upload / download | New hosts need approval; no `ssh-copy-id` |
+| `cloud` | `aws` / `gcloud` / `az` / `kubectl` | Read-only checks auto; mutations ask. No destroy / login |
+| `web_search` / `web_fetch` / `download_file` | Search and download | Network; no localhost / private nets |
+| `screenshot` / `computer` | Screenshot and mouse/keyboard | Screen. computer-use is **off** by default; `/settings computer-use` |
+| `extract_archive` | zip / tar / gz… | Write |
+| `install_program` | winget / choco / scoop / portable extract | Exec |
+| `Task` | Subagent. `worktree: true` jails to `.caw-agent/worktrees/<id>/` | — |
+| `Worktree` | `list` / `merge` / `abandon` | — |
+
+Under `auto`, git is **check-only**: `git_status` / `git_conflicts` / `git status|diff|log|show` / `git stash list|show`. Rebase still goes through `run`.
+
+Screenshots write inside the jail (default `.caw-agent/media/`). Full-screen capture tries to hide this terminal. macOS uses ScreenCaptureKit, then CoreGraphics.
+
+Computer-use has a machine-level lock, an app allowlist, and hard denies for password managers / banks. For the browser, `/mcp install browser` — do not click the web with `computer`.
+
+---
+
+## MCP and skills
+
+`.mcp.json` supports stdio or a remote URL (HTTP / SSE):
+
+```json
+{
+  "mcpServers": {
+    "local": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "."] },
+    "remote": { "url": "https://example.com/mcp", "headers": { "Authorization": "Bearer …" } }
+  }
+}
+```
+
+Official packs live in the public repo under `mcp/` ([catalog](https://github.com/noxrick91/caw-agent-hub/tree/master/mcp)): browser, doc, image, ocr, speech, freecad, blender. `/mcp install <name>` downloads from GitHub into `~/.caw-agent/mcp/<name>/`. Any GitHub pack works: `/mcp install owner/repo` or a repo URL. Workspace `./mcp/<name>`, a folder, or a zip still work. After `/mcp install browser`, use `mcp__browser__*`.
+
+Attached audio is only a path — it is **not** transcribed automatically. Use the speech pack when the user asks.
+
+Default skills are baked in: `review`, `fix`, `commit`, `doctor`, `verify`, `code-review`, `simplify`, `batch`, `pr`. Override with `~/.caw-agent/skills/` or workspace `skills/`. `/mcp install` copies that pack’s skills into global skills (stamped `.mcp-pack`); uninstall removes only stamped copies.
+
+```text
+/skills
+/skill review [args]
+/review
+/plugin enable <name>
+```
+
+---
+
+## UI and shortcuts
+
+Multi-tab: each tab has its own turn and queue. `ctrl+t` new tab, `ctrl+tab` switch, `ctrl+w` close. A background tab that finished is marked `•`.
+
+Above the prompt: **tasks / agents**. It appears when there are todos or subagents. Side by side and equal height when both are expanded and the terminal is wide; stacked and content-sized when it is narrow. Click `▾` / `▸` to fold one side. Todos follow document order, top to bottom; agents are newest-first (`main` pinned at the top).
+
+`← →` / `↓` switch main / sub; `/agents` opens the list; `/todos expand|collapse` folds tasks. The wheel scrolls the panel under the pointer; `Alt+↑↓` scrolls tasks. `/worktrees` manages isolated trees.
+
+While busy, Enter **queues** and does not interrupt. Esc: clear the draft first; if empty and busy, cancel. **Ctrl+C** quits (confirms if background tasks are running). **Ctrl+Shift+C** copies a dragged transcript selection.
+
+`@` opens the file picker. A long paste collapses to `[Pasted text #N]`. `PageUp` / `PageDown` page the transcript.
+
+---
+
+## Config snippets
+
+Common keys in `.caw-agent/config.json`:
+
+```json
+{
+  "auto_memory_enabled": true,
+  "auto_dream_enabled": true,
+  "auto_dream_min_writes": 3,
+  "auto_compact_enabled": true,
+  "compact_token_threshold": 80000,
+  "cost_limit_usd": 5.0,
+  "notify_on_idle": false,
+  "router": {
+    "enabled": false,
+    "classifier": "heuristic",
+    "fast": { "provider": "ollama", "model": "qwen2.5-coder:7b" }
+  }
+}
+```
+
+`/settings notify-on-idle` or `/notify on`: desktop toast when a background tab finishes or `--print` completes (off by default).
+
+---
+
+## Troubleshooting
+
+| Symptom | What to do |
+|---------|------------|
+| Upgrade HTTP 404 | That tag has no Release yet, or the private repo has not pushed artifacts to the hub. See [Releases](https://github.com/noxrick91/caw-agent-hub/releases) |
+| No asset for this platform | The matrix is only the targets in the table above |
+| GitHub 403 / 429 | Set `GH_TOKEN` or `CAW_GITHUB_TOKEN` |
+| SHA256 mismatch | Download again; do not mix sums and binaries from different tags |
+| `--version` mismatch | The installer tries to restore the `.bak` |
+| Native Windows `run` sandbox fails | Expected; use WSL2 or `/settings sandbox` to turn the jail off |
+| macOS screenshot is black / empty | Grant the terminal Screen Recording, then restart the terminal |
+| `--print` exit code 2 | Default `fail`: a permission / question / plan needs a human. Change `--on-approval` / `--on-ask` / `--on-plan` |
+| Command not found | `source ~/.caw-agent/env` or open a new terminal; the installer writes an rc hook |
+| `serve` refuses to listen | Anything other than `127.0.0.1` / `::1` needs `--token` or `CAW_SERVE_TOKEN` |
+| Ollama still asks for a key | Use `/model add ollama`, not an OpenAI-compatible gateway that requires a key |
+| Gateway 401 / unknown model | Use the relay’s own base URL, key, and model id; do not rewrite `openai` / `anthropic` presets. See [Models and keys](#/models) |
+
+This manual is the only public usage doc. Implementation notes stay in the private source repo.

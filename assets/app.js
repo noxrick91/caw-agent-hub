@@ -203,7 +203,7 @@ async function renderHome(releases) {
 
   document.getElementById("release-tag").textContent = tag;
   detectedPlatform = platform;
-  applyInstall(platform);
+  applyHowto(platform);
 
   const hereLabel = d?.table?.here || "本机";
   const checksumLabel = d?.table?.checksum || "校验和";
@@ -255,7 +255,10 @@ function showError(err) {
 }
 
 const INSTALL_UNIX = "curl -fsS https://agent.noxcaw.com/install | bash";
-const INSTALL_WIN = "irm https://agent.noxcaw.com/install.ps1 | iex";
+const INSTALL_WIN = "irm https://agent.noxcaw.com/install.txt | iex";
+const UPDATE_CMD = "caw-agent upgrade now";
+const UNINSTALL_UNIX = "rm -rf ~/.caw-agent";
+const UNINSTALL_WIN = "Remove-Item -Recurse -Force $HOME\\.caw-agent";
 
 function installLabel(platform) {
   const d = typeof dict === "function" ? dict().install : null;
@@ -265,12 +268,33 @@ function installLabel(platform) {
   return d?.unix || "Linux / macOS";
 }
 
-function applyInstall(platform) {
+function applyHowto(platform) {
   const win = platform === "win-x64" || platform === "win-arm64";
-  const cmd = document.getElementById("install-cmd");
-  if (cmd) cmd.textContent = win ? INSTALL_WIN : INSTALL_UNIX;
-  const label = document.getElementById("install-label");
-  if (label) label.textContent = installLabel(platform);
+  const how = typeof dict === "function" ? dict().howto : null;
+  const installCmd = document.getElementById("install-cmd");
+  if (installCmd) installCmd.textContent = win ? INSTALL_WIN : INSTALL_UNIX;
+  const installLabelEl = document.getElementById("install-label");
+  if (installLabelEl) installLabelEl.textContent = installLabel(platform);
+  const installNote = document.getElementById("install-note");
+  if (installNote) {
+    installNote.textContent = win
+      ? how?.installNoteWin || installNote.textContent
+      : how?.installNoteUnix || installNote.textContent;
+  }
+  const updateCmd = document.getElementById("update-cmd");
+  if (updateCmd) updateCmd.textContent = UPDATE_CMD;
+  const updateNote = document.getElementById("update-note");
+  if (updateNote && how?.updateNote) updateNote.textContent = how.updateNote;
+  const uninstallCmd = document.getElementById("uninstall-cmd");
+  if (uninstallCmd) uninstallCmd.textContent = win ? UNINSTALL_WIN : UNINSTALL_UNIX;
+  const uninstallLabel = document.getElementById("uninstall-label");
+  if (uninstallLabel) uninstallLabel.textContent = installLabel(platform);
+  const uninstallNote = document.getElementById("uninstall-note");
+  if (uninstallNote) {
+    uninstallNote.textContent = win
+      ? how?.uninstallNoteWin || uninstallNote.textContent
+      : how?.uninstallNoteUnix || uninstallNote.textContent;
+  }
 }
 
 function bindCopy(btnId, preId) {
@@ -290,14 +314,16 @@ function bindCopy(btnId, preId) {
   });
 }
 bindCopy("copy-install", "install-cmd");
+bindCopy("copy-update", "update-cmd");
+bindCopy("copy-uninstall", "uninstall-cmd");
 
 let detectedPlatform = "linux-x64";
 detectPlatform().then((p) => {
   detectedPlatform = p;
-  applyInstall(p);
+  applyHowto(p);
 });
 document.addEventListener("caw-lang", () => {
-  applyInstall(detectedPlatform);
+  applyHowto(detectedPlatform);
   if (lastReleases) renderHome(lastReleases);
 });
 

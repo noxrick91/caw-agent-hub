@@ -33,6 +33,16 @@
     el = document.createElement("section");
     el.id = "whats-new";
     el.className = "whats-new";
+    const howtoMore = document.querySelector(".howto-more");
+    if (howtoMore && howtoMore.parentNode) {
+      howtoMore.insertAdjacentElement("afterend", el);
+      return el;
+    }
+    const howto = document.getElementById("howto");
+    if (howto && howto.parentNode) {
+      howto.insertAdjacentElement("afterend", el);
+      return el;
+    }
     const install = document.getElementById("install");
     const after = install && (install.closest(".panel") || install);
     if (after && after.parentNode) {
@@ -75,8 +85,10 @@
     log.textContent = "Full changelog";
     const sep = document.createTextNode(" · ");
     const docs = document.createElement("a");
-    docs.href = "./docs.html#/what-s-new";
+    docs.setAttribute("data-keep-lang", "");
+    docs.href = "./docs.html#/whats-new";
     docs.textContent = "Release notes";
+    if (typeof applyI18n === "function") applyI18n(more);
     more.append(log, sep, docs);
     panel.append(ul, more);
     el.replaceChildren(h, panel);

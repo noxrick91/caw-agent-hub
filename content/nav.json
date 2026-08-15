@@ -2,23 +2,43 @@
   "groups": [
     {
       "title": { "zh": "开始使用", "en": "Getting started" },
-      "pages": ["介绍", "安装", "快速开始"]
+      "pages": [
+        { "key": "intro", "zh": "介绍", "en": "Introduction" },
+        { "key": "install", "zh": "安装", "en": "Install" },
+        { "key": "quick-start", "zh": "快速开始", "en": "Quick start" }
+      ]
     },
     {
       "title": { "zh": "使用", "en": "Using" },
-      "pages": ["斜杠命令", "命令行", "模型与密钥", "界面与快捷键"]
+      "pages": [
+        { "key": "slash-commands", "zh": "斜杠命令", "en": "Slash commands" },
+        { "key": "cli", "zh": "命令行", "en": "CLI" },
+        { "key": "models", "zh": "模型与密钥", "en": "Models and keys" },
+        { "key": "ui", "zh": "界面与快捷键", "en": "UI and shortcuts" }
+      ]
     },
     {
       "title": { "zh": "工作区", "en": "Workspace" },
-      "pages": ["工作区与全局目录", "权限与沙箱", "会话、记忆与导出"]
+      "pages": [
+        { "key": "workspace", "zh": "工作区与全局目录", "en": "Workspace and home" },
+        { "key": "permissions", "zh": "权限与沙箱", "en": "Permissions and sandbox" },
+        { "key": "sessions", "zh": "会话、记忆与导出", "en": "Sessions, memory, and export" }
+      ]
     },
     {
       "title": { "zh": "扩展", "en": "Extend" },
-      "pages": ["MCP 与技能", "工具摘要", "配置片段"]
+      "pages": [
+        { "key": "mcp", "zh": "MCP 与技能", "en": "MCP and skills" },
+        { "key": "tools", "zh": "工具摘要", "en": "Tools" },
+        { "key": "config", "zh": "配置片段", "en": "Config snippets" }
+      ]
     },
     {
       "title": { "zh": "帮助", "en": "Help" },
-      "pages": ["What's new", "故障排除"]
+      "pages": [
+        { "key": "whats-new", "zh": "What's new", "en": "What's new" },
+        { "key": "troubleshooting", "zh": "故障排除", "en": "Troubleshooting" }
+      ]
     }
   ]
 }
