@@ -25,11 +25,22 @@ Start with [Install](#/install) and [Quick start](#/quick-start). Slash commands
 
 ## What's new
 
-This page lists changes in the **current public release**. CI replaces this section from `CHANGELOG.md`.
+This page lists changes in the **current public release**.
+
+**What's new in v0.1.8** — 2026-08-15
+
+- Code blocks use a deeper well on every theme, with 1-cell side inset and a single row of air under the language header (no extra top/bottom pad).
+- Diff cards share that well, use a 1-cell inset, and put one row of air between the path header and hunks. Sign and hunk labels are tighter.
+- Tasks / agents chrome headers use a dedicated `chrome_bg` bar so they no longer look like code panels.
+- Public docs ship a full English manual. The 中文 / EN control switches sidebar titles, page bodies, and hashes (`#/install` works in both languages; old `#/安装` links still resolve).
+- Docs intro now explains what the agent does, where models come from (including third-party gateways), and how to read the manual. The models page has a dedicated gateway section.
+- Docs page scrollbars match the site: thin, warm, rounded; sidebars fade until hover.
+- Third-party OpenAI-compatible gateways are documented as a separate named provider (`/model add <name> <url> [model]`), not by rewriting official preset URLs.
+- `/model key` no longer treats the in-memory keyring mock as a real store. Linux/macOS/Windows now compile a platform backend, and a mock write cannot wipe `~/.caw-agent/secrets.json`. Saving a key also rebinds the client immediately so the next turn does not race the disk write.
+- Missing-key errors name the provider's real env var (`OPENROUTER_API_KEY` for OpenRouter, not `OPENAI_API_KEY`). `CAW_API_KEY` is accepted as a last-resort fallback for every provider.
+- Native Anthropic Messages API is used only for `api.anthropic.com`. A provider named `anthropic` / `claude` pointed at another host uses `/v1/chat/completions` (typical third-party relays). OpenAI org/project headers are sent only to `api.openai.com`.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
-
----
 
 ## Install
 
