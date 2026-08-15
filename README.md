@@ -2,6 +2,8 @@
 
 [官网](https://agent.noxcaw.com) · [文档](https://agent.noxcaw.com/docs.html) · [![downloads](https://img.shields.io/github/downloads/noxrick91/caw-agent-hub/total)](https://github.com/noxrick91/caw-agent-hub/releases)
 
+网站页面、安装器和手册从私有产品仓发布。请在那边改 `hub/` 与 `scripts/install*`，不要直接改本仓的 `index.html`、`docs.html`、`assets/`、`content/`、`install*`。本仓只手改 Releases、`mcp/` 和这份 README。
+
 你的终端里多了一个会改代码的搭档。
 
 读代码、改文件、跑测试，都在你打开的这个项目里完成。每次写盘或执行命令前，它都会停下来等你确认。
