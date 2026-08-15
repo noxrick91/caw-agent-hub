@@ -55,12 +55,22 @@ Windows PowerShell:
 irm https://agent.noxcaw.com/install.txt | iex
 ```
 
-The script picks the asset for your OS/ARCH (Linux x64/arm64, macOS Apple Silicon/Intel, Windows x64/ARM64), checks `SHA256SUMS` from the same Release, and installs into `~/.caw-agent/bin`. Windows ARM64 prefers the native build; if that Release has none, it falls back to x64 (system emulation). When a copy is already installed and you ask for latest, it runs `caw-agent upgrade now`. The installer writes `~/.caw-agent/env` and adds a hook in `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`, then `source`s that env. `curl | bash` cannot update the shell you already have open — open a new terminal, or run `source ~/.caw-agent/env`. Set `CAW_NO_PATH=1` to skip the rc hook.
+Do not use `irm …/install.ps1`: GitHub Pages serves `.ps1` as `application/octet-stream`, and Windows PowerShell 5.1 `irm` cannot treat that as a script. `.txt` is `text/plain`. To fetch the `.ps1` file anyway:
+
+```powershell
+iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))
+```
+
+The script picks the asset for your OS/ARCH (Linux x64/arm64, macOS Apple Silicon/Intel, Windows x64/ARM64), checks `SHA256SUMS` from the same Release, and installs into `~/.caw-agent/bin`. Windows ARM64 prefers the native build; if that Release has none, it falls back to x64 (system emulation). When a working copy is already installed and you ask for latest, it runs `caw-agent upgrade now`; a broken leftover file is re-downloaded. Set `CAW_FORCE=1` to reinstall. The installer writes `~/.caw-agent/env` and adds a hook in `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`, then `source`s that env. `curl | bash` cannot update the shell you already have open — open a new terminal, or run `source ~/.caw-agent/env`. Set `CAW_NO_PATH=1` to skip the rc hook.
 
 If Pages is not live yet:
 
 ```bash
 curl -fsS https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install | bash
+```
+
+```powershell
+irm https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install.ps1 | iex
 ```
 
 ### Website / manual download
@@ -543,7 +553,10 @@ Common keys in `.caw-agent/config.json`:
 | Native Windows `run` sandbox fails | Expected; use WSL2 or `/settings sandbox` to turn the jail off |
 | macOS screenshot is black / empty | Grant the terminal Screen Recording, then restart the terminal |
 | `--print` exit code 2 | Default `fail`: a permission / question / plan needs a human. Change `--on-approval` / `--on-ask` / `--on-plan` |
-| Command not found | `source ~/.caw-agent/env` or open a new terminal; the installer writes an rc hook |
+| Windows `irm …/install.ps1` errors or does nothing | GitHub Pages serves `.ps1` as binary. Use `irm https://agent.noxcaw.com/install.txt \| iex`, or `iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))` |
+| Windows TLS / secure channel error | Use Windows PowerShell 5.1+ or PowerShell 7; the installer forces TLS 1.2 |
+| Broken leftover `caw-agent.exe` blocks reinstall | Set `CAW_FORCE=1` and run the installer again, or delete `%USERPROFILE%\.caw-agent\bin\caw-agent.exe` |
+| Command not found | `source ~/.caw-agent/env` or open a new terminal; the installer writes an rc hook. On Windows, open a new terminal so the user PATH reloads |
 | `serve` refuses to listen | Anything other than `127.0.0.1` / `::1` needs `--token` or `CAW_SERVE_TOKEN` |
 | Ollama still asks for a key | Use `/model add ollama`, not an OpenAI-compatible gateway that requires a key |
 | Gateway 401 / unknown model | Use the relay’s own base URL, key, and model id; do not rewrite `openai` / `anthropic` presets. See [Models and keys](#/models) |
