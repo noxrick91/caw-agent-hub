@@ -1,3 +1,29 @@
+html:has(body.docs) {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 176, 88, 0.38) transparent;
+}
+html:has(body.docs)::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html:has(body.docs)::-webkit-scrollbar-track {
+  background: transparent;
+}
+html:has(body.docs)::-webkit-scrollbar-thumb {
+  background: rgba(255, 176, 88, 0.3);
+  border: 2px solid #121418;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+html:has(body.docs)::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 140, 48, 0.58);
+  border: 2px solid #121418;
+  background-clip: padding-box;
+}
+html:has(body.docs)::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 body.docs {
   background-color: #121418;
   background-image:
@@ -5,6 +31,41 @@ body.docs {
     linear-gradient(90deg, rgba(255, 232, 208, 0.03) 1px, transparent 1px),
     linear-gradient(rgba(255, 232, 208, 0.03) 1px, transparent 1px);
   background-size: 100% 100%, 56px 56px, 56px 56px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 176, 88, 0.38) transparent;
+}
+
+body.docs,
+body.docs * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 176, 88, 0.32) transparent;
+}
+
+body.docs::-webkit-scrollbar,
+body.docs *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+body.docs::-webkit-scrollbar-track,
+body.docs *::-webkit-scrollbar-track {
+  background: transparent;
+}
+body.docs::-webkit-scrollbar-thumb,
+body.docs *::-webkit-scrollbar-thumb {
+  background: rgba(255, 176, 88, 0.28);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+body.docs::-webkit-scrollbar-thumb:hover,
+body.docs *::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 140, 48, 0.58);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+body.docs::-webkit-scrollbar-corner,
+body.docs *::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .docs-top {
@@ -41,6 +102,7 @@ body.docs {
   top: 57px;
   height: calc(100vh - 57px);
   overflow: auto;
+  scrollbar-gutter: stable;
 }
 .docs-side-label,
 .docs-right-label {
@@ -127,6 +189,10 @@ body.docs {
 .docs-crumb .sep { color: var(--muted); opacity: 0.5; margin: 0 2px; }
 
 .docs-main .prose { max-width: 44rem; }
+.docs-main .prose pre {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 176, 88, 0.32) transparent;
+}
 .docs-main .prose h1 {
   font-size: 36px;
   font-weight: 600;
@@ -171,6 +237,25 @@ body.docs {
   top: 57px;
   height: calc(100vh - 57px);
   overflow: auto;
+  scrollbar-gutter: stable;
+}
+body.docs .docs-side,
+body.docs .docs-right {
+  scrollbar-color: transparent transparent;
+}
+body.docs .docs-side:hover,
+body.docs .docs-right:hover {
+  scrollbar-color: rgba(255, 176, 88, 0.38) transparent;
+}
+body.docs .docs-side::-webkit-scrollbar-thumb,
+body.docs .docs-right::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+body.docs .docs-side:hover::-webkit-scrollbar-thumb,
+body.docs .docs-right:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 176, 88, 0.32);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 .docs-right.empty { display: none; }
 .docs-right a {
@@ -201,6 +286,10 @@ body.docs {
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
+}
+#docs-search-hits {
+  max-height: min(52vh, 420px);
+  overflow: auto;
 }
 .docs-modal-box input {
   width: 100%;
