@@ -270,17 +270,14 @@ function installLabel(platform) {
 
 function applyHowto(platform) {
   const win = platform === "win-x64" || platform === "win-arm64";
-  const os = installLabel(platform);
+  const os = document.getElementById("howto-os");
+  if (os) os.textContent = installLabel(platform);
   const installCmd = document.getElementById("install-cmd");
   if (installCmd) installCmd.textContent = win ? INSTALL_WIN : INSTALL_UNIX;
-  const installLabelEl = document.getElementById("install-label");
-  if (installLabelEl) installLabelEl.textContent = os;
   const updateCmd = document.getElementById("update-cmd");
   if (updateCmd) updateCmd.textContent = UPDATE_CMD;
   const uninstallCmd = document.getElementById("uninstall-cmd");
   if (uninstallCmd) uninstallCmd.textContent = win ? UNINSTALL_WIN : UNINSTALL_UNIX;
-  const uninstallLabel = document.getElementById("uninstall-label");
-  if (uninstallLabel) uninstallLabel.textContent = os;
 }
 
 function bindCopy(btnId, preId) {

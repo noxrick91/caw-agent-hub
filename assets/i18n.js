@@ -35,7 +35,7 @@ const I18N = {
     },
     sec: {
       install: "安装",
-      howto: "安装 · 更新 · 卸载",
+      howto: "安装",
       why: "为什么用它",
       download: "下载",
     },
@@ -129,7 +129,7 @@ const I18N = {
     },
     sec: {
       install: "Install",
-      howto: "Install · Update · Uninstall",
+      howto: "Install",
       why: "Why use it",
       download: "Download",
     },
