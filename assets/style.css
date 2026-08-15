@@ -282,9 +282,16 @@ h1 {
   color: var(--muted);
   font-size: 13px;
 }
-.howto-sep {
-  margin: 0 0.35em;
-  opacity: 0.55;
+.howto-os {
+  margin-left: 8px;
+  font: 12px var(--mono);
+  opacity: 0.7;
+}
+.howto-desc {
+  margin: -2px 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
 }
 .howto-well {
   display: flex;

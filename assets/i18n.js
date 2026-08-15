@@ -28,7 +28,10 @@ const I18N = {
       install: "安装",
       update: "更新",
       uninstall: "卸载",
-      docs: "完整说明见文档",
+      docs: "安装说明",
+      installHint: "装到 ~/.caw-agent/bin。装完请新开一个终端。",
+      updateHint: "已安装时升到最新版。只检查用 caw-agent upgrade。",
+      uninstallHint: "删掉安装目录，配置和密钥会一起去掉。",
     },
     sec: {
       install: "安装",
@@ -119,7 +122,10 @@ const I18N = {
       install: "Install",
       update: "Update",
       uninstall: "Uninstall",
-      docs: "Full instructions in the docs",
+      docs: "Install docs",
+      installHint: "Installs into ~/.caw-agent/bin. Open a new terminal afterwards.",
+      updateHint: "Upgrades an existing install. Check only with caw-agent upgrade.",
+      uninstallHint: "Deletes the install directory, including config and keys.",
     },
     sec: {
       install: "Install",
