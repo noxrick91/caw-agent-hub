@@ -170,7 +170,10 @@ const I18N = {
   },
 };
 
+let chosenLang = null;
+
 function getLang() {
+  if (LANGS.includes(chosenLang)) return chosenLang;
   const q = new URLSearchParams(location.search).get("lang");
   if (LANGS.includes(q)) return q;
   try {
@@ -188,6 +191,7 @@ function dict() {
 
 function setLang(lang) {
   if (!LANGS.includes(lang)) return;
+  chosenLang = lang;
   try {
     localStorage.setItem("caw-lang", lang);
   } catch {
