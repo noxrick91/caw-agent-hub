@@ -270,7 +270,7 @@ function installLabel(platform) {
 
 const HOWTO = {
   install: { unix: INSTALL_UNIX, win: INSTALL_WIN, hint: "installHint" },
-  update: { unix: UPDATE_CMD, win: UPDATE_CMD, hint: "updateHint" },
+  update: { unix: UPDATE_CMD, win: INSTALL_WIN, hint: "updateHint" },
   uninstall: { unix: UNINSTALL_UNIX, win: UNINSTALL_WIN, hint: "uninstallHint" },
 };
 

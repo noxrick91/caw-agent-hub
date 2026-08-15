@@ -30,7 +30,7 @@ const I18N = {
       uninstall: "卸载",
       docs: "安装说明",
       installHint: "装到 ~/.caw-agent/bin。装完请新开一个终端。",
-      updateHint: "已安装时升到最新版。只检查用 caw-agent upgrade。",
+      updateHint: "重新下载最新包。先关掉正在跑的 caw-agent，装完请新开终端再看版本。",
       uninstallHint: "删掉安装目录，配置和密钥会一起去掉。",
     },
     sec: {
@@ -124,7 +124,7 @@ const I18N = {
       uninstall: "Uninstall",
       docs: "Install docs",
       installHint: "Installs into ~/.caw-agent/bin. Open a new terminal afterwards.",
-      updateHint: "Upgrades an existing install. Check only with caw-agent upgrade.",
+      updateHint: "Re-downloads the latest build. Close running caw-agent first, then open a new terminal to check the version.",
       uninstallHint: "Deletes the install directory, including config and keys.",
     },
     sec: {

@@ -25,22 +25,11 @@ Start with [Install](#/install) and [Quick start](#/quick-start). Slash commands
 
 ## What's new
 
-This page lists changes in the **current public release**.
-
-**What's new in v0.1.8** — 2026-08-15
-
-- Code blocks use a deeper well on every theme, with 1-cell side inset and a single row of air under the language header (no extra top/bottom pad).
-- Diff cards share that well, use a 1-cell inset, and put one row of air between the path header and hunks. Sign and hunk labels are tighter.
-- Tasks / agents chrome headers use a dedicated `chrome_bg` bar so they no longer look like code panels.
-- Public docs ship a full English manual. The 中文 / EN control switches sidebar titles, page bodies, and hashes (`#/install` works in both languages; old `#/安装` links still resolve).
-- Docs intro now explains what the agent does, where models come from (including third-party gateways), and how to read the manual. The models page has a dedicated gateway section.
-- Docs page scrollbars match the site: thin, warm, rounded; sidebars fade until hover.
-- Third-party OpenAI-compatible gateways are documented as a separate named provider (`/model add <name> <url> [model]`), not by rewriting official preset URLs.
-- `/model key` no longer treats the in-memory keyring mock as a real store. Linux/macOS/Windows now compile a platform backend, and a mock write cannot wipe `~/.caw-agent/secrets.json`. Saving a key also rebinds the client immediately so the next turn does not race the disk write.
-- Missing-key errors name the provider's real env var (`OPENROUTER_API_KEY` for OpenRouter, not `OPENAI_API_KEY`). `CAW_API_KEY` is accepted as a last-resort fallback for every provider.
-- Native Anthropic Messages API is used only for `api.anthropic.com`. A provider named `anthropic` / `claude` pointed at another host uses `/v1/chat/completions` (typical third-party relays). OpenAI org/project headers are sent only to `api.openai.com`.
+This page lists changes in the **current public release**. CI replaces this section from `CHANGELOG.md`.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
+
+---
 
 ## Install
 
@@ -72,7 +61,7 @@ Do not use `irm …/install.ps1`: GitHub Pages serves `.ps1` as `application/oct
 iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))
 ```
 
-The script picks the asset for your OS/ARCH (Linux x64/arm64, macOS Apple Silicon/Intel, Windows x64/ARM64), checks `SHA256SUMS` from the same Release, and installs into `~/.caw-agent/bin`. Windows ARM64 prefers the native build; if that Release has none, it falls back to x64 (system emulation). When a working copy is already installed and you ask for latest, it runs `caw-agent upgrade now`; a broken leftover file is re-downloaded. Set `CAW_FORCE=1` to reinstall. The installer writes `~/.caw-agent/env` and adds a hook in `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`, then `source`s that env. `curl | bash` cannot update the shell you already have open — open a new terminal, or run `source ~/.caw-agent/env`. Set `CAW_NO_PATH=1` to skip the rc hook.
+The script picks the asset for your OS/ARCH (Linux x64/arm64, macOS Apple Silicon/Intel, Windows x64/ARM64), checks `SHA256SUMS` from the same Release, and installs into `~/.caw-agent/bin`. Windows ARM64 prefers the native build; if that Release has none, it falls back to x64 (system emulation). Running the installer again re-downloads and replaces the current file (on Windows it renames a running exe to `.bak` first). The installer writes `~/.caw-agent/env` and adds a hook in `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`, then `source`s that env. `curl | bash` cannot update the shell you already have open — open a new terminal, or run `source ~/.caw-agent/env`. Set `CAW_NO_PATH=1` to skip the rc hook.
 
 If Pages is not live yet:
 
@@ -125,7 +114,7 @@ caw-agent upgrade v0.1.1
 
 Downloads show bytes and percent, verify SHA256, then run `--version`. A mismatch restores the `.bak`. Default hub is `noxrick91/caw-agent-hub`. Override with `CAW_GITHUB=owner/name`.
 
-On Windows, replacing a running binary writes beside it and asks you to restart.
+On Windows the installer renames a running `caw-agent.exe` to `.bak` and then writes the new file. If the rename fails, it writes beside the exe and asks you to close every window. Open a new terminal and run `caw-agent --version`. If PATH still points at another copy, use `%USERPROFILE%\.caw-agent\bin\caw-agent.exe`.
 
 ### Uninstall
 
@@ -566,7 +555,8 @@ Common keys in `.caw-agent/config.json`:
 | `--print` exit code 2 | Default `fail`: a permission / question / plan needs a human. Change `--on-approval` / `--on-ask` / `--on-plan` |
 | Windows `irm …/install.ps1` errors or does nothing | GitHub Pages serves `.ps1` as binary. Use `irm https://agent.noxcaw.com/install.txt \| iex`, or `iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))` |
 | Windows TLS / secure channel error | Use Windows PowerShell 5.1+ or PowerShell 7; the installer forces TLS 1.2 |
-| Broken leftover `caw-agent.exe` blocks reinstall | Set `CAW_FORCE=1` and run the installer again, or delete `%USERPROFILE%\.caw-agent\bin\caw-agent.exe` |
+| Broken leftover `caw-agent.exe` blocks reinstall | Close every caw-agent window and run the installer again, or delete `%USERPROFILE%\.caw-agent\bin\caw-agent.exe` |
+| Windows reinstall/update still shows an old version | Older installers handed an existing install to `caw-agent upgrade now`, which can leave 0.1.6 in place if the exe is locked or the GitHub API fails. Close every window, run `irm https://agent.noxcaw.com/install.txt \| iex` again, then open a new terminal and run `caw-agent --version`. Use `Get-Command caw-agent` to make sure PATH is not another old exe |
 | Command not found | `source ~/.caw-agent/env` or open a new terminal; the installer writes an rc hook. On Windows, open a new terminal so the user PATH reloads |
 | `serve` refuses to listen | Anything other than `127.0.0.1` / `::1` needs `--token` or `CAW_SERVE_TOKEN` |
 | Ollama still asks for a key | Use `/model add ollama`, not an OpenAI-compatible gateway that requires a key |

@@ -3,7 +3,7 @@
 #   curl -fsS https://agent.noxcaw.com/install | bash
 #   curl -fsS https://agent.noxcaw.com/install | bash -s -- v0.1.1
 # Windows PowerShell: irm https://agent.noxcaw.com/install.txt | iex
-# Env: CAW_TAG  CAW_GITHUB  PREFIX  BIN_DIR  GH_TOKEN  CAW_GITHUB_TOKEN  NO_COLOR  CAW_NO_PATH  CAW_FORCE
+# Env: CAW_TAG  CAW_GITHUB  PREFIX  BIN_DIR  GH_TOKEN  CAW_GITHUB_TOKEN  NO_COLOR  CAW_NO_PATH
 set -euo pipefail
 
 REPO="${CAW_GITHUB:-noxrick91/caw-agent-hub}"
@@ -171,12 +171,6 @@ esac
 ok "Detected ${os}/${arch} → ${asset}"
 
 dest="${BIN_DIR}/${bin_name}"
-if [ -z "${CAW_FORCE:-}" ] && [ -x "${dest}" ] && [ "${TAG}" = "latest" ] && "${dest}" --version >/dev/null 2>&1; then
-  step "Existing install found — running caw-agent upgrade now"
-  ensure_shell_path
-  exec "${dest}" upgrade now
-fi
-
 if [ "${TAG}" = "latest" ]; then
   base="https://github.com/${REPO}/releases/latest/download"
 else

@@ -25,22 +25,11 @@ caw-agent 是跑在你终端里的编程助手：读代码、改文件、跑测�
 
 ## What's new
 
-This page lists changes in the **current public release**.
-
-**What's new in v0.1.8** — 2026-08-15
-
-- Code blocks use a deeper well on every theme, with 1-cell side inset and a single row of air under the language header (no extra top/bottom pad).
-- Diff cards share that well, use a 1-cell inset, and put one row of air between the path header and hunks. Sign and hunk labels are tighter.
-- Tasks / agents chrome headers use a dedicated `chrome_bg` bar so they no longer look like code panels.
-- Public docs ship a full English manual. The 中文 / EN control switches sidebar titles, page bodies, and hashes (`#/install` works in both languages; old `#/安装` links still resolve).
-- Docs intro now explains what the agent does, where models come from (including third-party gateways), and how to read the manual. The models page has a dedicated gateway section.
-- Docs page scrollbars match the site: thin, warm, rounded; sidebars fade until hover.
-- Third-party OpenAI-compatible gateways are documented as a separate named provider (`/model add <name> <url> [model]`), not by rewriting official preset URLs.
-- `/model key` no longer treats the in-memory keyring mock as a real store. Linux/macOS/Windows now compile a platform backend, and a mock write cannot wipe `~/.caw-agent/secrets.json`. Saving a key also rebinds the client immediately so the next turn does not race the disk write.
-- Missing-key errors name the provider's real env var (`OPENROUTER_API_KEY` for OpenRouter, not `OPENAI_API_KEY`). `CAW_API_KEY` is accepted as a last-resort fallback for every provider.
-- Native Anthropic Messages API is used only for `api.anthropic.com`. A provider named `anthropic` / `claude` pointed at another host uses `/v1/chat/completions` (typical third-party relays). OpenAI org/project headers are sent only to `api.openai.com`.
+本页列出**当前公开发布版本**的更新（英文）。CI 会用 `CHANGELOG.md` 替换这一节。
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
+
+---
 
 ## 安装
 
@@ -72,7 +61,7 @@ irm https://agent.noxcaw.com/install.txt | iex
 iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))
 ```
 
-脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、macOS Apple Silicon/Intel、Windows x64/ARM64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。Windows ARM64 优先装原生包；该 Release 没有时回退到 x64（系统模拟运行）。已安装且二进制能跑、又在装 latest 时会走 `caw-agent upgrade now`；损坏的旧文件会重新下载。强制重装设 `CAW_FORCE=1`。安装脚本会写入 `~/.caw-agent/env`，并在 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里加上 hook，然后 `source` 该 env。`curl | bash` 改不了你当前已经打开的 shell，新开终端即可，或执行 `source ~/.caw-agent/env`。不想改 rc 时设 `CAW_NO_PATH=1`。
+脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、macOS Apple Silicon/Intel、Windows x64/ARM64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。Windows ARM64 优先装原生包；该 Release 没有时回退到 x64（系统模拟运行）。再跑一次安装器会重新下载并覆盖当前文件（Windows 先把正在用的 exe 改名为 `.bak` 再写入新文件）。安装脚本会写入 `~/.caw-agent/env`，并在 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里加上 hook，然后 `source` 该 env。`curl | bash` 改不了你当前已经打开的 shell，新开终端即可，或执行 `source ~/.caw-agent/env`。不想改 rc 时设 `CAW_NO_PATH=1`。
 
 Pages 尚未生效时可用：
 
@@ -125,7 +114,7 @@ caw-agent upgrade v0.1.1
 
 下载时显示字节与百分比；校验 SHA256；装完跑 `--version`，对不上会恢复 `.bak`。默认读公开仓 `noxrick91/caw-agent-hub`。可用 `CAW_GITHUB=owner/name` 覆盖。
 
-Windows 若正在替换自己，会旁路写入并提示重启后再生效。
+Windows 会先把正在运行的 `caw-agent.exe` 改名为 `.bak` 再写入新文件。若改名失败，再旁路写入并提示关掉所有窗口。装完请新开终端，用 `caw-agent --version` 确认；若 PATH 上还有另一份旧程序，以 `%USERPROFILE%\.caw-agent\bin\caw-agent.exe` 为准。
 
 ### 卸载
 
@@ -566,7 +555,8 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 | `--print` 退出码 2 | 默认 `fail`：权限 / 提问 / 计划需要人。改 `--on-approval` / `--on-ask` / `--on-plan` |
 | Windows `irm …/install.ps1` 报错或没有真正执行 | GitHub Pages 把 `.ps1` 标成二进制。改用 `irm https://agent.noxcaw.com/install.txt \| iex`，或 `iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))` |
 | Windows 提示 TLS / secure channel | 用 Windows PowerShell 5.1+ 或 PowerShell 7；安装器会强制 TLS 1.2 |
-| 已有损坏的 `caw-agent.exe` 无法重装 | 设 `CAW_FORCE=1` 后再跑安装器，或删掉 `%USERPROFILE%\.caw-agent\bin\caw-agent.exe` |
+| 已有损坏的 `caw-agent.exe` 无法重装 | 关掉所有 caw-agent 窗口后再跑安装器，或删掉 `%USERPROFILE%\.caw-agent\bin\caw-agent.exe` |
+| Windows 重装/更新后仍是旧版本 | 旧安装器会把「已安装」交给 `caw-agent upgrade now`，文件锁或 GitHub API 失败时不会换包。关掉窗口后重新跑 `irm https://agent.noxcaw.com/install.txt \| iex`，再新开终端执行 `caw-agent --version`。用 `Get-Command caw-agent` 确认不是别的目录里的旧 exe |
 | 找不到命令 | `source ~/.caw-agent/env` 或新开终端；安装器会写 rc hook。Windows 新开一个终端以加载用户 PATH |
 | `serve` 拒绝监听 | 非 `127.0.0.1` / `::1` 必须 `--token` 或 `CAW_SERVE_TOKEN` |
 | Ollama 仍要密钥 | 用 `/model add ollama`，不要走需要 key 的 OpenAI 兼容网关 |

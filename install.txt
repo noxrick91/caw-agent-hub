@@ -1,7 +1,7 @@
 # caw-agent Windows installer.
 #   irm https://agent.noxcaw.com/install.txt | iex
 #   iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))
-# Env: CAW_TAG  CAW_GITHUB  PREFIX  BIN_DIR  GH_TOKEN  CAW_GITHUB_TOKEN  CAW_FORCE
+# Env: CAW_TAG  CAW_GITHUB  PREFIX  BIN_DIR  GH_TOKEN  CAW_GITHUB_TOKEN
 # Do not `exit` — this file is meant to run via iex in an interactive shell.
 $ErrorActionPreference = "Stop"
 try {
@@ -12,7 +12,6 @@ $Repo = if ($env:CAW_GITHUB) { $env:CAW_GITHUB } else { "noxrick91/caw-agent-hub
 $Prefix = if ($env:PREFIX) { $env:PREFIX } else { Join-Path $env:USERPROFILE ".caw-agent" }
 $BinDir = if ($env:BIN_DIR) { $env:BIN_DIR } else { Join-Path $Prefix "bin" }
 $Tag = if ($env:CAW_TAG) { $env:CAW_TAG } else { "latest" }
-$Force = ($env:CAW_FORCE -eq "1")
 if ($Tag -eq "now") { $Tag = "latest" }
 if ($Tag -match '^[0-9]') { $Tag = "v$Tag" }
 
@@ -66,14 +65,31 @@ function Get-CawRemoteFile([string]$Url, [string]$OutFile) {
     }
 }
 
-function Test-CawBinary([string]$Path) {
-    if (-not (Test-Path $Path)) { return $false }
-    try {
-        $null = & $Path --version
-        return ($LASTEXITCODE -eq 0)
-    } catch {
-        return $false
+function Install-CawBinary([string]$Src, [string]$Dest) {
+    $bak = "$Dest.bak"
+    if (Test-Path -LiteralPath $Dest) {
+        if (Test-Path -LiteralPath $bak) {
+            Remove-Item -LiteralPath $bak -Force -ErrorAction SilentlyContinue
+        }
+        try {
+            # Renaming a running Windows exe is allowed; overwriting it is not.
+            Move-Item -LiteralPath $Dest -Destination $bak -Force
+        } catch {
+            throw "Cannot replace $Dest. Close every caw-agent window and retry."
+        }
     }
+    Copy-Item -LiteralPath $Src -Destination $Dest -Force
+    try { Unblock-File -LiteralPath $Dest -ErrorAction SilentlyContinue } catch { }
+}
+
+function Show-CawPathConflict([string]$Dest) {
+    $cmd = Get-Command caw-agent -ErrorAction SilentlyContinue
+    if (-not $cmd) { $cmd = Get-Command caw-agent.exe -ErrorAction SilentlyContinue }
+    if (-not $cmd -or -not $cmd.Source) { return }
+    if ([string]::Equals($cmd.Source, $Dest, [StringComparison]::OrdinalIgnoreCase)) { return }
+    Write-Host "Warning: PATH 'caw-agent' is $($cmd.Source)"
+    Write-Host "         installer wrote $Dest"
+    Write-Host "         Open a new terminal, or run: & '$Dest' --version"
 }
 
 $Kind = Get-CawWindowsKind
@@ -98,15 +114,6 @@ if ($Tag -eq "latest") {
 Write-Host ""
 Write-Host "caw-agent installer"
 Write-Host "  Windows $Kind"
-
-if ((-not $Force) -and ($Tag -eq "latest") -and (Test-CawBinary $Dest)) {
-    Write-Host "Existing install found — running caw-agent upgrade now"
-    & $Dest upgrade now
-    if ($LASTEXITCODE -ne 0) {
-        throw "caw-agent upgrade now exited $LASTEXITCODE (set CAW_FORCE=1 to reinstall)"
-    }
-    return
-}
 
 New-Item -ItemType Directory -Force -Path $BinDir | Out-Null
 
@@ -140,9 +147,7 @@ try {
     if ($Got -ne $Expect.ToLowerInvariant()) {
         throw "SHA256 mismatch: got $Got expected $Expect"
     }
-    if (Test-Path $Dest) { Copy-Item $Dest "$Dest.bak" -Force -ErrorAction SilentlyContinue }
-    Copy-Item $Bin $Dest -Force
-    try { Unblock-File -LiteralPath $Dest -ErrorAction SilentlyContinue } catch { }
+    Install-CawBinary $Bin $Dest
 } finally {
     Remove-Item $Tmp -Recurse -Force -ErrorAction SilentlyContinue
 }
@@ -163,6 +168,7 @@ if ($Ver) { Write-Host "  version  $Ver" }
 Write-Host "  binary   $Dest"
 if ($Got) { Write-Host "  sha256   $Got" }
 Write-Host ""
+Show-CawPathConflict $Dest
 Write-Host "  caw-agent --help"
 Write-Host "  caw-agent upgrade --check"
 Write-Host ""
