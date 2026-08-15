@@ -263,53 +263,13 @@ h1 {
   height: 1px;
   background: var(--line);
 }
-.sec + .panel, .sec + .grid, .sec + .table-wrap, .sec + .howto { margin-top: 0; }
-.howto {
-  margin: 0 0 8px;
-  min-width: 0;
-}
-.howto-item {
-  padding: 22px 24px 24px;
-}
-.howto-item + .howto-item {
-  border-top: 1px solid var(--line);
-}
-.howto-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 0 0 8px;
-  color: var(--muted);
-  font-size: 13px;
-}
-.howto-cmd {
-  display: block;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  background: none;
-  font: 14px/1.55 var(--mono);
-  color: var(--ivory);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-.howto-desc {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.45;
-}
-.howto .copy {
-  min-width: 3.5em;
-  padding: 0;
-  text-align: right;
-}
+.sec + .panel, .sec + .grid, .sec + .table-wrap { margin-top: 0; }
 .howto-more {
   margin: 10px 0 4px;
+  color: var(--muted);
   font-size: 13px;
 }
+.howto-sep { margin: 0 0.4em; opacity: 0.5; }
 .panel {
   margin: 28px 0 8px;
   background: var(--bg-2);

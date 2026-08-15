@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/style.css?v=howto7">
+  <link rel="stylesheet" href="./assets/style.css?v=howto8">
 </head>
 <body>
   <div class="wrap">
@@ -71,34 +71,23 @@
       </div>
     </section>
 
-    <h2 class="sec" data-i18n="sec.howto">安装</h2>
-    <div class="panel howto" id="howto">
-      <div class="howto-item" id="install">
-        <div class="howto-head">
-          <span data-i18n="howto.install">安装</span>
-          <button class="copy" id="copy-install" type="button" data-i18n="install.copy">复制</button>
+    <h2 class="sec" id="install" data-i18n="sec.howto">安装</h2>
+    <div class="panel" id="howto">
+      <header>
+        <div class="seg" role="tablist">
+          <button type="button" class="seg-btn on" data-howto="install" data-i18n="howto.install">安装</button>
+          <button type="button" class="seg-btn" data-howto="update" data-i18n="howto.update">更新</button>
+          <button type="button" class="seg-btn" data-howto="uninstall" data-i18n="howto.uninstall">卸载</button>
         </div>
-        <code class="howto-cmd" id="install-cmd">curl -fsS https://agent.noxcaw.com/install | bash</code>
-        <p class="howto-desc" data-i18n="howto.installHint">装到 ~/.caw-agent/bin。装完请新开一个终端。</p>
-      </div>
-      <div class="howto-item" id="update">
-        <div class="howto-head">
-          <span data-i18n="howto.update">更新</span>
-          <button class="copy" id="copy-update" type="button" data-i18n="install.copy">复制</button>
-        </div>
-        <code class="howto-cmd" id="update-cmd">caw-agent upgrade now</code>
-        <p class="howto-desc" data-i18n="howto.updateHint">已安装时升到最新版。只检查用 caw-agent upgrade。</p>
-      </div>
-      <div class="howto-item" id="uninstall">
-        <div class="howto-head">
-          <span data-i18n="howto.uninstall">卸载</span>
-          <button class="copy" id="copy-uninstall" type="button" data-i18n="install.copy">复制</button>
-        </div>
-        <code class="howto-cmd" id="uninstall-cmd">rm -rf ~/.caw-agent</code>
-        <p class="howto-desc" data-i18n="howto.uninstallHint">删掉安装目录，配置和密钥会一起去掉。</p>
-      </div>
+        <button class="copy" id="copy-howto" type="button" data-i18n="install.copy">复制</button>
+      </header>
+      <pre class="cmd" id="howto-cmd">curl -fsS https://agent.noxcaw.com/install | bash</pre>
     </div>
-    <p class="howto-more"><a href="./docs.html#/install" data-keep-lang data-i18n="howto.docs">安装说明</a></p>
+    <p class="howto-more">
+      <span id="howto-hint">装到 ~/.caw-agent/bin。装完请新开一个终端。</span>
+      <span class="howto-sep">·</span>
+      <a href="./docs.html#/install" data-keep-lang data-i18n="howto.docs">安装说明</a>
+    </p>
 
     <h2 class="sec" data-i18n="sec.why">为什么用它</h2>
     <div class="grid">
@@ -136,9 +125,9 @@
     </div>
 
   </div>
-  <script src="./assets/i18n.js?v=howto7"></script>
+  <script src="./assets/i18n.js?v=howto8"></script>
   <script src="./assets/stage.js"></script>
-  <script src="./assets/whats-new.js?v=howto7"></script>
-  <script src="./assets/app.js?v=howto7"></script>
+  <script src="./assets/whats-new.js?v=howto8"></script>
+  <script src="./assets/app.js?v=howto8"></script>
 </body>
 </html>

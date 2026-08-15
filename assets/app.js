@@ -268,35 +268,49 @@ function installLabel(platform) {
   return d?.unix || "Linux / macOS";
 }
 
+const HOWTO = {
+  install: { unix: INSTALL_UNIX, win: INSTALL_WIN, hint: "installHint" },
+  update: { unix: UPDATE_CMD, win: UPDATE_CMD, hint: "updateHint" },
+  uninstall: { unix: UNINSTALL_UNIX, win: UNINSTALL_WIN, hint: "uninstallHint" },
+};
+
+let howtoTab = "install";
+
 function applyHowto(platform) {
   const win = platform === "win-x64" || platform === "win-arm64";
-  const installCmd = document.getElementById("install-cmd");
-  if (installCmd) installCmd.textContent = win ? INSTALL_WIN : INSTALL_UNIX;
-  const updateCmd = document.getElementById("update-cmd");
-  if (updateCmd) updateCmd.textContent = UPDATE_CMD;
-  const uninstallCmd = document.getElementById("uninstall-cmd");
-  if (uninstallCmd) uninstallCmd.textContent = win ? UNINSTALL_WIN : UNINSTALL_UNIX;
-}
-
-function bindCopy(btnId, preId) {
-  document.getElementById(btnId)?.addEventListener("click", async () => {
-    const text = document.getElementById(preId)?.textContent;
-    if (!text) return;
-    const d = typeof dict === "function" ? dict().install : null;
-    try {
-      await navigator.clipboard.writeText(text);
-      document.getElementById(btnId).textContent = d?.copied || "已复制";
-      setTimeout(() => {
-        document.getElementById(btnId).textContent = d?.copy || "复制";
-      }, 1400);
-    } catch {
-      /* ignore */
-    }
+  const spec = HOWTO[howtoTab] || HOWTO.install;
+  const cmd = document.getElementById("howto-cmd");
+  if (cmd) cmd.textContent = win ? spec.win : spec.unix;
+  const hint = document.getElementById("howto-hint");
+  const how = typeof dict === "function" ? dict().howto : null;
+  if (hint && how?.[spec.hint]) hint.textContent = how[spec.hint];
+  document.querySelectorAll("[data-howto]").forEach((btn) => {
+    btn.classList.toggle("on", btn.getAttribute("data-howto") === howtoTab);
   });
 }
-bindCopy("copy-install", "install-cmd");
-bindCopy("copy-update", "update-cmd");
-bindCopy("copy-uninstall", "uninstall-cmd");
+
+document.querySelectorAll("[data-howto]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    howtoTab = btn.getAttribute("data-howto") || "install";
+    applyHowto(detectedPlatform);
+  });
+});
+
+document.getElementById("copy-howto")?.addEventListener("click", async () => {
+  const text = document.getElementById("howto-cmd")?.textContent;
+  if (!text) return;
+  const d = typeof dict === "function" ? dict().install : null;
+  const btn = document.getElementById("copy-howto");
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = d?.copied || "已复制";
+    setTimeout(() => {
+      btn.textContent = d?.copy || "复制";
+    }, 1400);
+  } catch {
+    /* ignore */
+  }
+});
 
 let detectedPlatform = "linux-x64";
 detectPlatform().then((p) => {
