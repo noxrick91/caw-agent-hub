@@ -18,10 +18,40 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 176, 88, 0.38) transparent;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: transparent;
+}
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: rgba(255, 176, 88, 0.28);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 140, 48, 0.58);
+}
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner {
+  background: transparent;
+}
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: clip;
   background: var(--bg);
   color: var(--ink);
   font: 16px/1.55 var(--sans);
@@ -235,21 +265,50 @@ h1 {
 }
 .sec + .panel, .sec + .grid, .sec + .table-wrap, .sec + .howto { margin-top: 0; }
 .howto {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
   margin: 0 0 8px;
+  min-width: 0;
 }
-.howto .panel { margin: 0; }
-.howto .note {
-  margin: 0;
-  padding: 0 16px 14px;
+.howto-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.howto-row:last-child { border-bottom: 0; }
+.howto-k {
   color: var(--muted);
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.4;
+  padding-top: 1px;
+}
+.howto-os {
+  display: block;
+  margin-top: 3px;
+  font: 11px var(--mono);
+  color: var(--muted);
+  opacity: 0.75;
+}
+.howto-cmd {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  font: 13px/1.55 var(--mono);
+  color: var(--ivory);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.howto .copy {
+  padding-top: 1px;
+  flex-shrink: 0;
 }
 .howto-more {
-  margin: 4px 0 8px;
+  margin: 8px 0 4px;
   font-size: 13px;
 }
 .panel {
@@ -272,8 +331,21 @@ h1 {
   margin: 0;
   padding: 16px;
   overflow-x: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
   font: 13px/1.5 var(--mono);
   color: var(--ivory);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 176, 88, 0.32) transparent;
+}
+.panel pre::-webkit-scrollbar,
+.cmd::-webkit-scrollbar { height: 8px; }
+.panel pre::-webkit-scrollbar-thumb,
+.cmd::-webkit-scrollbar-thumb {
+  background: rgba(255, 176, 88, 0.28);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
 }
 .copy {
   border: 0;
@@ -316,12 +388,27 @@ h1 {
 .card h3 { margin: 0 0 6px; font-size: 15px; }
 .card p { margin: 0; color: var(--muted); font-size: 14px; }
 
-.table-wrap { overflow-x: auto; margin: 28px 0 64px; }
+.table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 28px 0 64px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 176, 88, 0.32) transparent;
+}
+.table-wrap::-webkit-scrollbar { height: 8px; }
+.table-wrap::-webkit-scrollbar-track { background: transparent; }
+.table-wrap::-webkit-scrollbar-thumb {
+  background: rgba(255, 176, 88, 0.28);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+.table-wrap::-webkit-scrollbar-corner { background: transparent; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); }
 th { color: var(--muted); font-weight: 500; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
 th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
-td a { font-family: var(--mono); font-size: 13px; }
+td a { font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
 #dl-stats { margin: 0 0 10px; }
 .err { color: var(--bad); }
 
@@ -410,8 +497,15 @@ footer {
   .row .btn { justify-content: center; }
   .grid { grid-template-columns: 1fr; margin-top: 20px; }
   .sec { margin: 36px 0 12px; font-size: 18px; }
-  .howto { grid-template-columns: 1fr; }
-  .panel pre, .cmd { font-size: 12px; padding: 12px; white-space: pre-wrap; word-break: break-all; }
+  .howto-row {
+    grid-template-columns: 1fr auto;
+    gap: 6px 12px;
+  }
+  .howto-cmd {
+    grid-column: 1 / -1;
+    font-size: 12px;
+  }
+  .panel pre, .cmd { font-size: 12px; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 }
 
 @media (max-width: 520px) {

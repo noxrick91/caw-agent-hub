@@ -29,11 +29,6 @@ const I18N = {
       update: "更新",
       uninstall: "卸载",
       docs: "完整说明见文档",
-      installNoteUnix: "装到 ~/.caw-agent/bin，并写入 shell PATH。当前终端请 source ~/.caw-agent/env，或新开一个。",
-      installNoteWin: "装到 %USERPROFILE%\\.caw-agent\\bin，并加入用户 PATH。请新开一个终端。",
-      updateNote: "只检查、不下载用 caw-agent upgrade。指定版本：caw-agent upgrade v0.1.8。",
-      uninstallNoteUnix: "会删掉二进制、配置、密钥和 MCP。shell rc 里 # >>> caw-agent >>> 到 # <<< caw-agent <<< 那几行请手动删。",
-      uninstallNoteWin: "会删掉二进制、配置、密钥和 MCP。用户 PATH 里的 .caw-agent\\bin 请手动去掉。",
     },
     sec: {
       install: "安装",
@@ -125,11 +120,6 @@ const I18N = {
       update: "Update",
       uninstall: "Uninstall",
       docs: "Full instructions in the docs",
-      installNoteUnix: "Installs into ~/.caw-agent/bin and hooks your shell PATH. In this terminal run source ~/.caw-agent/env, or open a new one.",
-      installNoteWin: "Installs into %USERPROFILE%\\.caw-agent\\bin and adds the user PATH. Open a new terminal.",
-      updateNote: "Check only, no download: caw-agent upgrade. Pin a version: caw-agent upgrade v0.1.8.",
-      uninstallNoteUnix: "Deletes the binary, config, keys, and MCP packs. Remove the # >>> caw-agent >>> … # <<< caw-agent <<< block from your shell rc by hand.",
-      uninstallNoteWin: "Deletes the binary, config, keys, and MCP packs. Remove .caw-agent\\bin from your user PATH by hand.",
     },
     sec: {
       install: "Install",

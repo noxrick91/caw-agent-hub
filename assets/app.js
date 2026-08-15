@@ -270,31 +270,17 @@ function installLabel(platform) {
 
 function applyHowto(platform) {
   const win = platform === "win-x64" || platform === "win-arm64";
-  const how = typeof dict === "function" ? dict().howto : null;
+  const os = installLabel(platform);
   const installCmd = document.getElementById("install-cmd");
   if (installCmd) installCmd.textContent = win ? INSTALL_WIN : INSTALL_UNIX;
   const installLabelEl = document.getElementById("install-label");
-  if (installLabelEl) installLabelEl.textContent = installLabel(platform);
-  const installNote = document.getElementById("install-note");
-  if (installNote) {
-    installNote.textContent = win
-      ? how?.installNoteWin || installNote.textContent
-      : how?.installNoteUnix || installNote.textContent;
-  }
+  if (installLabelEl) installLabelEl.textContent = os;
   const updateCmd = document.getElementById("update-cmd");
   if (updateCmd) updateCmd.textContent = UPDATE_CMD;
-  const updateNote = document.getElementById("update-note");
-  if (updateNote && how?.updateNote) updateNote.textContent = how.updateNote;
   const uninstallCmd = document.getElementById("uninstall-cmd");
   if (uninstallCmd) uninstallCmd.textContent = win ? UNINSTALL_WIN : UNINSTALL_UNIX;
   const uninstallLabel = document.getElementById("uninstall-label");
-  if (uninstallLabel) uninstallLabel.textContent = installLabel(platform);
-  const uninstallNote = document.getElementById("uninstall-note");
-  if (uninstallNote) {
-    uninstallNote.textContent = win
-      ? how?.uninstallNoteWin || uninstallNote.textContent
-      : how?.uninstallNoteUnix || uninstallNote.textContent;
-  }
+  if (uninstallLabel) uninstallLabel.textContent = os;
 }
 
 function bindCopy(btnId, preId) {
