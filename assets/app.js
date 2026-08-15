@@ -247,7 +247,7 @@ function showError(err) {
   const recMeta = document.getElementById("dl-meta");
   claimDynamic(recBtn);
   claimDynamic(recMeta);
-  recBtn.href = "#install";
+  recBtn.href = "#howto";
   recBtn.textContent = d?.dl?.releases || "用安装命令";
   recBtn.removeAttribute("aria-disabled");
   recMeta.innerHTML =

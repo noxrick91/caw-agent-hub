@@ -264,10 +264,36 @@ h1 {
   background: var(--line);
 }
 .sec + .panel, .sec + .grid, .sec + .table-wrap { margin-top: 0; }
+.howto {
+  margin: 48px auto 8px;
+}
+.howto header {
+  justify-content: center;
+  position: relative;
+  padding: 16px 20px;
+}
+.howto .copy {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+}
+.howto .seg-btn {
+  font-size: 16px;
+  padding: 8px 20px;
+}
+.howto .cmd {
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 22px 24px 24px;
+}
 .howto-more {
-  margin: 10px 0 4px;
+  margin: 12px 0 4px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
+  text-align: center;
 }
 .howto-sep { margin: 0 0.4em; opacity: 0.5; }
 .panel {
@@ -279,9 +305,10 @@ h1 {
 }
 .panel header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--line);
   color: var(--muted);
   font-size: 13px;
@@ -456,8 +483,6 @@ footer {
   .row .btn { justify-content: center; }
   .grid { grid-template-columns: 1fr; margin-top: 20px; }
   .sec { margin: 36px 0 12px; font-size: 18px; }
-  .howto-item { padding: 18px 16px 20px; }
-  .howto-cmd { font-size: 12px; }
   .panel pre, .cmd { font-size: 12px; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 }
 
