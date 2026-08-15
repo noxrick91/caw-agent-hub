@@ -11,8 +11,15 @@ and shows the current version on https://agent.noxcaw.com.
 
 ## [Unreleased]
 
+### Added
+
+- Homepage now shows install, update, and uninstall commands (platform-aware, bilingual), with a matching uninstall section in the install docs.
+
 ### Fixed
 
+- Windows one-line install no longer uses `irm …/install.ps1`. GitHub Pages serves that file as `application/octet-stream`, which Windows PowerShell 5.1 cannot `iex`. The documented command is now `irm https://agent.noxcaw.com/install.txt | iex`.
+- The Windows installer forces TLS 1.2, downloads with `WebClient` (GitHub token supported), strips CR from `SHA256SUMS`, unblocks the exe, and only calls `upgrade now` when the existing binary actually runs. `CAW_FORCE=1` reinstalls. The script no longer `exit`s the user's PowerShell session.
+- The Unix installer picks the asset from `SHA256SUMS` before downloading (so Windows ARM fallback does not 404 first), ignores CRLF in checksums, sends a User-Agent, and skips `upgrade now` when the existing binary is broken.
 - Docs language switch now updates sidebar page titles, crumbs, and pager. Those labels were frozen in the language from the first page load.
 - Docs asset URLs are cache-busted so Cloudflare no longer keeps a 4-hour-old `docs.js` after a notes publish.
 
