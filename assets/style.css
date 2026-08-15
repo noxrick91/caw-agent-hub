@@ -265,50 +265,63 @@ h1 {
 }
 .sec + .panel, .sec + .grid, .sec + .table-wrap, .sec + .howto { margin-top: 0; }
 .howto {
-  display: flex;
-  flex-direction: column;
   margin: 0 0 8px;
   min-width: 0;
 }
-.howto-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 10px 16px;
-  padding: 14px 16px;
+.howto-item {
+  padding: 16px 18px 18px;
   border-bottom: 1px solid var(--line);
 }
-.howto-row:last-child { border-bottom: 0; }
-.howto-k {
+.howto-item:last-child { border-bottom: 0; }
+.howto-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 10px;
   color: var(--muted);
   font-size: 13px;
-  line-height: 1.4;
-  padding-top: 1px;
 }
-.howto-os {
-  display: block;
-  margin-top: 3px;
-  font: 11px var(--mono);
-  color: var(--muted);
-  opacity: 0.75;
+.howto-sep {
+  margin: 0 0.35em;
+  opacity: 0.55;
+}
+.howto-well {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.howto-prompt {
+  flex-shrink: 0;
+  color: var(--egg);
+  font: 500 13px/1.5 var(--mono);
+  user-select: none;
 }
 .howto-cmd {
+  flex: 1 1 auto;
   min-width: 0;
   margin: 0;
   padding: 0;
   background: none;
-  font: 13px/1.55 var(--mono);
+  font: 13px/1.5 var(--mono);
   color: var(--ivory);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 .howto .copy {
-  padding-top: 1px;
-  flex-shrink: 0;
+  min-width: 4.5em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-align: right;
 }
+.howto .copy:hover { background: rgba(255, 140, 48, 0.1); }
 .howto-more {
-  margin: 8px 0 4px;
+  margin: 10px 0 4px;
   font-size: 13px;
 }
 .panel {
@@ -497,14 +510,8 @@ footer {
   .row .btn { justify-content: center; }
   .grid { grid-template-columns: 1fr; margin-top: 20px; }
   .sec { margin: 36px 0 12px; font-size: 18px; }
-  .howto-row {
-    grid-template-columns: 1fr auto;
-    gap: 6px 12px;
-  }
-  .howto-cmd {
-    grid-column: 1 / -1;
-    font-size: 12px;
-  }
+  .howto-item { padding: 14px 14px 16px; }
+  .howto-cmd { font-size: 12px; }
   .panel pre, .cmd { font-size: 12px; padding: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 }
 

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/style.css?v=howto3">
+  <link rel="stylesheet" href="./assets/style.css?v=howto4">
 </head>
 <body>
   <div class="wrap">
@@ -73,26 +73,43 @@
 
     <h2 class="sec" data-i18n="sec.howto">安装 · 更新 · 卸载</h2>
     <div class="panel howto" id="howto">
-      <div class="howto-row" id="install">
-        <span class="howto-k">
-          <span data-i18n="howto.install">安装</span>
-          <span class="howto-os" id="install-label">Linux</span>
-        </span>
-        <code class="howto-cmd" id="install-cmd">curl -fsS https://agent.noxcaw.com/install | bash</code>
-        <button class="copy" id="copy-install" type="button" data-i18n="install.copy">复制</button>
+      <div class="howto-item" id="install">
+        <div class="howto-head">
+          <span>
+            <span data-i18n="howto.install">安装</span>
+            <span class="howto-sep">·</span>
+            <span id="install-label">Linux</span>
+          </span>
+          <button class="copy" id="copy-install" type="button" data-i18n="install.copy">复制</button>
+        </div>
+        <div class="howto-well">
+          <span class="howto-prompt" aria-hidden="true">$</span>
+          <code class="howto-cmd" id="install-cmd">curl -fsS https://agent.noxcaw.com/install | bash</code>
+        </div>
       </div>
-      <div class="howto-row" id="update">
-        <span class="howto-k" data-i18n="howto.update">更新</span>
-        <code class="howto-cmd" id="update-cmd">caw-agent upgrade now</code>
-        <button class="copy" id="copy-update" type="button" data-i18n="install.copy">复制</button>
+      <div class="howto-item" id="update">
+        <div class="howto-head">
+          <span data-i18n="howto.update">更新</span>
+          <button class="copy" id="copy-update" type="button" data-i18n="install.copy">复制</button>
+        </div>
+        <div class="howto-well">
+          <span class="howto-prompt" aria-hidden="true">$</span>
+          <code class="howto-cmd" id="update-cmd">caw-agent upgrade now</code>
+        </div>
       </div>
-      <div class="howto-row" id="uninstall">
-        <span class="howto-k">
-          <span data-i18n="howto.uninstall">卸载</span>
-          <span class="howto-os" id="uninstall-label">Linux</span>
-        </span>
-        <code class="howto-cmd" id="uninstall-cmd">rm -rf ~/.caw-agent</code>
-        <button class="copy" id="copy-uninstall" type="button" data-i18n="install.copy">复制</button>
+      <div class="howto-item" id="uninstall">
+        <div class="howto-head">
+          <span>
+            <span data-i18n="howto.uninstall">卸载</span>
+            <span class="howto-sep">·</span>
+            <span id="uninstall-label">Linux</span>
+          </span>
+          <button class="copy" id="copy-uninstall" type="button" data-i18n="install.copy">复制</button>
+        </div>
+        <div class="howto-well">
+          <span class="howto-prompt" aria-hidden="true">$</span>
+          <code class="howto-cmd" id="uninstall-cmd">rm -rf ~/.caw-agent</code>
+        </div>
       </div>
     </div>
     <p class="howto-more"><a href="./docs.html#/install" data-keep-lang data-i18n="howto.docs">完整说明见文档</a></p>
@@ -133,9 +150,9 @@
     </div>
 
   </div>
-  <script src="./assets/i18n.js?v=howto3"></script>
+  <script src="./assets/i18n.js?v=howto4"></script>
   <script src="./assets/stage.js"></script>
-  <script src="./assets/whats-new.js?v=howto3"></script>
-  <script src="./assets/app.js?v=howto3"></script>
+  <script src="./assets/whats-new.js?v=howto4"></script>
+  <script src="./assets/app.js?v=howto4"></script>
 </body>
 </html>
