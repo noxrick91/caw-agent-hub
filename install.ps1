@@ -36,6 +36,12 @@ function Get-CawWindowsKind {
 function Get-CawRemoteFile([string]$Url, [string]$OutFile) {
     $wc = New-Object Net.WebClient
     try {
+        try {
+            $wc.Proxy = [Net.WebRequest]::DefaultWebProxy
+            if ($wc.Proxy) {
+                $wc.Proxy.Credentials = [Net.CredentialCache]::DefaultCredentials
+            }
+        } catch { }
         $wc.Headers.Add("User-Agent", "caw-agent-installer")
         $token = $env:CAW_GITHUB_TOKEN
         if (-not $token) { $token = $env:GH_TOKEN }
