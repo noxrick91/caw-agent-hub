@@ -14,6 +14,7 @@ and shows the current version on https://agent.noxcaw.com.
 ### Fixed
 
 - Docs language switch now updates sidebar page titles, crumbs, and pager. Those labels were frozen in the language from the first page load.
+- Docs asset URLs are cache-busted so Cloudflare no longer keeps a 4-hour-old `docs.js` after a notes publish.
 
 ## [0.1.8] - 2026-08-15
 
