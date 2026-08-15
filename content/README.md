@@ -66,12 +66,22 @@ Windows PowerShell：
 irm https://agent.noxcaw.com/install.txt | iex
 ```
 
-脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、macOS Apple Silicon/Intel、Windows x64/ARM64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。Windows ARM64 优先装原生包；该 Release 没有时回退到 x64（系统模拟运行）。已安装且装 latest 时会走 `caw-agent upgrade now`。安装脚本会写入 `~/.caw-agent/env`，并在 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里加上 hook，然后 `source` 该 env。`curl | bash` 改不了你当前已经打开的 shell，新开终端即可，或执行 `source ~/.caw-agent/env`。不想改 rc 时设 `CAW_NO_PATH=1`。
+不要用 `irm …/install.ps1`：GitHub Pages 把 `.ps1` 标成 `application/octet-stream`，Windows PowerShell 5.1 的 `irm` 读不成脚本。`.txt` 是 `text/plain`。若必须拉 `.ps1`：
+
+```powershell
+iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))
+```
+
+脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、macOS Apple Silicon/Intel、Windows x64/ARM64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。Windows ARM64 优先装原生包；该 Release 没有时回退到 x64（系统模拟运行）。已安装且二进制能跑、又在装 latest 时会走 `caw-agent upgrade now`；损坏的旧文件会重新下载。强制重装设 `CAW_FORCE=1`。安装脚本会写入 `~/.caw-agent/env`，并在 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里加上 hook，然后 `source` 该 env。`curl | bash` 改不了你当前已经打开的 shell，新开终端即可，或执行 `source ~/.caw-agent/env`。不想改 rc 时设 `CAW_NO_PATH=1`。
 
 Pages 尚未生效时可用：
 
 ```bash
 curl -fsS https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install | bash
+```
+
+```powershell
+irm https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install.ps1 | iex
 ```
 
 ### 官网 / 手动下载
@@ -554,7 +564,10 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 | 原生 Windows `run` 沙箱失败 | 预期行为；用 WSL2 或 `/settings sandbox` 关掉 jail |
 | macOS 截图黑屏 / 空图 | 给终端「屏幕录制」权限后重启终端 |
 | `--print` 退出码 2 | 默认 `fail`：权限 / 提问 / 计划需要人。改 `--on-approval` / `--on-ask` / `--on-plan` |
-| 找不到命令 | `source ~/.caw-agent/env` 或新开终端；安装器会写 rc hook |
+| Windows `irm …/install.ps1` 报错或没有真正执行 | GitHub Pages 把 `.ps1` 标成二进制。改用 `irm https://agent.noxcaw.com/install.txt \| iex`，或 `iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))` |
+| Windows 提示 TLS / secure channel | 用 Windows PowerShell 5.1+ 或 PowerShell 7；安装器会强制 TLS 1.2 |
+| 已有损坏的 `caw-agent.exe` 无法重装 | 设 `CAW_FORCE=1` 后再跑安装器，或删掉 `%USERPROFILE%\.caw-agent\bin\caw-agent.exe` |
+| 找不到命令 | `source ~/.caw-agent/env` 或新开终端；安装器会写 rc hook。Windows 新开一个终端以加载用户 PATH |
 | `serve` 拒绝监听 | 非 `127.0.0.1` / `::1` 必须 `--token` 或 `CAW_SERVE_TOKEN` |
 | Ollama 仍要密钥 | 用 `/model add ollama`，不要走需要 key 的 OpenAI 兼容网关 |
 | 中转站 401 / 模型不存在 | 用中转站自己的 Base URL、密钥和模型名；不要改 `openai` / `anthropic` 预设地址。见 [模型与密钥](#/models) |
