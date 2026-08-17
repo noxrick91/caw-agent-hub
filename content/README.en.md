@@ -1,6 +1,6 @@
 # caw-agent user guide
 
-caw-agent is a coding partner that lives in your terminal. It reads code, edits files, and runs tests in the project you opened. Before every write or command, it stops and waits for your OK. The UI is a Claude Code–style TUI, with a permission broker, a sandbox, MCP, sessions, and memory.
+caw-agent is a coding partner that lives in your terminal. It reads code, edits files, and runs tests in the project you opened. Before every write or command, it stops and waits for your OK. The UI provides a permission broker, sandbox, MCP, sessions, and memory.
 
 Prebuilt binaries install from this site’s [GitHub Releases](https://github.com/noxrick91/caw-agent-hub/releases) into `~/.caw-agent/bin`. The source repo is private.
 
@@ -25,11 +25,22 @@ Start with [Install](#/install) and [Quick start](#/quick-start). Slash commands
 
 ## What's new
 
-This page lists changes in the **current public release**. CI replaces this section from `CHANGELOG.md`.
+This page lists changes in the **current public release**.
+
+**What's new in v0.1.9** — 2026-08-18
+
+- Added dedicated language-server isolation controls and a clear confirmation before a project-defined server starts.
+- Added platform-aware dependency installation suggestions with an explicit Install / Cancel prompt.
+- Added safer opt-in loading for workspace MCP configuration.
+- Refined the terminal interface, including larger plan diagrams, more consistent panels, and smoother task, agent, and todo updates.
+- Improved background-task handling so interactive and long-running programs are represented more accurately.
+- Refined built-in skills, tool guidance, permission prompts, and project safety rules.
+- Improved browser, screenshot, build, and debugging workflows across supported platforms.
+- Fixed incomplete terminal borders and background painting in several layouts.
+- Fixed task lifecycle and timeout edge cases that could report active work as failed.
+- Fixed several permission, path, and cross-platform command handling issues.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
-
----
 
 ## Install
 
@@ -189,13 +200,13 @@ caw-agent serve [--listen 127.0.0.1:4150] [--token TOKEN] [--workdir DIR]
 | Option | Meaning |
 |--------|---------|
 | `-w, --workdir` | Workspace root (default: current directory) |
-| `--add-dir` | Extra work directory (repeatable; Claude `--add-dir`) |
+| `--add-dir` | Extra work directory (repeatable) |
 | `--no-mcp` | Do not auto-start MCP |
 | `--base-url` / `CAW_BASE_URL` | OpenAI-compatible API |
 | `--model` / `CAW_MODEL` | Model id |
 | `--api-key` / `CAW_API_KEY` | Key for this process |
-| `-c, --continue` | Resume the last session in this workspace |
-| `-r, --resume <id>` | Resume by full UUID or unique prefix |
+| `-c, --continue` | Resume the last session in this workspace (skips the crash prompt) |
+| `-r, --resume <id>` | Resume by full UUID or unique prefix (skips the crash prompt) |
 | `--permission-mode` | `default` \| `acceptEdits` \| `plan` \| `auto` \| `bypassPermissions` |
 | `--dangerously-skip-permissions` | Enter full access |
 | `-p, --print` | No TUI; assistant reply on stdout |
@@ -272,21 +283,25 @@ Local REST / SSE control plane, default `http://127.0.0.1:4150`. A non-loopback 
 /cd [path]               switch workspace (creates the dir if missing)
 /add-dir [path]          extra work directory
 /rewind                  file checkpoints (undo · last · redo)
-/plan                    plan mode
+/plan [task]             enter plan mode; with a task, start that plan (/plan off leaves)
 /debug                   debugger session
 /init                    detect the stack and write CAW.md
 /skills · /skill <name>  skills
 /mcp                     MCP packs (list / install NAME)
 /plugin enable|disable   plugins
 /worktrees               Task worktree list
-/todos [expand|collapse] task list above the prompt
-/agents · /tasks         subagents and background tasks
+/todos [expand|collapse|id] task list · click a row or `/todos <id>` for detail
+/agents · /tasks         subagents and background tasks · click a row for detail
 /exit                    save and quit (exit / quit work too)
 ```
 
+Saying quit, leave, or goodbye in any language in chat makes the agent call `exit` — same as `/exit`. To pause without closing the app, use `/pause`.
+
+After an unclean exit (kill, power loss, panic), the next launch asks **continue the last session** or **start a new one**. Choosing continue restores the chat and open todos, then the agent resumes that work immediately. A normal quit or closing the Windows console saves first and clears the lock, so the prompt does not appear. `--continue` / `--resume` restore immediately.
+
 Cycle permission modes with **Shift+Tab** (or **Alt+M** / **Alt+Shift+M**): default → accept edits → plan → auto → full access.
 
-Tasks and agents share a row above the prompt: side by side when both are open and the terminal is wide, stacked when it is narrow. Click `▾` / `▸` on a title to fold that panel. `← →` switches main / subagent; `Alt+↑↓` scrolls the task list.
+Tasks and agents share a row above the prompt: side by side when both are open and the terminal is wide, stacked when it is narrow. Click a row for that item's detail; click `▾` / `▸` on a title to fold that panel. `← →` switches main / subagent; `Alt+↑↓` scrolls the task list.
 
 ---
 
@@ -299,7 +314,7 @@ The default provider is `openai` → `https://api.openai.com/v1` (`gpt-5.6`).
 /model list                    list and key status
 /model <name>                  switch a saved provider
 /model add openai              official GPT (aliases gpt / chatgpt)
-/model add anthropic           Claude Messages API (alias claude)
+/model add anthropic           native Messages API
 /model add deepseek            also qwen, qwen-intl, glm, glm-coding, ollama
 /model add myapi https://…/v1 mid    third-party / OpenAI-compatible gateway
 /model key openai sk-...       write ~/.caw-agent/secrets.json (all workspaces)
@@ -320,16 +335,16 @@ NewAPI, OneAPI, and other “OpenAI-compatible” relays should be a **separate 
 |-------|-----------------|
 | Base URL | OpenAI-compatible root, usually ending in `/v1` |
 | Key | The `sk-…` the gateway issued — not an official Anthropic / OpenAI key |
-| Model id | Whatever it lists (`gpt-4o`, `claude-sonnet-4`, or prefixed ids like `openai/gpt-4o`) |
+| Model id | Whatever the provider lists (for example, `gpt-4o` or a provider-prefixed id) |
 
 ```text
-/model add relay https://your-gateway.example/v1 claude-sonnet-4
+/model add relay https://your-gateway.example/v1 gpt-4o
 /model key relay sk-...
 ```
 
-Traffic uses `/v1/chat/completions`. Official Claude stays on `/model add anthropic` (`api.anthropic.com` + native Messages). OpenRouter is a first-class preset: `/model add openrouter`, key `OPENROUTER_API_KEY`. If you point an existing `anthropic` profile at a gateway with `/model url`, that host also uses the compatible API so Messages requests are not sent to the relay.
+Gateway traffic uses `/v1/chat/completions`. The native Messages protocol is used only with its official endpoint; pointing a saved profile at a gateway automatically selects the compatible API. Add OpenRouter with `/model add openrouter` and use `OPENROUTER_API_KEY`.
 
-**Anthropic:** native `/v1/messages` only when the host is `api.anthropic.com`. A provider named `anthropic` / `claude` aimed at any other host uses OpenAI-compatible `/v1/chat/completions`. OpenRouter, DashScope, and URLs containing `compatible` or `/chat/completions` do the same. Official key: `ANTHROPIC_API_KEY` or `/model key anthropic`.
+**Native Messages:** `/v1/messages` is used only with the official endpoint; every other address uses the compatible API. `/chat/completions` gateways are supported, and keys can be configured through an environment variable or `/model key`.
 
 Lookup order (active provider): env (`api_key_env` for that provider — OpenRouter is `OPENROUTER_API_KEY`; `CAW_API_KEY` is a last resort) → optional project `.caw-agent/secrets.json` → **`~/.caw-agent/secrets.json`** → inline key in config. When `use_keyring` is true (the global default), the OS keyring is tried first. If the keyring backend is not durable, the key stays in `secrets.json` instead of being wiped by an in-memory mock.
 
@@ -360,6 +375,7 @@ Each project has its own `.caw-agent/`; cross-project data lives in `~/.caw-agen
 | `downloads/` | Default dir for `download_file` |
 | `scoop/` | Isolated Scoop root on Windows |
 | `mcp/` | Installed MCP packs |
+| `languages.toml` | Extra stack / LSP / debug maps (still the built-in `analyze` / `lsp` / `debug` tools) |
 
 ### Project `.caw-agent/`
 
@@ -369,6 +385,7 @@ Each project has its own `.caw-agent/`; cross-project data lives in `~/.caw-agen
 | `secrets.json` | Optional project key override (do not commit) |
 | `memory/` | Project auto memory |
 | `sessions/` | Sessions |
+| `runtime.lock` | TUI-running marker; used to offer restore after a crash |
 | `exports/` | Redacted `/export` transcripts |
 | `checkpoints/` | `/rewind` file snapshots |
 | `audit.log` | Tool allow/deny audit |
@@ -377,10 +394,11 @@ Each project has its own `.caw-agent/`; cross-project data lives in `~/.caw-agen
 | `worktrees/` | Isolated trees for `Task worktree: true` |
 | `media/` | Screenshot output (still inside the jail) |
 | `plan.md` | Plan-mode draft |
+| `languages.toml` | Per-repo language detection overlay (wins over the global file) |
 
-Write project notes in `CAW.md` at the workspace root. MCP servers go in `.mcp.json`.
+Write project notes in `CAW.md` at the workspace root. Workspace MCP servers may go in `.mcp.json`, but repository config can launch local processes and is not loaded by default; use `/settings mcp-workspace` only after you trust the repository. Add long-tail languages in `languages.toml` — do not install one MCP per language.
 
-`/cd` switches workspace mid-session: saves the old session, loads config / skills / MCP for the new root, rebinds the file jail, and opens a new session id (on-screen chat text stays). You cannot switch during a turn or a permission prompt.
+`/cd` switches workspace mid-session: saves the old session, loads config / skills / trusted MCP for the new root, rebinds the file jail, and opens a new session id (on-screen chat text stays). You cannot switch during a turn or a permission prompt.
 
 ---
 
@@ -392,7 +410,7 @@ Write project notes in `CAW.md` at the workspace root. MCP servers go in `.mcp.j
 |------|----------|
 | `default` | Reads may auto-allow; write / exec / MCP / network / screenshot ask |
 | `acceptEdits` | File writes and safe filesystem commands auto-pass; MCP / network / other `run` still ask |
-| `plan` | Research only. After writing `.caw-agent/plan.md`, `ExitPlanMode`; you approve before implement |
+| `plan` | Research only. After writing `.caw-agent/plan.md`, `ExitPlanMode`; architecture plans include diagrams; approve to implement in auto (or ask first). Plan itself is not the startup default |
 | `auto` | accept-edits + `analyze` / check-test-lint + git **read-only checks**. Mutating git, bare `make`, network, screen, MCP, and installs still ask |
 | `bypassPermissions` (UI: **full access**) | Skip every prompt (including screenshots). Leaving full access clears session grants |
 
@@ -400,7 +418,7 @@ Hard denies (`permissions.deny`, `/settings deny exec:rm *`) apply in every mode
 
 The first time you enter full access, it confirms and writes `"allow_bypass": true`.
 
-**Full access only skips prompts. It does not turn off the OS jail.** Same as Claude Code.
+**Full access only skips prompts. It does not turn off the OS jail.**
 
 Permission sheet: `1` / Enter once · `2` this session · `3` write to config · Esc deny.
 
@@ -419,6 +437,14 @@ Permission sheet: `1` / Enter once · `2` this session · `3` write to config ·
 Defaults: jail **on** (except Windows), exec network **off**, timeout 120s. `/settings sandbox` turns the jail off. Every sandboxed `run` that fails attaches `<sandbox_violations>`. `dangerouslyDisableSandbox: true` is a one-shot escape (`/settings unsandbox`).
 
 Hard blocks include fork-bombs, `rm -rf /`, piping into a shell, and reading or writing `.caw-agent/secrets.json` / `config.json`.
+
+### Dedicated LSP jail
+
+Language servers persist per workspace and server id, but use a separate OS-jail policy: network is denied and workspace source is read-only by default, while only `.caw-agent/lsp/<server>/` is writable. Toolchain/package caches are read-only; SSH, cloud credentials, keyrings, and caw-agent secrets stay hidden. Changing policy or shutting down terminates the complete server process tree, and the LSP message queue is bounded.
+
+A server defined by project `.caw-agent/languages.toml` is repository-controlled executable code. Before every new process, caw-agent previews the resolved program, arguments, isolation policy, and configuration fingerprint and requires **Start server / Cancel**. Auto, Full access, and remembered grants cannot bypass this boundary. A command or configuration change produces a new fingerprint.
+
+Use `/settings lsp-sandbox` for the jail, `/settings lsp-writes` for full-workspace writes, and `/settings lsp-network` for host networking. Changing any option first stops running servers. Native Windows still has no OS jail, so WSL2 is recommended; workspace-defined servers still require confirmation.
 
 ---
 
@@ -440,7 +466,7 @@ After a failed recovery with no memory write, the turn end nags once. Two failur
 
 `/rewind` or **Esc Esc** on an empty prompt opens checkpoints: restore code, chat, or both. It does not undo `run` / MCP / hand edits — use git for those.
 
-If background tasks are still running, the first `/exit` or Ctrl+C asks you to confirm.
+If background tasks or unfinished todos are still open, the first `/exit`, Ctrl+C, or in-chat `exit` asks you to confirm.
 
 ---
 
@@ -450,9 +476,10 @@ If background tasks are still running, the first `/exit` or Ctrl+C asks you to c
 |------|---------|------------|
 | File read/write / glob / grep / apply_patch | Workspace jail | Read may auto; write asks |
 | `run` | Command at the workspace root | Exec + optional OS jail |
-| `analyze` | Run checks/tests and parse `file:line` | Exec |
-| `debug` | gdb / lldb / cdb / pdb / node / dlv / jdb / … | Exec |
-| `git_*` | status / diff / log / commit / fetch / pull / push / conflicts / stash | Checks are read-only; mutations need Exec. commit rejects Cursor attribution. push never uses `--force` |
+| `analyze` | Run checks/tests and parse `file:line` (built-in, not MCP) | Exec |
+| `lsp` | Language server: hover / definition / references / symbols / diagnostics (built-in) | First query may launch a process and needs Exec; status / shutdown are reads |
+| `debug` | gdb / lldb / cdb / pdb / node / dlv / jdb / … (built-in) | Exec |
+| `git_*` | status / diff / log / commit / fetch / pull / push / conflicts / stash | Checks are read-only; mutations need Exec. commits do not add third-party attribution. push never uses `--force` |
 | `gh` | PR / issue / release / run / `repo_view`; create and comment | No merge / close / `gh api` |
 | `hf` | Hugging Face: whoami / download / upload / cache | Download uses network; upload needs Exec. Token: `HF_TOKEN` |
 | `db` | sqlite (workspace path) or postgres / mysql (DSN) | Read-only query; `exec` asks. Non-localhost needs an allowlist |
@@ -462,9 +489,10 @@ If background tasks are still running, the first `/exit` or Ctrl+C asks you to c
 | `web_search` / `web_fetch` / `download_file` | Search and download | Network; no localhost / private nets |
 | `screenshot` / `computer` | Screenshot and mouse/keyboard | Screen. computer-use is **off** by default; `/settings computer-use` |
 | `extract_archive` | zip / tar / gz… | Write |
-| `install_program` | winget / choco / scoop / portable extract | Exec |
+| `install_program` | Auto-detect host package manager; winget/choco/scoop/apt/dnf/pacman/brew/pip/portable | Every install shows Install / Cancel |
 | `Task` | Subagent. `worktree: true` jails to `.caw-agent/worktrees/<id>/` | — |
 | `Worktree` | `list` / `merge` / `abandon` | — |
+| `exit` | Leave the process when the user says goodbye or asks to quit (parent only) | Auto |
 
 Under `auto`, git is **check-only**: `git_status` / `git_conflicts` / `git status|diff|log|show` / `git stash list|show`. Rebase still goes through `run`.
 
@@ -487,6 +515,8 @@ Computer-use has a machine-level lock, an app allowlist, and hard denies for pas
 }
 ```
 
+Global installed packs and enabled plugins are user-managed and load normally. A repository's `.mcp.json` is ignored as untrusted by default; enable `/settings mcp-workspace` only for a repository you trust. Turning it off unloads those workspace servers immediately.
+
 Official packs live in the public repo under `mcp/` ([catalog](https://github.com/noxrick91/caw-agent-hub/tree/master/mcp)): browser, doc, image, ocr, speech, freecad, blender. `/mcp install <name>` downloads from GitHub into `~/.caw-agent/mcp/<name>/`. Any GitHub pack works: `/mcp install owner/repo` or a repo URL. Workspace `./mcp/<name>`, a folder, or a zip still work. After `/mcp install browser`, use `mcp__browser__*`.
 
 Attached audio is only a path — it is **not** transcribed automatically. Use the speech pack when the user asks.
@@ -506,13 +536,13 @@ Default skills are baked in: `review`, `fix`, `commit`, `doctor`, `verify`, `cod
 
 Multi-tab: each tab has its own turn and queue. `ctrl+t` new tab, `ctrl+tab` switch, `ctrl+w` close. A background tab that finished is marked `•`.
 
-Above the prompt: **tasks / agents**. It appears when there are todos or subagents. Side by side and equal height when both are expanded and the terminal is wide; stacked and content-sized when it is narrow. Click `▾` / `▸` to fold one side. Todos follow document order, top to bottom; agents are newest-first (`main` pinned at the top).
+Above the prompt: **tasks / agents**. It appears when there are todos or subagents. Side by side and equal height when both are expanded and the terminal is wide; stacked and content-sized when it is narrow. Click a row for detail (`how` / accept / last check, or the subagent transcript). Click `▾` / `▸` to fold one side. Todos follow document order, top to bottom; agents are newest-first (`main` pinned at the top).
 
-`← →` / `↓` switch main / sub; `/agents` opens the list; `/todos expand|collapse` folds tasks. The wheel scrolls the panel under the pointer; `Alt+↑↓` scrolls tasks. `/worktrees` manages isolated trees.
+`← →` / `↓` switch main / sub; `/agents` opens the list; click a tasks or agents row (or `/todos <id>`) for that item's how / accept / last check or live transcript. `/todos expand|collapse` folds tasks. The wheel scrolls the panel under the pointer; `Alt+↑↓` scrolls tasks. `/worktrees` manages isolated trees.
 
 While busy, Enter **queues** and does not interrupt. Esc: clear the draft first; if empty and busy, cancel. **Ctrl+C** quits (confirms if background tasks are running). **Ctrl+Shift+C** copies a dragged transcript selection.
 
-`@` opens the file picker. A long paste collapses to `[Pasted text #N]`. `PageUp` / `PageDown` page the transcript.
+`@` opens the file picker. A long paste collapses to `[Pasted text #N]`. The composer grows to about 8 rows, then scrolls with the wheel, `Shift+↑↓`, or `Shift+PgUp/PgDn` (caret and queue stay put). Drafts cap at 4000 characters. `PageUp` / `PageDown` page the transcript.
 
 ---
 
@@ -529,12 +559,40 @@ Common keys in `.caw-agent/config.json`:
   "compact_token_threshold": 80000,
   "cost_limit_usd": 5.0,
   "notify_on_idle": false,
+  "permissions": {
+    "lsp": {
+      "sandbox": true,
+      "allow_network": false,
+      "allow_workspace_writes": false
+    }
+  },
   "router": {
     "enabled": false,
     "classifier": "heuristic",
     "fast": { "provider": "ollama", "model": "qwen2.5-coder:7b" }
   }
 }
+```
+
+`languages.toml` example (`~/.caw-agent/` or project `.caw-agent/`):
+
+The global file is user-managed. A project file's `commands` trigger a fingerprinted launch confirmation whenever caw-agent creates a server process.
+
+```toml
+[[stack]]
+name = "Acme"
+manifests = ["acme.lock"]
+check = "acme check"
+test = "acme test"
+
+[[lsp]]
+id = "acme"
+extensions = ["acme"]
+commands = [["acme-lsp", "--stdio"]]
+
+[[debug]]
+backend = "native"
+extensions = ["acme"]
 ```
 
 `/settings notify-on-idle` or `/notify on`: desktop toast when a background tab finishes or `--print` completes (off by default).

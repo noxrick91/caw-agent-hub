@@ -1,20 +1,20 @@
 {
-  "tag": "v0.1.8",
-  "version": "0.1.8",
-  "date": "2026-08-15",
-  "title": "What's new in v0.1.8",
+  "tag": "v0.1.9",
+  "version": "0.1.9",
+  "date": "2026-08-18",
+  "title": "What's new in v0.1.9",
   "notes": [
-    "Code blocks use a deeper well on every theme, with 1-cell side inset and a single row of air under the language header (no extra top/bottom pad).",
-    "Diff cards share that well, use a 1-cell inset, and put one row of air between the path header and hunks. Sign and hunk labels are tighter.",
-    "Tasks / agents chrome headers use a dedicated `chrome_bg` bar so they no longer look like code panels.",
-    "Public docs ship a full English manual. The 中文 / EN control switches sidebar titles, page bodies, and hashes (`#/install` works in both languages; old `#/安装` links still resolve).",
-    "Docs intro now explains what the agent does, where models come from (including third-party gateways), and how to read the manual. The models page has a dedicated gateway section.",
-    "Docs page scrollbars match the site: thin, warm, rounded; sidebars fade until hover.",
-    "Third-party OpenAI-compatible gateways are documented as a separate named provider (`/model add <name> <url> [model]`), not by rewriting official preset URLs.",
-    "`/model key` no longer treats the in-memory keyring mock as a real store. Linux/macOS/Windows now compile a platform backend, and a mock write cannot wipe `~/.caw-agent/secrets.json`. Saving a key also rebinds the client immediately so the next turn does not race the disk write.",
-    "Missing-key errors name the provider's real env var (`OPENROUTER_API_KEY` for OpenRouter, not `OPENAI_API_KEY`). `CAW_API_KEY` is accepted as a last-resort fallback for every provider.",
-    "Native Anthropic Messages API is used only for `api.anthropic.com`. A provider named `anthropic` / `claude` pointed at another host uses `/v1/chat/completions` (typical third-party relays). OpenAI org/project headers are sent only to `api.openai.com`."
+    "Added dedicated language-server isolation controls and a clear confirmation before a project-defined server starts.",
+    "Added platform-aware dependency installation suggestions with an explicit Install / Cancel prompt.",
+    "Added safer opt-in loading for workspace MCP configuration.",
+    "Refined the terminal interface, including larger plan diagrams, more consistent panels, and smoother task, agent, and todo updates.",
+    "Improved background-task handling so interactive and long-running programs are represented more accurately.",
+    "Refined built-in skills, tool guidance, permission prompts, and project safety rules.",
+    "Improved browser, screenshot, build, and debugging workflows across supported platforms.",
+    "Fixed incomplete terminal borders and background painting in several layouts.",
+    "Fixed task lifecycle and timeout edge cases that could report active work as failed.",
+    "Fixed several permission, path, and cross-platform command handling issues."
   ],
-  "body": "### Changed\n\n- Code blocks use a deeper well on every theme, with 1-cell side inset and a single row of air under the language header (no extra top/bottom pad).\n- Diff cards share that well, use a 1-cell inset, and put one row of air between the path header and hunks. Sign and hunk labels are tighter.\n- Tasks / agents chrome headers use a dedicated `chrome_bg` bar so they no longer look like code panels.\n- Public docs ship a full English manual. The 中文 / EN control switches sidebar titles, page bodies, and hashes (`#/install` works in both languages; old `#/安装` links still resolve).\n- Docs intro now explains what the agent does, where models come from (including third-party gateways), and how to read the manual. The models page has a dedicated gateway section.\n- Docs page scrollbars match the site: thin, warm, rounded; sidebars fade until hover.\n- Third-party OpenAI-compatible gateways are documented as a separate named provider (`/model add <name> <url> [model]`), not by rewriting official preset URLs.\n\n### Fixed\n\n- `/model key` no longer treats the in-memory keyring mock as a real store. Linux/macOS/Windows now compile a platform backend, and a mock write cannot wipe `~/.caw-agent/secrets.json`. Saving a key also rebinds the client immediately so the next turn does not race the disk write.\n- Missing-key errors name the provider's real env var (`OPENROUTER_API_KEY` for OpenRouter, not `OPENAI_API_KEY`). `CAW_API_KEY` is accepted as a last-resort fallback for every provider.\n- Native Anthropic Messages API is used only for `api.anthropic.com`. A provider named `anthropic` / `claude` pointed at another host uses `/v1/chat/completions` (typical third-party relays). OpenAI org/project headers are sent only to `api.openai.com`.",
+  "body": "### Added\n\n- Added dedicated language-server isolation controls and a clear confirmation before a project-defined server starts.\n- Added platform-aware dependency installation suggestions with an explicit Install / Cancel prompt.\n- Added safer opt-in loading for workspace MCP configuration.\n\n### Changed\n\n- Refined the terminal interface, including larger plan diagrams, more consistent panels, and smoother task, agent, and todo updates.\n- Improved background-task handling so interactive and long-running programs are represented more accurately.\n- Refined built-in skills, tool guidance, permission prompts, and project safety rules.\n- Improved browser, screenshot, build, and debugging workflows across supported platforms.\n\n### Fixed\n\n- Fixed incomplete terminal borders and background painting in several layouts.\n- Fixed task lifecycle and timeout edge cases that could report active work as failed.\n- Fixed several permission, path, and cross-platform command handling issues.",
   "url": "./CHANGELOG.md"
 }
