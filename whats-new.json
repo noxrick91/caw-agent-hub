@@ -1,15 +1,11 @@
 {
-  "tag": "v0.1.14",
-  "version": "0.1.14",
+  "tag": "v0.1.15",
+  "version": "0.1.15",
   "date": "2026-08-18",
-  "title": "What's new in v0.1.14",
+  "title": "What's new in v0.1.15",
   "notes": [
-    "Improved the contrast of compact header, status, and footer text.",
-    "Presented LLM failures as a distinct error block instead of inline transcript text.",
-    "Fixed stale characters appearing around ambiguous-width punctuation in Chinese Windows Terminal sessions.",
-    "Fixed Windows workspace paths showing Unix separators or leaking the `\\\\?\\` verbatim prefix.",
-    "Kept bottom chrome above ConPTY's partially visible resize row so footer text is not clipped."
+    "Fixed `upgrade now` rejecting GitHub releases whose optional notes field is `null`."
   ],
-  "body": "### Changed\n\n- Improved the contrast of compact header, status, and footer text.\n- Presented LLM failures as a distinct error block instead of inline transcript text.\n\n### Fixed\n\n- Fixed stale characters appearing around ambiguous-width punctuation in Chinese Windows Terminal sessions.\n- Fixed Windows workspace paths showing Unix separators or leaking the `\\\\?\\` verbatim prefix.\n- Kept bottom chrome above ConPTY's partially visible resize row so footer text is not clipped.",
+  "body": "### Fixed\n\n- Fixed `upgrade now` rejecting GitHub releases whose optional notes field is `null`.",
   "url": "./CHANGELOG.md"
 }
