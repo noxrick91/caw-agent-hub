@@ -27,13 +27,9 @@ Start with [Install](#/install) and [Quick start](#/quick-start). Slash commands
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.14** — 2026-08-18
+**What's new in v0.1.15** — 2026-08-18
 
-- Improved the contrast of compact header, status, and footer text.
-- Presented LLM failures as a distinct error block instead of inline transcript text.
-- Fixed stale characters appearing around ambiguous-width punctuation in Chinese Windows Terminal sessions.
-- Fixed Windows workspace paths showing Unix separators or leaking the `\?\` verbatim prefix.
-- Kept bottom chrome above ConPTY's partially visible resize row so footer text is not clipped.
+- Fixed `upgrade now` rejecting GitHub releases whose optional notes field is `null`.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
