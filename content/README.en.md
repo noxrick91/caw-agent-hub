@@ -27,14 +27,10 @@ Start with [Install](#/install) and [Quick start](#/quick-start). Slash commands
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.10** — 2026-08-18
+**What's new in v0.1.13** — 2026-08-18
 
-- Added Tab-cycled keyboard focus so the composer, tasks, and agents panels can be navigated without fighting the input caret.
-- Improved file downloads with live byte and percentage progress.
-- Improved install and upgrade guidance: Linux sudo is requested in another terminal, PATH conflicts are explained, and Windows replaces the locked executable after exit.
-- Fixed failed background tasks leaving the parent idle instead of recovering.
-- Fixed transcript scrolling so code and diagram headers no longer stay pinned while the body moves.
-- Fixed markdown tables overflowing a narrow terminal.
+- Added native Windows ARM64 release builds, installers, self-upgrades, and website downloads alongside Linux x86_64/ARM64 and Windows x86_64.
+- Removed unavailable macOS binaries from the public download matrix while retaining source-level macOS support.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
@@ -68,7 +64,7 @@ Do not use `irm …/install.ps1`: GitHub Pages serves `.ps1` as `application/oct
 iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))
 ```
 
-The script picks the asset for your OS/ARCH (Linux x64/arm64, macOS Apple Silicon/Intel, Windows x64/ARM64), checks `SHA256SUMS` from the same Release, and installs into `~/.caw-agent/bin`. Windows ARM64 prefers the native build; if that Release has none, it falls back to x64 (system emulation). Running the installer again re-downloads and replaces the current file (on Windows it renames a running exe to `.bak` first). The installer writes `~/.caw-agent/env` and adds a hook in `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`, then `source`s that env. `curl | bash` cannot update the shell you already have open — open a new terminal, or run `source ~/.caw-agent/env`. Set `CAW_NO_PATH=1` to skip the rc hook.
+The script picks the asset for your OS/ARCH (Linux x64/arm64 or Windows x64/ARM64), checks `SHA256SUMS` from the same Release, and installs into `~/.caw-agent/bin`. Windows ARM64 prefers the native build and falls back to x64 emulation for older Releases without an ARM64 asset. macOS prebuilt packages are temporarily unavailable. Running the installer again re-downloads and replaces the current file (on Windows it renames a running exe to `.bak` first). The installer writes `~/.caw-agent/env` and adds a hook in `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`, then `source`s that env. `curl | bash` cannot update the shell you already have open — open a new terminal, or run `source ~/.caw-agent/env`. Set `CAW_NO_PATH=1` to skip the rc hook.
 
 If Pages is not live yet:
 
@@ -88,10 +84,8 @@ Open the homepage, download the latest asset for your platform, put it in `~/.ca
 |----------|--------|
 | Linux x86_64 | `caw-agent-x86_64-unknown-linux-gnu` |
 | Linux aarch64 | `caw-agent-aarch64-unknown-linux-gnu` |
-| macOS Apple Silicon | `caw-agent-aarch64-apple-darwin` |
-| macOS Intel | `caw-agent-x86_64-apple-darwin` |
-| Windows x64 | `caw-agent-x86_64-pc-windows-msvc.exe` |
-| Windows ARM64 | `caw-agent-aarch64-pc-windows-msvc.exe` (installer falls back to x64 if missing) |
+| Windows x64 | `caw-agent-x86_64-pc-windows-gnu.exe` |
+| Windows ARM64 | `caw-agent-aarch64-pc-windows-msvc.exe` |
 
 Unsupported combos (Linux musl, 32-bit Windows) have no prebuilt — build from source.
 
