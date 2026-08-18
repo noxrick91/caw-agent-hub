@@ -27,18 +27,14 @@ caw-agent 是跑在你终端里的编程助手：读代码、改文件、跑测�
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.9** — 2026-08-18
+**What's new in v0.1.10** — 2026-08-18
 
-- Added dedicated language-server isolation controls and a clear confirmation before a project-defined server starts.
-- Added platform-aware dependency installation suggestions with an explicit Install / Cancel prompt.
-- Added safer opt-in loading for workspace MCP configuration.
-- Refined the terminal interface, including larger plan diagrams, more consistent panels, and smoother task, agent, and todo updates.
-- Improved background-task handling so interactive and long-running programs are represented more accurately.
-- Refined built-in skills, tool guidance, permission prompts, and project safety rules.
-- Improved browser, screenshot, build, and debugging workflows across supported platforms.
-- Fixed incomplete terminal borders and background painting in several layouts.
-- Fixed task lifecycle and timeout edge cases that could report active work as failed.
-- Fixed several permission, path, and cross-platform command handling issues.
+- Added Tab-cycled keyboard focus so the composer, tasks, and agents panels can be navigated without fighting the input caret.
+- Improved file downloads with live byte and percentage progress.
+- Improved install and upgrade guidance: Linux sudo is requested in another terminal, PATH conflicts are explained, and Windows replaces the locked executable after exit.
+- Fixed failed background tasks leaving the parent idle instead of recovering.
+- Fixed transcript scrolling so code and diagram headers no longer stay pinned while the body moves.
+- Fixed markdown tables overflowing a narrow terminal.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
@@ -301,7 +297,7 @@ caw-agent --print --continue -w . "keep going"
 
 权限模式用 **Shift+Tab**（或 **Alt+M** / **Alt+Shift+M**）循环：default → accept edits → plan → auto → full access。
 
-任务与子代理共用提示词上方一行：两边都有时宽屏并排、窄屏上下叠。点一行看该条详情；点标题 `▾` / `▸` 可单独折叠。`← →` 切换主 / 子代理；`Alt+↑↓` 滚动任务列表。
+任务与子代理共用提示词上方一行：两边都有时宽屏并排、窄屏上下叠。点一行看该条详情；点标题 `▾` / `▸` 可单独折叠。`Tab` 在输入框、任务、子代理之间切换键盘焦点；焦点在面板上时 `↑↓` 滚动该列表，`← →` 在 agents 焦点下切换主 / 子代理；`Esc` 回到输入框。
 
 ---
 
@@ -538,7 +534,7 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 
 提示词上方是 **tasks / agents** 条：有待办或子代理时出现。两边都展开且够宽时并排等高；窄屏上下叠，高度跟着内容走。点一行看详情（how / accept / 最近验收，或子代理笔录）。点 `▾` / `▸` 单独折叠。任务按文档顺序从上往下推进；子代理按开始时间新的在上（`main` 钉在顶部）。
 
-`← →` / `↓` 切换主 / 子；`/agents` 打开列表；点 tasks / agents 一行（或 `/todos <id>`）看该条的 how / accept / 最近验收或实时笔录。`/todos expand|collapse` 折任务。滚轮落在对应面板上滚动；`Alt+↑↓` 滚任务。`/worktrees` 处理隔离树。
+`Tab` 在输入框和已展开的 tasks / agents 面板之间循环焦点。焦点在面板上时 `↑↓` 滚动该列表，`← →` 切换主 / 子。点 tasks / agents 一行（或 `/todos <id>`）看该条的 how / accept / 最近验收或实时笔录。`/todos expand|collapse` 折任务。滚轮落在对应面板上滚动；`Alt+↑↓` 仍滚当前焦点区域。`/worktrees` 处理隔离树。
 
 忙碌时 Enter **入队**，不打断。Esc：先清草稿；空且忙碌则中断。**Ctrl+C** 退出（有后台任务会先确认）。**Ctrl+Shift+C** 复制拖选的笔录。
 
