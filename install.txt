@@ -117,11 +117,12 @@ function Show-CawPathConflict([string]$Dest) {
 }
 
 $Kind = Get-CawWindowsKind
-$Fallback = "caw-agent-x86_64-pc-windows-msvc.exe"
+$Fallback = "caw-agent-x86_64-pc-windows-gnu.exe"
+$Arm64 = "caw-agent-aarch64-pc-windows-msvc.exe"
 switch ($Kind) {
     "x64" { $Candidates = @($Fallback) }
     "arm64" {
-        $Candidates = @("caw-agent-aarch64-pc-windows-msvc.exe", $Fallback)
+        $Candidates = @($Arm64, $Fallback)
     }
     default {
         throw "unsupported Windows architecture $Kind (need x64 or arm64)"
@@ -159,7 +160,7 @@ try {
         throw "SHA256SUMS has no Windows build for $Kind — https://github.com/$Repo/releases"
     }
     if ($Kind -eq "arm64" -and $Asset -eq $Fallback) {
-        Write-Host "No native ARM64 build in this release — using x64 (Windows emulation)"
+        Write-Host "Using the x64 build through Windows emulation"
     }
     Write-Host "  $Asset -> $Dest"
     $Bin = Join-Path $Tmp $Asset
