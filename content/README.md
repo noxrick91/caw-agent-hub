@@ -27,14 +27,10 @@ caw-agent 是跑在你终端里的编程助手：读代码、改文件、跑测�
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.10** — 2026-08-18
+**What's new in v0.1.13** — 2026-08-18
 
-- Added Tab-cycled keyboard focus so the composer, tasks, and agents panels can be navigated without fighting the input caret.
-- Improved file downloads with live byte and percentage progress.
-- Improved install and upgrade guidance: Linux sudo is requested in another terminal, PATH conflicts are explained, and Windows replaces the locked executable after exit.
-- Fixed failed background tasks leaving the parent idle instead of recovering.
-- Fixed transcript scrolling so code and diagram headers no longer stay pinned while the body moves.
-- Fixed markdown tables overflowing a narrow terminal.
+- Added native Windows ARM64 release builds, installers, self-upgrades, and website downloads alongside Linux x86_64/ARM64 and Windows x86_64.
+- Removed unavailable macOS binaries from the public download matrix while retaining source-level macOS support.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
@@ -68,7 +64,7 @@ irm https://agent.noxcaw.com/install.txt | iex
 iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))
 ```
 
-脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、macOS Apple Silicon/Intel、Windows x64/ARM64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。Windows ARM64 优先装原生包；该 Release 没有时回退到 x64（系统模拟运行）。再跑一次安装器会重新下载并覆盖当前文件（Windows 先把正在用的 exe 改名为 `.bak` 再写入新文件）。安装脚本会写入 `~/.caw-agent/env`，并在 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里加上 hook，然后 `source` 该 env。`curl | bash` 改不了你当前已经打开的 shell，新开终端即可，或执行 `source ~/.caw-agent/env`。不想改 rc 时设 `CAW_NO_PATH=1`。
+脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、Windows x64/ARM64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。Windows ARM64 优先安装原生版本；旧版 Release 没有 ARM64 资产时回退到 x64 系统模拟。macOS 预编译包暂不提供。再跑一次安装器会重新下载并覆盖当前文件（Windows 先把正在用的 exe 改名为 `.bak` 再写入新文件）。安装脚本会写入 `~/.caw-agent/env`，并在 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里加上 hook，然后 `source` 该 env。`curl | bash` 改不了你当前已经打开的 shell，新开终端即可，或执行 `source ~/.caw-agent/env`。不想改 rc 时设 `CAW_NO_PATH=1`。
 
 Pages 尚未生效时可用：
 
@@ -88,10 +84,8 @@ irm https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install.ps1
 |------|------|
 | Linux x86_64 | `caw-agent-x86_64-unknown-linux-gnu` |
 | Linux aarch64 | `caw-agent-aarch64-unknown-linux-gnu` |
-| macOS Apple Silicon | `caw-agent-aarch64-apple-darwin` |
-| macOS Intel | `caw-agent-x86_64-apple-darwin` |
-| Windows x64 | `caw-agent-x86_64-pc-windows-msvc.exe` |
-| Windows ARM64 | `caw-agent-aarch64-pc-windows-msvc.exe`（没有时安装器回退 x64） |
+| Windows x64 | `caw-agent-x86_64-pc-windows-gnu.exe` |
+| Windows ARM64 | `caw-agent-aarch64-pc-windows-msvc.exe` |
 
 不支持的组合（如 Linux musl、32 位 Windows）没有预编译包，需从源码构建。
 
