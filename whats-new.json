@@ -1,11 +1,13 @@
 {
-  "tag": "v0.1.15",
-  "version": "0.1.15",
-  "date": "2026-08-18",
-  "title": "What's new in v0.1.15",
+  "tag": "v0.1.16",
+  "version": "0.1.16",
+  "date": "2026-08-19",
+  "title": "What's new in v0.1.16",
   "notes": [
-    "Fixed `upgrade now` rejecting GitHub releases whose optional notes field is `null`."
+    "Added keyboard selection and detail opening to the Todo list, matching the Agents panel controls.",
+    "Added Plan-style Todo detail sheets with Markdown tables, code blocks, and Mermaid diagrams.",
+    "Reduced intermittent UI stalls during active tasks by making periodic persistence non-blocking and consolidating recovery snapshots."
   ],
-  "body": "### Fixed\n\n- Fixed `upgrade now` rejecting GitHub releases whose optional notes field is `null`.",
+  "body": "### Added\n\n- Added keyboard selection and detail opening to the Todo list, matching the Agents panel controls.\n- Added Plan-style Todo detail sheets with Markdown tables, code blocks, and Mermaid diagrams.\n\n### Fixed\n\n- Reduced intermittent UI stalls during active tasks by making periodic persistence non-blocking and consolidating recovery snapshots.",
   "url": "./CHANGELOG.md"
 }
