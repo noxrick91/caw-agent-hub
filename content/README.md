@@ -27,10 +27,13 @@ caw-agent 是跑在你终端里的编程助手：读代码、改文件、跑测�
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.13** — 2026-08-18
+**What's new in v0.1.14** — 2026-08-18
 
-- Added native Windows ARM64 release builds, installers, self-upgrades, and website downloads alongside Linux x86_64/ARM64 and Windows x86_64.
-- Removed unavailable macOS binaries from the public download matrix while retaining source-level macOS support.
+- Improved the contrast of compact header, status, and footer text.
+- Presented LLM failures as a distinct error block instead of inline transcript text.
+- Fixed stale characters appearing around ambiguous-width punctuation in Chinese Windows Terminal sessions.
+- Fixed Windows workspace paths showing Unix separators or leaking the `\?\` verbatim prefix.
+- Kept bottom chrome above ConPTY's partially visible resize row so footer text is not clipped.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
