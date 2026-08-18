@@ -6,6 +6,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.1.16] - 2026-08-19
+
+### Added
+
+- Added keyboard selection and detail opening to the Todo list, matching the Agents panel controls.
+- Added Plan-style Todo detail sheets with Markdown tables, code blocks, and Mermaid diagrams.
+
+### Fixed
+
+- Reduced intermittent UI stalls during active tasks by making periodic persistence non-blocking and consolidating recovery snapshots.
+
 ## [0.1.15] - 2026-08-18
 
 ### Fixed
