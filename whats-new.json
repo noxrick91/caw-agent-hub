@@ -1,20 +1,16 @@
 {
-  "tag": "v0.1.9",
-  "version": "0.1.9",
+  "tag": "v0.1.10",
+  "version": "0.1.10",
   "date": "2026-08-18",
-  "title": "What's new in v0.1.9",
+  "title": "What's new in v0.1.10",
   "notes": [
-    "Added dedicated language-server isolation controls and a clear confirmation before a project-defined server starts.",
-    "Added platform-aware dependency installation suggestions with an explicit Install / Cancel prompt.",
-    "Added safer opt-in loading for workspace MCP configuration.",
-    "Refined the terminal interface, including larger plan diagrams, more consistent panels, and smoother task, agent, and todo updates.",
-    "Improved background-task handling so interactive and long-running programs are represented more accurately.",
-    "Refined built-in skills, tool guidance, permission prompts, and project safety rules.",
-    "Improved browser, screenshot, build, and debugging workflows across supported platforms.",
-    "Fixed incomplete terminal borders and background painting in several layouts.",
-    "Fixed task lifecycle and timeout edge cases that could report active work as failed.",
-    "Fixed several permission, path, and cross-platform command handling issues."
+    "Added Tab-cycled keyboard focus so the composer, tasks, and agents panels can be navigated without fighting the input caret.",
+    "Improved file downloads with live byte and percentage progress.",
+    "Improved install and upgrade guidance: Linux sudo is requested in another terminal, PATH conflicts are explained, and Windows replaces the locked executable after exit.",
+    "Fixed failed background tasks leaving the parent idle instead of recovering.",
+    "Fixed transcript scrolling so code and diagram headers no longer stay pinned while the body moves.",
+    "Fixed markdown tables overflowing a narrow terminal."
   ],
-  "body": "### Added\n\n- Added dedicated language-server isolation controls and a clear confirmation before a project-defined server starts.\n- Added platform-aware dependency installation suggestions with an explicit Install / Cancel prompt.\n- Added safer opt-in loading for workspace MCP configuration.\n\n### Changed\n\n- Refined the terminal interface, including larger plan diagrams, more consistent panels, and smoother task, agent, and todo updates.\n- Improved background-task handling so interactive and long-running programs are represented more accurately.\n- Refined built-in skills, tool guidance, permission prompts, and project safety rules.\n- Improved browser, screenshot, build, and debugging workflows across supported platforms.\n\n### Fixed\n\n- Fixed incomplete terminal borders and background painting in several layouts.\n- Fixed task lifecycle and timeout edge cases that could report active work as failed.\n- Fixed several permission, path, and cross-platform command handling issues.",
+  "body": "### Changed\n\n- Added Tab-cycled keyboard focus so the composer, tasks, and agents panels can be navigated without fighting the input caret.\n- Improved file downloads with live byte and percentage progress.\n- Improved install and upgrade guidance: Linux sudo is requested in another terminal, PATH conflicts are explained, and Windows replaces the locked executable after exit.\n\n### Fixed\n\n- Fixed failed background tasks leaving the parent idle instead of recovering.\n- Fixed transcript scrolling so code and diagram headers no longer stay pinned while the body moves.\n- Fixed markdown tables overflowing a narrow terminal.",
   "url": "./CHANGELOG.md"
 }
