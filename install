@@ -149,19 +149,16 @@ case "${os}-${arch}" in
   linux-aarch64 | linux-arm64)
     asset="caw-agent-aarch64-unknown-linux-gnu"
     ;;
-  darwin-arm64)
-    asset="caw-agent-aarch64-apple-darwin"
-    ;;
-  darwin-x86_64)
-    asset="caw-agent-x86_64-apple-darwin"
+  darwin-*)
+    die "macOS prebuilt packages are temporarily unavailable"
     ;;
   mingw*-aarch64 | mingw*-arm64 | msys*-aarch64 | msys*-arm64 | cygwin*-aarch64 | cygwin*-arm64 | windows*-aarch64 | windows*-arm64)
     asset="caw-agent-aarch64-pc-windows-msvc.exe"
-    fallback_asset="caw-agent-x86_64-pc-windows-msvc.exe"
+    fallback_asset="caw-agent-x86_64-pc-windows-gnu.exe"
     bin_name="caw-agent.exe"
     ;;
   mingw* | msys* | cygwin* | windows*)
-    asset="caw-agent-x86_64-pc-windows-msvc.exe"
+    asset="caw-agent-x86_64-pc-windows-gnu.exe"
     bin_name="caw-agent.exe"
     ;;
   *)
