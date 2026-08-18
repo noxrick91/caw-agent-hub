@@ -1,22 +1,26 @@
 {
-  "tag_name": "v0.1.12",
-  "published_at": "2026-08-18T11:08:28Z",
+  "tag_name": "v0.1.13",
+  "published_at": "2026-08-18T14:04:33Z",
   "assets": [
     {
       "name": "SHA256SUMS",
-      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.12/SHA256SUMS"
+      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.13/SHA256SUMS"
+    },
+    {
+      "name": "caw-agent-aarch64-pc-windows-msvc.exe",
+      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.13/caw-agent-aarch64-pc-windows-msvc.exe"
     },
     {
       "name": "caw-agent-aarch64-unknown-linux-gnu",
-      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.12/caw-agent-aarch64-unknown-linux-gnu"
+      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.13/caw-agent-aarch64-unknown-linux-gnu"
     },
     {
       "name": "caw-agent-x86_64-pc-windows-gnu.exe",
-      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.12/caw-agent-x86_64-pc-windows-gnu.exe"
+      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.13/caw-agent-x86_64-pc-windows-gnu.exe"
     },
     {
       "name": "caw-agent-x86_64-unknown-linux-gnu",
-      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.12/caw-agent-x86_64-unknown-linux-gnu"
+      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.13/caw-agent-x86_64-unknown-linux-gnu"
     }
   ]
 }
