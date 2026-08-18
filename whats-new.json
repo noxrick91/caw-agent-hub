@@ -1,16 +1,12 @@
 {
-  "tag": "v0.1.10",
-  "version": "0.1.10",
+  "tag": "v0.1.13",
+  "version": "0.1.13",
   "date": "2026-08-18",
-  "title": "What's new in v0.1.10",
+  "title": "What's new in v0.1.13",
   "notes": [
-    "Added Tab-cycled keyboard focus so the composer, tasks, and agents panels can be navigated without fighting the input caret.",
-    "Improved file downloads with live byte and percentage progress.",
-    "Improved install and upgrade guidance: Linux sudo is requested in another terminal, PATH conflicts are explained, and Windows replaces the locked executable after exit.",
-    "Fixed failed background tasks leaving the parent idle instead of recovering.",
-    "Fixed transcript scrolling so code and diagram headers no longer stay pinned while the body moves.",
-    "Fixed markdown tables overflowing a narrow terminal."
+    "Added native Windows ARM64 release builds, installers, self-upgrades, and website downloads alongside Linux x86_64/ARM64 and Windows x86_64.",
+    "Removed unavailable macOS binaries from the public download matrix while retaining source-level macOS support."
   ],
-  "body": "### Changed\n\n- Added Tab-cycled keyboard focus so the composer, tasks, and agents panels can be navigated without fighting the input caret.\n- Improved file downloads with live byte and percentage progress.\n- Improved install and upgrade guidance: Linux sudo is requested in another terminal, PATH conflicts are explained, and Windows replaces the locked executable after exit.\n\n### Fixed\n\n- Fixed failed background tasks leaving the parent idle instead of recovering.\n- Fixed transcript scrolling so code and diagram headers no longer stay pinned while the body moves.\n- Fixed markdown tables overflowing a narrow terminal.",
+  "body": "### Changed\n\n- Added native Windows ARM64 release builds, installers, self-upgrades, and website downloads alongside Linux x86_64/ARM64 and Windows x86_64.\n- Removed unavailable macOS binaries from the public download matrix while retaining source-level macOS support.",
   "url": "./CHANGELOG.md"
 }
