@@ -6,6 +6,41 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.1.13] - 2026-08-18
+
+### Changed
+
+- Added native Windows ARM64 release builds, installers, self-upgrades, and website downloads alongside Linux x86_64/ARM64 and Windows x86_64.
+- Removed unavailable macOS binaries from the public download matrix while retaining source-level macOS support.
+
+## [0.1.12] - 2026-08-18
+
+### Changed
+
+- Hardened built-in MCP services with workspace-confined paths, dependency allowlists, and framing-safe stdout handling.
+- Added separate prompt-cache write token and pricing accounting.
+- Added self-hosted Forgejo release builds for Linux x86_64, Linux ARM64, and Windows x86_64 GNU; macOS prebuilt packages are temporarily unavailable.
+
+### Fixed
+
+- Fixed Anthropic prompt totals, cache-hit percentages, cache-write accounting, context compaction thresholds, and cost estimates.
+- Fixed document, image, OCR, and speech MCP smoke tests hanging on Content-Length framing.
+- Fixed FreeCAD and Blender status calls failing when their desktop backends are not installed.
+
+## [0.1.11] - 2026-08-18
+
+### Changed
+
+- Improved terminal image previews with full half-block color detail and theme-aware transparent backgrounds.
+- Hardened Unix and Windows installers with executable/version verification, strict checksum matching, and automatic rollback.
+
+### Fixed
+
+- Fixed Windows commands that used unavailable `head` or `tail` utilities, including commands inside shell pipelines.
+- Fixed the unpainted Windows terminal safety column that could leave a missing background patch at the lower-right edge.
+- Fixed completed projects occasionally reopening the Welcome setup after restart or console-window close.
+- Fixed model API keys entered for a non-active provider being dispatched as chat messages instead of saved securely.
+
 ## [0.1.10] - 2026-08-18
 
 ### Changed
