@@ -6,6 +6,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.1.14] - 2026-08-18
+
+### Changed
+
+- Improved the contrast of compact header, status, and footer text.
+- Presented LLM failures as a distinct error block instead of inline transcript text.
+
+### Fixed
+
+- Fixed stale characters appearing around ambiguous-width punctuation in Chinese Windows Terminal sessions.
+- Fixed Windows workspace paths showing Unix separators or leaking the `\\?\` verbatim prefix.
+- Kept bottom chrome above ConPTY's partially visible resize row so footer text is not clipped.
+
 ## [0.1.13] - 2026-08-18
 
 ### Changed
