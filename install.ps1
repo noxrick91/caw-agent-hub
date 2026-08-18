@@ -78,8 +78,32 @@ function Install-CawBinary([string]$Src, [string]$Dest) {
             throw "Cannot replace $Dest. Close every caw-agent window and retry."
         }
     }
-    Copy-Item -LiteralPath $Src -Destination $Dest -Force
+    try {
+        Copy-Item -LiteralPath $Src -Destination $Dest -Force
+    } catch {
+        if (Test-Path -LiteralPath $bak) {
+            Move-Item -LiteralPath $bak -Destination $Dest -Force -ErrorAction SilentlyContinue
+        }
+        throw
+    }
     try { Unblock-File -LiteralPath $Dest -ErrorAction SilentlyContinue } catch { }
+}
+
+function Restore-CawBinary([string]$Dest) {
+    $bak = "$Dest.bak"
+    Remove-Item -LiteralPath $Dest -Force -ErrorAction SilentlyContinue
+    if (Test-Path -LiteralPath $bak) {
+        Move-Item -LiteralPath $bak -Destination $Dest -Force
+    }
+}
+
+function Get-CawChecksum($Lines, [string]$Asset) {
+    $pattern = '^\s*([0-9a-fA-F]{64})\s+\*?' + [regex]::Escape($Asset) + '\s*$'
+    foreach ($line in $Lines) {
+        $match = [regex]::Match($line, $pattern)
+        if ($match.Success) { return $match.Groups[1].Value.ToLowerInvariant() }
+    }
+    return $null
 }
 
 function Show-CawPathConflict([string]$Dest) {
@@ -126,7 +150,7 @@ try {
     $SumLines = Get-Content -LiteralPath $Sums | ForEach-Object { $_.TrimEnd("`r") }
     $Asset = $null
     foreach ($c in $Candidates) {
-        if ($SumLines | Where-Object { $_ -match [regex]::Escape($c) }) {
+        if (Get-CawChecksum $SumLines $c) {
             $Asset = $c
             break
         }
@@ -140,8 +164,7 @@ try {
     Write-Host "  $Asset -> $Dest"
     $Bin = Join-Path $Tmp $Asset
     Get-CawRemoteFile "$Base/$Asset" $Bin
-    $Expect = ($SumLines | Where-Object { $_ -match [regex]::Escape($Asset) } | Select-Object -First 1) `
-        -split '\s+' | Select-Object -First 1
+    $Expect = Get-CawChecksum $SumLines $Asset
     if (-not $Expect) { throw "SHA256SUMS has no entry for $Asset" }
     $Got = (Get-FileHash -Algorithm SHA256 -Path $Bin).Hash.ToLowerInvariant()
     if ($Got -ne $Expect.ToLowerInvariant()) {
@@ -163,6 +186,18 @@ if (-not $onPath) {
 
 $Ver = ""
 try { $Ver = (& $Dest --version 2>$null) } catch { }
+if (-not $Ver) {
+    Restore-CawBinary $Dest
+    throw "Downloaded binary did not run: $Dest --version"
+}
+if ($Tag -ne "latest") {
+    $ExpectedVersion = $Tag.TrimStart('v')
+    $ActualVersion = (($Ver | Select-Object -First 1) -split '\s+' | Select-Object -Last 1).TrimStart('v')
+    if ($ActualVersion -ne $ExpectedVersion) {
+        Restore-CawBinary $Dest
+        throw "$Dest --version is '$Ver', expected $ExpectedVersion"
+    }
+}
 Write-Host "Installation complete."
 if ($Ver) { Write-Host "  version  $Ver" }
 Write-Host "  binary   $Dest"

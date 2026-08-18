@@ -240,7 +240,9 @@ if [ "${expect}" != "${got}" ]; then
 fi
 ok "Checksum verified"
 
+had_dest=0
 if [ -e "${dest}" ]; then
+  had_dest=1
   cp -f "${dest}" "${dest}.bak" 2>/dev/null || true
 fi
 chmod +x "${tmp}/${asset}"
@@ -248,14 +250,22 @@ mv "${tmp}/${asset}" "${dest}"
 ok "Installed ${dest}"
 
 ver="$("${dest}" --version 2>/dev/null || true)"
+rollback_binary() {
+  rm -f "${dest}"
+  if [ "${had_dest}" = "1" ] && [ -e "${dest}.bak" ]; then
+    mv -f "${dest}.bak" "${dest}"
+  fi
+}
+if [ -z "${ver}" ]; then
+  rollback_binary
+  die "downloaded binary did not run: ${dest} --version"
+fi
 if [ -n "${ver}" ] && [ "${TAG}" != "latest" ]; then
   expect_ver="${TAG#v}"
   ver_num="${ver##* }"
   ver_num="${ver_num#v}"
   if [ "${ver_num}" != "${expect_ver}" ]; then
-    if [ -e "${dest}.bak" ]; then
-      mv -f "${dest}.bak" "${dest}"
-    fi
+    rollback_binary
     die "${dest} --version is \`${ver}\`, expected ${expect_ver}"
   fi
 fi
