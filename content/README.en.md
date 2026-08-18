@@ -27,11 +27,15 @@ Start with [Install](#/install) and [Quick start](#/quick-start). Slash commands
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.16** — 2026-08-19
+**What's new in v0.1.17** — 2026-08-19
 
-- Added keyboard selection and detail opening to the Todo list, matching the Agents panel controls.
-- Added Plan-style Todo detail sheets with Markdown tables, code blocks, and Mermaid diagrams.
-- Reduced intermittent UI stalls during active tasks by making periodic persistence non-blocking and consolidating recovery snapshots.
+- Redesigned the Router menu with Provider and Model pickers for Fast, Default, Strong, and the dedicated classifier model.
+- Made Router escalation gradual from Fast to Default to Strong, with working controls for stall and verification-failure escalation.
+- Expanded Router decision feedback with classification source, score, confidence, fallback, vision requirements, and routing reasons.
+- Clarified when Hybrid and LLM classification can add an extra model request and cost.
+- Kept the selected Welcome theme visible when the terminal is too short to show the complete theme list.
+- Prevented selecting a Router tier from silently clearing its configured model.
+- Warned when a visual request falls back to a model that is not vision-capable.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
