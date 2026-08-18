@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.1.15] - 2026-08-18
+
+### Fixed
+
+- Fixed `upgrade now` rejecting GitHub releases whose optional notes field is `null`.
+
 ## [0.1.14] - 2026-08-18
 
 ### Changed
