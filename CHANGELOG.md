@@ -6,6 +6,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.1.17] - 2026-08-19
+
+### Changed
+
+- Redesigned the Router menu with Provider and Model pickers for Fast, Default, Strong, and the dedicated classifier model.
+- Made Router escalation gradual from Fast to Default to Strong, with working controls for stall and verification-failure escalation.
+- Expanded Router decision feedback with classification source, score, confidence, fallback, vision requirements, and routing reasons.
+- Clarified when Hybrid and LLM classification can add an extra model request and cost.
+
+### Fixed
+
+- Kept the selected Welcome theme visible when the terminal is too short to show the complete theme list.
+- Prevented selecting a Router tier from silently clearing its configured model.
+- Warned when a visual request falls back to a model that is not vision-capable.
+
 ## [0.1.16] - 2026-08-19
 
 ### Added
