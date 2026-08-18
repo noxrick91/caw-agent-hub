@@ -6,6 +6,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-08-18
+
+### Changed
+
+- Added Tab-cycled keyboard focus so the composer, tasks, and agents panels can be navigated without fighting the input caret.
+- Improved file downloads with live byte and percentage progress.
+- Improved install and upgrade guidance: Linux sudo is requested in another terminal, PATH conflicts are explained, and Windows replaces the locked executable after exit.
+
+### Fixed
+
+- Fixed failed background tasks leaving the parent idle instead of recovering.
+- Fixed transcript scrolling so code and diagram headers no longer stay pinned while the body moves.
+- Fixed markdown tables overflowing a narrow terminal.
+
 ## [0.1.9] - 2026-08-18
 
 ### Added
