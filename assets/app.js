@@ -7,9 +7,7 @@ const CACHE_MS = 10 * 60 * 1000;
 const ASSETS = [
   { id: "linux-x64", label: "Linux x86_64", file: "caw-agent-x86_64-unknown-linux-gnu" },
   { id: "linux-arm64", label: "Linux aarch64", file: "caw-agent-aarch64-unknown-linux-gnu" },
-  { id: "mac-arm64", label: "macOS Apple Silicon", file: "caw-agent-aarch64-apple-darwin" },
-  { id: "mac-x64", label: "macOS Intel", file: "caw-agent-x86_64-apple-darwin" },
-  { id: "win-x64", label: "Windows x64", file: "caw-agent-x86_64-pc-windows-msvc.exe" },
+  { id: "win-x64", label: "Windows x64", file: "caw-agent-x86_64-pc-windows-gnu.exe" },
   { id: "win-arm64", label: "Windows ARM64", file: "caw-agent-aarch64-pc-windows-msvc.exe" },
 ];
 
@@ -21,7 +19,7 @@ async function detectPlatform() {
       const plat = `${uaData.platform || ""} ${extra.architecture || ""}`.toLowerCase();
       const arm = /arm/.test(plat);
       if (/win/.test(plat)) return arm ? "win-arm64" : "win-x64";
-      if (/mac/.test(plat)) return arm ? "mac-arm64" : "mac-x64";
+      if (/mac/.test(plat)) return "unsupported";
       if (/linux/.test(plat)) return arm ? "linux-arm64" : "linux-x64";
     } catch {
       /* fall through */
@@ -34,7 +32,7 @@ async function detectPlatform() {
   const isLinux = /Linux/i.test(plat) || /Linux/i.test(ua);
   const isArm = /aarch64|arm64/i.test(ua);
   if (isWin) return isArm ? "win-arm64" : "win-x64";
-  if (isMac) return isArm ? "mac-arm64" : "mac-arm64";
+  if (isMac) return "unsupported";
   if (isLinux) return isArm ? "linux-arm64" : "linux-x64";
   return "linux-x64";
 }
@@ -176,8 +174,8 @@ async function renderHome(releases) {
       )
     : "";
   const platform = await detectPlatform();
-  const rec = ASSETS.find((a) => a.id === platform) || ASSETS[0];
-  const recAsset = byName(release, rec.file);
+  const rec = ASSETS.find((a) => a.id === platform);
+  const recAsset = rec ? byName(release, rec.file) : null;
   const sums = byName(release, "SHA256SUMS");
 
   const d = typeof dict === "function" ? dict() : null;
@@ -185,12 +183,18 @@ async function renderHome(releases) {
   const recMeta = document.getElementById("dl-meta");
   claimDynamic(recBtn);
   claimDynamic(recMeta);
-  recBtn.href = recAsset ? recAsset.browser_download_url : assetUrl(tag, rec.file);
-  recBtn.textContent = `${(d?.dl?.prefix) || "下载"} ${rec.label}`;
+  recBtn.href = rec
+    ? (recAsset ? recAsset.browser_download_url : assetUrl(tag, rec.file))
+    : `https://github.com/${REPO}/releases`;
+  recBtn.textContent = rec
+    ? `${(d?.dl?.prefix) || "下载"} ${rec.label}`
+    : "macOS 暂无预编译包";
   recBtn.removeAttribute("aria-disabled");
   const latestBin = binaryTotal([release]);
   const allBin = binaryTotal(releases);
-  recMeta.textContent = d?.table?.meta
+  recMeta.textContent = !rec
+    ? "当前仅发布 Linux 和 Windows 版本"
+    : d?.table?.meta
     ? d.table.meta(tag, rec.file, date, fmtCount(latestBin), fmtCount(allBin))
     : `${tag} · ${rec.file}${date ? ` · ${date}` : ""} · ${fmtCount(latestBin)} · ${fmtCount(allBin)}`;
   const stats = document.getElementById("dl-stats");
@@ -263,7 +267,7 @@ const UNINSTALL_WIN = "Remove-Item -Recurse -Force $HOME\\.caw-agent";
 function installLabel(platform) {
   const d = typeof dict === "function" ? dict().install : null;
   if (platform === "win-x64" || platform === "win-arm64") return d?.win || "Windows";
-  if (platform === "mac-arm64" || platform === "mac-x64") return d?.mac || "macOS";
+  if (platform === "unsupported") return d?.mac || "macOS";
   if (platform === "linux-x64" || platform === "linux-arm64") return d?.linux || "Linux";
   return d?.unix || "Linux / macOS";
 }
@@ -277,10 +281,13 @@ const HOWTO = {
 let howtoTab = "install";
 
 function applyHowto(platform) {
+  const unsupported = platform === "unsupported";
   const win = platform === "win-x64" || platform === "win-arm64";
   const spec = HOWTO[howtoTab] || HOWTO.install;
   const cmd = document.getElementById("howto-cmd");
-  if (cmd) cmd.textContent = win ? spec.win : spec.unix;
+  if (cmd) cmd.textContent = unsupported
+    ? "macOS prebuilt packages are temporarily unavailable"
+    : (win ? spec.win : spec.unix);
   const hint = document.getElementById("howto-hint");
   const how = typeof dict === "function" ? dict().howto : null;
   if (hint && how?.[spec.hint]) hint.textContent = how[spec.hint];
