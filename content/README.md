@@ -27,9 +27,11 @@ caw-agent 是跑在你终端里的编程助手：读代码、改文件、跑测�
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.15** — 2026-08-18
+**What's new in v0.1.16** — 2026-08-19
 
-- Fixed `upgrade now` rejecting GitHub releases whose optional notes field is `null`.
+- Added keyboard selection and detail opening to the Todo list, matching the Agents panel controls.
+- Added Plan-style Todo detail sheets with Markdown tables, code blocks, and Mermaid diagrams.
+- Reduced intermittent UI stalls during active tasks by making periodic persistence non-blocking and consolidating recovery snapshots.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
