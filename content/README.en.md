@@ -27,18 +27,14 @@ Start with [Install](#/install) and [Quick start](#/quick-start). Slash commands
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.9** — 2026-08-18
+**What's new in v0.1.10** — 2026-08-18
 
-- Added dedicated language-server isolation controls and a clear confirmation before a project-defined server starts.
-- Added platform-aware dependency installation suggestions with an explicit Install / Cancel prompt.
-- Added safer opt-in loading for workspace MCP configuration.
-- Refined the terminal interface, including larger plan diagrams, more consistent panels, and smoother task, agent, and todo updates.
-- Improved background-task handling so interactive and long-running programs are represented more accurately.
-- Refined built-in skills, tool guidance, permission prompts, and project safety rules.
-- Improved browser, screenshot, build, and debugging workflows across supported platforms.
-- Fixed incomplete terminal borders and background painting in several layouts.
-- Fixed task lifecycle and timeout edge cases that could report active work as failed.
-- Fixed several permission, path, and cross-platform command handling issues.
+- Added Tab-cycled keyboard focus so the composer, tasks, and agents panels can be navigated without fighting the input caret.
+- Improved file downloads with live byte and percentage progress.
+- Improved install and upgrade guidance: Linux sudo is requested in another terminal, PATH conflicts are explained, and Windows replaces the locked executable after exit.
+- Fixed failed background tasks leaving the parent idle instead of recovering.
+- Fixed transcript scrolling so code and diagram headers no longer stay pinned while the body moves.
+- Fixed markdown tables overflowing a narrow terminal.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
@@ -301,7 +297,7 @@ After an unclean exit (kill, power loss, panic), the next launch asks **continue
 
 Cycle permission modes with **Shift+Tab** (or **Alt+M** / **Alt+Shift+M**): default → accept edits → plan → auto → full access.
 
-Tasks and agents share a row above the prompt: side by side when both are open and the terminal is wide, stacked when it is narrow. Click a row for that item's detail; click `▾` / `▸` on a title to fold that panel. `← →` switches main / subagent; `Alt+↑↓` scrolls the task list.
+Tasks and agents share a row above the prompt: side by side when both are open and the terminal is wide, stacked when it is narrow. Click a row for that item's detail; click `▾` / `▸` on a title to fold that panel. `Tab` moves keyboard focus between the composer, tasks, and agents; `↑↓` scrolls the focused panel; `← →` switches main / subagent when agents have focus; `Esc` returns to the composer.
 
 ---
 
@@ -538,7 +534,7 @@ Multi-tab: each tab has its own turn and queue. `ctrl+t` new tab, `ctrl+tab` swi
 
 Above the prompt: **tasks / agents**. It appears when there are todos or subagents. Side by side and equal height when both are expanded and the terminal is wide; stacked and content-sized when it is narrow. Click a row for detail (`how` / accept / last check, or the subagent transcript). Click `▾` / `▸` to fold one side. Todos follow document order, top to bottom; agents are newest-first (`main` pinned at the top).
 
-`← →` / `↓` switch main / sub; `/agents` opens the list; click a tasks or agents row (or `/todos <id>`) for that item's how / accept / last check or live transcript. `/todos expand|collapse` folds tasks. The wheel scrolls the panel under the pointer; `Alt+↑↓` scrolls tasks. `/worktrees` manages isolated trees.
+`Tab` cycles keyboard focus across the composer and any expanded tasks / agents panel. With a panel focused, `↑↓` scrolls it and `← →` switches main / sub. Click a tasks or agents row (or `/todos <id>`) for that item's how / accept / last check or live transcript. `/todos expand|collapse` folds tasks. The wheel scrolls the panel under the pointer; `Alt+↑↓` still scrolls the focused region. `/worktrees` manages isolated trees.
 
 While busy, Enter **queues** and does not interrupt. Esc: clear the draft first; if empty and busy, cancel. **Ctrl+C** quits (confirms if background tasks are running). **Ctrl+Shift+C** copies a dragged transcript selection.
 
