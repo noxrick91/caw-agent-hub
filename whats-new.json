@@ -1,12 +1,16 @@
 {
-  "tag": "v0.1.19",
-  "version": "0.1.19",
+  "tag": "v0.1.20",
+  "version": "0.1.20",
   "date": "2026-08-19",
-  "title": "What's new in v0.1.19",
+  "title": "What's new in v0.1.20",
   "notes": [
-    "Published the complete Cawki distribution under the `cawki` command, package, release-asset, data-directory, and Hub names.",
-    "Serialized Windows ARM64 SDK downloads and added visible heartbeats, hard timeouts, and cache-preserving retries for the China-hosted release runner."
+    "Added visible MCP pack installation phases, duplicate-operation protection, and a persistent custom-source action in the MCP catalog.",
+    "Made MCP dependency installation explicit and on demand instead of silently installing every package's Python requirements.",
+    "Staged and validated MCP pack updates before activation, preserving the previous version when installation or registration fails.",
+    "Restricted automatic bridge setup to official Hub packs and documented which external dependencies and application add-ons remain after uninstall.",
+    "Prevented MCP installs from appearing permanently stuck during hidden dependency setup and bounded official bridge setup with a hard timeout.",
+    "Surfaced post-install warnings in the MCP menu and cleaned temporary download, extraction, and staging directories after failures."
   ],
-  "body": "### Changed\n\n- Published the complete Cawki distribution under the `cawki` command, package, release-asset, data-directory, and Hub names.\n- Serialized Windows ARM64 SDK downloads and added visible heartbeats, hard timeouts, and cache-preserving retries for the China-hosted release runner.",
+  "body": "### Changed\n\n- Added visible MCP pack installation phases, duplicate-operation protection, and a persistent custom-source action in the MCP catalog.\n- Made MCP dependency installation explicit and on demand instead of silently installing every package's Python requirements.\n- Staged and validated MCP pack updates before activation, preserving the previous version when installation or registration fails.\n- Restricted automatic bridge setup to official Hub packs and documented which external dependencies and application add-ons remain after uninstall.\n\n### Fixed\n\n- Prevented MCP installs from appearing permanently stuck during hidden dependency setup and bounded official bridge setup with a hard timeout.\n- Surfaced post-install warnings in the MCP menu and cleaned temporary download, extraction, and staging directories after failures.",
   "url": "./CHANGELOG.md"
 }
