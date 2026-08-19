@@ -1,14 +1,14 @@
-const REPO = "noxrick91/caw-agent-hub";
+const REPO = "noxrick91/cawki-hub";
 const API = `https://api.github.com/repos/${REPO}/releases?per_page=100`;
 const LOCAL_LATEST = "./latest.json";
 const CACHE_KEY = "caw-releases-v2";
 const CACHE_MS = 10 * 60 * 1000;
 
 const ASSETS = [
-  { id: "linux-x64", label: "Linux x86_64", file: "caw-agent-x86_64-unknown-linux-gnu" },
-  { id: "linux-arm64", label: "Linux aarch64", file: "caw-agent-aarch64-unknown-linux-gnu" },
-  { id: "win-x64", label: "Windows x64", file: "caw-agent-x86_64-pc-windows-gnu.exe" },
-  { id: "win-arm64", label: "Windows ARM64", file: "caw-agent-aarch64-pc-windows-msvc.exe" },
+  { id: "linux-x64", label: "Linux x86_64", file: "cawki-x86_64-unknown-linux-gnu" },
+  { id: "linux-arm64", label: "Linux aarch64", file: "cawki-aarch64-unknown-linux-gnu" },
+  { id: "win-x64", label: "Windows x64", file: "cawki-x86_64-pc-windows-gnu.exe" },
+  { id: "win-arm64", label: "Windows ARM64", file: "cawki-aarch64-pc-windows-msvc.exe" },
 ];
 
 async function detectPlatform() {
@@ -38,6 +38,9 @@ async function detectPlatform() {
 }
 
 function assetUrl(tag, file) {
+  if (tag === "latest") {
+    return `https://github.com/${REPO}/releases/latest/download/${file}`;
+  }
   return `https://github.com/${REPO}/releases/download/${tag}/${file}`;
 }
 
@@ -79,11 +82,10 @@ async function loadGithubReleases() {
 }
 
 function embeddedLatest() {
-  const tag = "v0.1.2";
+  const tag = "latest";
   return [
     {
       tag_name: tag,
-      published_at: "2026-08-14T06:47:38Z",
       assets: [
         ...ASSETS.map((a) => ({
           name: a.file,
@@ -175,28 +177,20 @@ async function renderHome(releases) {
     : "";
   const platform = await detectPlatform();
   const rec = ASSETS.find((a) => a.id === platform);
-  const recAsset = rec ? byName(release, rec.file) : null;
   const sums = byName(release, "SHA256SUMS");
 
   const d = typeof dict === "function" ? dict() : null;
-  const recBtn = document.getElementById("dl-recommended");
   const recMeta = document.getElementById("dl-meta");
-  claimDynamic(recBtn);
   claimDynamic(recMeta);
-  recBtn.href = rec
-    ? (recAsset ? recAsset.browser_download_url : assetUrl(tag, rec.file))
-    : `https://github.com/${REPO}/releases`;
-  recBtn.textContent = rec
-    ? `${(d?.dl?.prefix) || "下载"} ${rec.label}`
-    : "macOS 暂无预编译包";
-  recBtn.removeAttribute("aria-disabled");
   const latestBin = binaryTotal([release]);
   const allBin = binaryTotal(releases);
   recMeta.textContent = !rec
-    ? "当前仅发布 Linux 和 Windows 版本"
+    ? (d?.dl?.unsupported || "当前仅发布 Linux 和 Windows 版本")
     : d?.table?.meta
     ? d.table.meta(tag, rec.file, date, fmtCount(latestBin), fmtCount(allBin))
     : `${tag} · ${rec.file}${date ? ` · ${date}` : ""} · ${fmtCount(latestBin)} · ${fmtCount(allBin)}`;
+  const stageVersion = document.getElementById("stage-version");
+  if (stageVersion) stageVersion.textContent = tag;
   const stats = document.getElementById("dl-stats");
   if (stats) {
     const versions = releases.filter((r) => !r.draft).length;
@@ -247,22 +241,17 @@ async function renderHome(releases) {
 
 function showError(err) {
   const d = typeof dict === "function" ? dict() : null;
-  const recBtn = document.getElementById("dl-recommended");
   const recMeta = document.getElementById("dl-meta");
-  claimDynamic(recBtn);
   claimDynamic(recMeta);
-  recBtn.href = "#howto";
-  recBtn.textContent = d?.dl?.releases || "用安装命令";
-  recBtn.removeAttribute("aria-disabled");
-  recMeta.innerHTML =
-    `<span class="err">${d?.dl?.error || "暂时读不到 latest。请到 Releases 手动下载。"}</span>`;
+  recMeta.classList.add("err");
+  recMeta.textContent = d?.dl?.error || "最新版暂时读不到，用安装命令即可。";
 }
 
 const INSTALL_UNIX = "curl -fsS https://agent.noxcaw.com/install | bash";
 const INSTALL_WIN = "irm https://agent.noxcaw.com/install.txt | iex";
-const UPDATE_CMD = "caw-agent upgrade now";
-const UNINSTALL_UNIX = "rm -rf ~/.caw-agent";
-const UNINSTALL_WIN = "Remove-Item -Recurse -Force $HOME\\.caw-agent";
+const UPDATE_CMD = "cawki upgrade now";
+const UNINSTALL_UNIX = "rm -rf ~/.cawki";
+const UNINSTALL_WIN = "Remove-Item -Recurse -Force $HOME\\.cawki";
 
 function installLabel(platform) {
   const d = typeof dict === "function" ? dict().install : null;
@@ -274,7 +263,7 @@ function installLabel(platform) {
 
 const HOWTO = {
   install: { unix: INSTALL_UNIX, win: INSTALL_WIN, hint: "installHint" },
-  update: { unix: UPDATE_CMD, win: INSTALL_WIN, hint: "updateHint" },
+  update: { unix: UPDATE_CMD, win: UPDATE_CMD, hint: "updateHint" },
   uninstall: { unix: UNINSTALL_UNIX, win: UNINSTALL_WIN, hint: "uninstallHint" },
 };
 
@@ -284,22 +273,45 @@ function applyHowto(platform) {
   const unsupported = platform === "unsupported";
   const win = platform === "win-x64" || platform === "win-arm64";
   const spec = HOWTO[howtoTab] || HOWTO.install;
-  const cmd = document.getElementById("howto-cmd");
-  if (cmd) cmd.textContent = unsupported
-    ? "macOS prebuilt packages are temporarily unavailable"
-    : (win ? spec.win : spec.unix);
-  const hint = document.getElementById("howto-hint");
   const how = typeof dict === "function" ? dict().howto : null;
-  if (hint && how?.[spec.hint]) hint.textContent = how[spec.hint];
+  const unavailable = unsupported && howtoTab !== "uninstall";
+  const cmd = document.getElementById("howto-cmd");
+  if (cmd) cmd.textContent = unavailable
+    ? (how?.macUnavailable || "macOS prebuilt packages are temporarily unavailable")
+    : (win ? spec.win : spec.unix);
+  const copy = document.getElementById("copy-howto");
+  if (copy) copy.disabled = unavailable;
+  const hint = document.getElementById("howto-hint");
+  if (hint) {
+    const hintKey = unavailable ? "macHint" : spec.hint;
+    if (how?.[hintKey]) hint.textContent = how[hintKey];
+  }
   document.querySelectorAll("[data-howto]").forEach((btn) => {
-    btn.classList.toggle("on", btn.getAttribute("data-howto") === howtoTab);
+    const active = btn.getAttribute("data-howto") === howtoTab;
+    btn.classList.toggle("on", active);
+    btn.setAttribute("aria-selected", String(active));
+    btn.tabIndex = active ? 0 : -1;
+    if (active && cmd) cmd.setAttribute("aria-labelledby", btn.id);
   });
 }
 
-document.querySelectorAll("[data-howto]").forEach((btn) => {
+const howtoTabs = [...document.querySelectorAll("[data-howto]")];
+howtoTabs.forEach((btn) => {
   btn.addEventListener("click", () => {
     howtoTab = btn.getAttribute("data-howto") || "install";
     applyHowto(detectedPlatform);
+  });
+  btn.addEventListener("keydown", (event) => {
+    const index = howtoTabs.indexOf(btn);
+    let next = null;
+    if (event.key === "ArrowRight") next = (index + 1) % howtoTabs.length;
+    if (event.key === "ArrowLeft") next = (index - 1 + howtoTabs.length) % howtoTabs.length;
+    if (event.key === "Home") next = 0;
+    if (event.key === "End") next = howtoTabs.length - 1;
+    if (next == null) return;
+    event.preventDefault();
+    howtoTabs[next].click();
+    howtoTabs[next].focus();
   });
 });
 
