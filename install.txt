@@ -1,4 +1,4 @@
-# caw-agent Windows installer.
+# Cawki Windows installer.
 #   irm https://agent.noxcaw.com/install.txt | iex
 #   iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))
 # Env: CAW_TAG  CAW_GITHUB  PREFIX  BIN_DIR  GH_TOKEN  CAW_GITHUB_TOKEN
@@ -8,8 +8,8 @@ try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 } catch { }
 
-$Repo = if ($env:CAW_GITHUB) { $env:CAW_GITHUB } else { "noxrick91/caw-agent-hub" }
-$Prefix = if ($env:PREFIX) { $env:PREFIX } else { Join-Path $env:USERPROFILE ".caw-agent" }
+$Repo = if ($env:CAW_GITHUB) { $env:CAW_GITHUB } else { "noxrick91/cawki-hub" }
+$Prefix = if ($env:PREFIX) { $env:PREFIX } else { Join-Path $env:USERPROFILE ".cawki" }
 $BinDir = if ($env:BIN_DIR) { $env:BIN_DIR } else { Join-Path $Prefix "bin" }
 $Tag = if ($env:CAW_TAG) { $env:CAW_TAG } else { "latest" }
 if ($Tag -eq "now") { $Tag = "latest" }
@@ -41,7 +41,7 @@ function Get-CawRemoteFile([string]$Url, [string]$OutFile) {
                 $wc.Proxy.Credentials = [Net.CredentialCache]::DefaultCredentials
             }
         } catch { }
-        $wc.Headers.Add("User-Agent", "caw-agent-installer")
+        $wc.Headers.Add("User-Agent", "cawki-installer")
         $token = $env:CAW_GITHUB_TOKEN
         if (-not $token) { $token = $env:GH_TOKEN }
         if ($token) { $wc.Headers.Add("Authorization", "Bearer $token") }
@@ -75,7 +75,7 @@ function Install-CawBinary([string]$Src, [string]$Dest) {
             # Renaming a running Windows exe is allowed; overwriting it is not.
             Move-Item -LiteralPath $Dest -Destination $bak -Force
         } catch {
-            throw "Cannot replace $Dest. Close every caw-agent window and retry."
+            throw "Cannot replace $Dest. Close every Cawki window and retry."
         }
     }
     try {
@@ -107,18 +107,18 @@ function Get-CawChecksum($Lines, [string]$Asset) {
 }
 
 function Show-CawPathConflict([string]$Dest) {
-    $cmd = Get-Command caw-agent -ErrorAction SilentlyContinue
-    if (-not $cmd) { $cmd = Get-Command caw-agent.exe -ErrorAction SilentlyContinue }
+    $cmd = Get-Command cawki -ErrorAction SilentlyContinue
+    if (-not $cmd) { $cmd = Get-Command cawki.exe -ErrorAction SilentlyContinue }
     if (-not $cmd -or -not $cmd.Source) { return }
     if ([string]::Equals($cmd.Source, $Dest, [StringComparison]::OrdinalIgnoreCase)) { return }
-    Write-Host "Warning: PATH 'caw-agent' is $($cmd.Source)"
+    Write-Host "Warning: PATH 'cawki' is $($cmd.Source)"
     Write-Host "         installer wrote $Dest"
     Write-Host "         Open a new terminal, or run: & '$Dest' --version"
 }
 
 $Kind = Get-CawWindowsKind
-$Fallback = "caw-agent-x86_64-pc-windows-gnu.exe"
-$Arm64 = "caw-agent-aarch64-pc-windows-msvc.exe"
+$Fallback = "cawki-x86_64-pc-windows-gnu.exe"
+$Arm64 = "cawki-aarch64-pc-windows-msvc.exe"
 switch ($Kind) {
     "x64" { $Candidates = @($Fallback) }
     "arm64" {
@@ -129,7 +129,7 @@ switch ($Kind) {
     }
 }
 
-$Dest = Join-Path $BinDir "caw-agent.exe"
+$Dest = Join-Path $BinDir "cawki.exe"
 if ($Tag -eq "latest") {
     $Base = "https://github.com/$Repo/releases/latest/download"
 } else {
@@ -137,12 +137,12 @@ if ($Tag -eq "latest") {
 }
 
 Write-Host ""
-Write-Host "caw-agent installer"
+Write-Host "Cawki installer"
 Write-Host "  Windows $Kind"
 
 New-Item -ItemType Directory -Force -Path $BinDir | Out-Null
 
-$Tmp = Join-Path $env:TEMP ("caw-agent-install-" + [guid]::NewGuid())
+$Tmp = Join-Path $env:TEMP ("cawki-install-" + [guid]::NewGuid())
 New-Item -ItemType Directory -Force -Path $Tmp | Out-Null
 $Got = ""
 try {
@@ -205,6 +205,6 @@ Write-Host "  binary   $Dest"
 if ($Got) { Write-Host "  sha256   $Got" }
 Write-Host ""
 Show-CawPathConflict $Dest
-Write-Host "  caw-agent --help"
-Write-Host "  caw-agent upgrade --check"
+Write-Host "  cawki --help"
+Write-Host "  cawki upgrade --check"
 Write-Host ""
