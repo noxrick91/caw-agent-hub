@@ -173,7 +173,10 @@ function renderNav(nav, ordered, current) {
       const a = document.createElement("a");
       a.href = `#/${p.key}`;
       a.textContent = displayTitle(e);
-      if (p.key === current.key) a.className = "active";
+      if (p.key === current.key) {
+        a.className = "active";
+        a.setAttribute("aria-current", "page");
+      }
       wrap.append(a);
     }
     box.append(wrap);
@@ -231,7 +234,7 @@ function renderPage(page, ordered) {
     pager.append(a);
   }
 
-  document.title = `${title} — caw-agent`;
+  document.title = `${title} — Cawki`;
   watchHeadings();
   window.scrollTo(0, 0);
 }
@@ -255,16 +258,27 @@ function watchHeadings() {
   document.querySelectorAll(".prose h2, .prose h3").forEach((h) => headingIo.observe(h));
 }
 
+let searchReturnFocus = null;
+
 function closeSearch() {
   const modal = document.getElementById("docs-modal");
-  if (modal) modal.hidden = true;
+  if (!modal || modal.hidden) return;
+  modal.hidden = true;
+  document.body.classList.remove("modal-open");
+  document.getElementById("docs-search-input")?.setAttribute("aria-expanded", "false");
+  const target = searchReturnFocus;
+  searchReturnFocus = null;
+  if (target?.isConnected) target.focus();
 }
 
 function openSearch(pages) {
   const modal = document.getElementById("docs-modal");
   const input = document.getElementById("docs-search-input");
   const hits = document.getElementById("docs-search-hits");
+  if (modal.hidden) searchReturnFocus = document.activeElement;
   modal.hidden = false;
+  document.body.classList.add("modal-open");
+  input.setAttribute("aria-expanded", "true");
   input.placeholder = t("docs.search", "搜索文档…");
   input.value = "";
   input.focus();
@@ -279,6 +293,7 @@ function openSearch(pages) {
       })
       .slice(0, 12);
     if (!found.length) {
+      input.removeAttribute("aria-activedescendant");
       const empty = document.createElement("p");
       empty.className = "docs-empty";
       empty.textContent = t("docs.nohits", "没有匹配的页面。");
@@ -288,11 +303,15 @@ function openSearch(pages) {
     found.forEach((p, i) => {
       const a = document.createElement("a");
       a.className = "docs-hit" + (i === 0 ? " on" : "");
+      a.id = `docs-hit-${i}`;
       a.href = `#/${p.key}`;
+      a.setAttribute("role", "option");
+      a.setAttribute("aria-selected", String(i === 0));
       a.innerHTML = `${liveTitle(p)}<small>${liveGroup(p).trim()}</small>`;
       a.addEventListener("click", closeSearch);
       hits.append(a);
     });
+    input.setAttribute("aria-activedescendant", "docs-hit-0");
   };
   input.oninput = render;
   render();
@@ -304,7 +323,10 @@ function moveHit(delta) {
   const i = items.findIndex((el) => el.classList.contains("on"));
   const next = items[Math.max(0, Math.min(items.length - 1, (i < 0 ? 0 : i) + delta))];
   items.forEach((el) => el.classList.remove("on"));
+  items.forEach((el) => el.setAttribute("aria-selected", "false"));
   next.classList.add("on");
+  next.setAttribute("aria-selected", "true");
+  document.getElementById("docs-search-input")?.setAttribute("aria-activedescendant", next.id);
   next.scrollIntoView({ block: "nearest" });
 }
 
@@ -326,10 +348,16 @@ function showCurrent() {
   closeNav();
 }
 
-function closeNav() {
+let navReturnFocus = null;
+
+function closeNav(restoreFocus = false) {
   document.getElementById("docs-side")?.classList.remove("open");
   const back = document.getElementById("docs-backdrop");
   if (back) back.hidden = true;
+  document.getElementById("docs-contents-btn")?.setAttribute("aria-expanded", "false");
+  document.body.classList.remove("nav-open");
+  if (restoreFocus && navReturnFocus?.isConnected) navReturnFocus.focus();
+  navReturnFocus = null;
 }
 
 function toggleNav() {
@@ -337,8 +365,11 @@ function toggleNav() {
   const back = document.getElementById("docs-backdrop");
   if (!side) return;
   const open = !side.classList.contains("open");
+  if (open) navReturnFocus = document.activeElement;
   side.classList.toggle("open", open);
   if (back) back.hidden = !open;
+  document.getElementById("docs-contents-btn")?.setAttribute("aria-expanded", String(open));
+  document.body.classList.toggle("nav-open", open);
 }
 
 function buildLang(md, nav, introTitle, code) {
@@ -391,7 +422,7 @@ bindSearch("docs-search-btn");
 bindSearch("docs-search-btn-mobile");
 
 document.getElementById("docs-contents-btn")?.addEventListener("click", toggleNav);
-document.getElementById("docs-backdrop")?.addEventListener("click", closeNav);
+document.getElementById("docs-backdrop")?.addEventListener("click", () => closeNav(true));
 document.getElementById("docs-modal")?.addEventListener("click", (e) => {
   if (e.target.id === "docs-modal") closeSearch();
 });
@@ -404,6 +435,19 @@ document.addEventListener("keydown", (e) => {
   }
   if (!open) return;
   if (e.key === "Escape") closeSearch();
+  if (e.key === "Tab") {
+    const focusable = [...modal.querySelectorAll('input, a[href], button:not([disabled])')];
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
   if (e.key === "ArrowDown") {
     e.preventDefault();
     moveHit(1);
@@ -419,6 +463,11 @@ document.addEventListener("keydown", (e) => {
       hit.click();
     }
   }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape" || !document.getElementById("docs-modal")?.hidden) return;
+  if (document.getElementById("docs-side")?.classList.contains("open")) closeNav(true);
 });
 
 main();
