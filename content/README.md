@@ -1,12 +1,12 @@
-# caw-agent 使用手册
+# Cawki 使用手册
 
-caw-agent 是跑在你终端里的编程助手：读代码、改文件、跑测试，都在你打开的这个项目里完成。每次写盘或执行命令前，它会停下来等你确认。界面提供权限经纪、沙箱、MCP、会话与记忆。
+Cawki 是跑在你终端里的编程助手：读代码、改文件、跑测试，都可以在当前工作区里完成。文件工具默认限制在工作区；写入与命令默认先询问，权限也可以按项目收紧或放宽。界面提供权限经纪、沙箱、MCP、会话与记忆。
 
-预编译包从本站 [GitHub Releases](https://github.com/noxrick91/caw-agent-hub/releases) 装到 `~/.caw-agent/bin`。源码仓私有，不对外。
+预编译包从本站 [GitHub Releases](https://github.com/noxrick91/cawki-hub/releases) 装到 `~/.cawki/bin`。源码仓私有，不对外。
 
 ### 它做什么
 
-- 只碰你打开的工作区；读、改、跑的每一步都显示在终端里
+- 文件工具默认限制在工作区；读、改、跑的每一步都显示在终端里
 - 写文件和跑命令默认先征求同意，权限可以按项目收紧或放宽
 - 记住跨会话的项目习惯；需要时接 MCP 服务器和技能
 - 官方 API、本地 Ollama，以及第三方 OpenAI 兼容中转，都可以用
@@ -27,15 +27,10 @@ caw-agent 是跑在你终端里的编程助手：读代码、改文件、跑测�
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.17** — 2026-08-19
+**What's new in v0.1.19** — 2026-08-19
 
-- Redesigned the Router menu with Provider and Model pickers for Fast, Default, Strong, and the dedicated classifier model.
-- Made Router escalation gradual from Fast to Default to Strong, with working controls for stall and verification-failure escalation.
-- Expanded Router decision feedback with classification source, score, confidence, fallback, vision requirements, and routing reasons.
-- Clarified when Hybrid and LLM classification can add an extra model request and cost.
-- Kept the selected Welcome theme visible when the terminal is too short to show the complete theme list.
-- Prevented selecting a Router tier from silently clearing its configured model.
-- Warned when a visual request falls back to a model that is not vision-capable.
+- Published the complete Cawki distribution under the `cawki` command, package, release-asset, data-directory, and Hub names.
+- Serialized Windows ARM64 SDK downloads and added visible heartbeats, hard timeouts, and cache-preserving retries for the China-hosted release runner.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
@@ -69,28 +64,28 @@ irm https://agent.noxcaw.com/install.txt | iex
 iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))
 ```
 
-脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、Windows x64/ARM64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.caw-agent/bin`。Windows ARM64 优先安装原生版本；旧版 Release 没有 ARM64 资产时回退到 x64 系统模拟。macOS 预编译包暂不提供。再跑一次安装器会重新下载并覆盖当前文件（Windows 先把正在用的 exe 改名为 `.bak` 再写入新文件）。安装脚本会写入 `~/.caw-agent/env`，并在 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里加上 hook，然后 `source` 该 env。`curl | bash` 改不了你当前已经打开的 shell，新开终端即可，或执行 `source ~/.caw-agent/env`。不想改 rc 时设 `CAW_NO_PATH=1`。
+脚本按本机 OS/ARCH 选择资产（Linux x64/arm64、Windows x64/ARM64），下载后核对同 Release 的 `SHA256SUMS`，装到 `~/.cawki/bin`。Windows ARM64 优先安装原生版本；旧版 Release 没有 ARM64 资产时回退到 x64 系统模拟。macOS 预编译包暂不提供。再跑一次安装器会重新下载并覆盖当前文件（Windows 先把正在用的 exe 改名为 `.bak` 再写入新文件）。安装脚本会写入 `~/.cawki/env`，并在 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里加上 hook，然后 `source` 该 env。`curl | bash` 改不了你当前已经打开的 shell，新开终端即可，或执行 `source ~/.cawki/env`。不想改 rc 时设 `CAW_NO_PATH=1`。
 
 Pages 尚未生效时可用：
 
 ```bash
-curl -fsS https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install | bash
+curl -fsS https://raw.githubusercontent.com/noxrick91/cawki-hub/master/install | bash
 ```
 
 ```powershell
-irm https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install.ps1 | iex
+irm https://raw.githubusercontent.com/noxrick91/cawki-hub/master/install.ps1 | iex
 ```
 
 ### 官网 / 手动下载
 
-打开本站首页，按平台下载最新资产，放到 `~/.caw-agent/bin`（Windows 为 `%USERPROFILE%\.caw-agent\bin\caw-agent.exe`），并对照 `SHA256SUMS`。首页表格的「本版 / 累计」来自 GitHub Release 每个资产的 `download_count`：一键安装、`caw-agent upgrade`、浏览器手动下载都会加一。拉 Pages 上的 `install` 脚本本身不计入；`SHA256SUMS` 单独计数（每次安装会先下校验文件）。`upgrade --check` 只打 API，不增加下载量。
+打开本站首页，按平台下载最新资产，放到 `~/.cawki/bin`（Windows 为 `%USERPROFILE%\.cawki\bin\cawki.exe`），并对照 `SHA256SUMS`。首页表格的「本版 / 累计」来自 GitHub Release 每个资产的 `download_count`：一键安装、`cawki upgrade`、浏览器手动下载都会加一。拉 Pages 上的 `install` 脚本本身不计入；`SHA256SUMS` 单独计数（每次安装会先下校验文件）。`upgrade --check` 只打 API，不增加下载量。
 
 | 平台 | 资产 |
 |------|------|
-| Linux x86_64 | `caw-agent-x86_64-unknown-linux-gnu` |
-| Linux aarch64 | `caw-agent-aarch64-unknown-linux-gnu` |
-| Windows x64 | `caw-agent-x86_64-pc-windows-gnu.exe` |
-| Windows ARM64 | `caw-agent-aarch64-pc-windows-msvc.exe` |
+| Linux x86_64 | `cawki-x86_64-unknown-linux-gnu` |
+| Linux aarch64 | `cawki-aarch64-unknown-linux-gnu` |
+| Windows x64 | `cawki-x86_64-pc-windows-gnu.exe` |
+| Windows ARM64 | `cawki-aarch64-pc-windows-msvc.exe` |
 
 不支持的组合（如 Linux musl、32 位 Windows）没有预编译包，需从源码构建。
 
@@ -100,49 +95,49 @@ irm https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install.ps1
 
 ```text
 /upgrade
-caw-agent upgrade
-caw-agent upgrade --check
+cawki upgrade
+cawki upgrade --check
 ```
 
 安装最新版（仅当比当前新）：
 
 ```text
 /upgrade now
-caw-agent upgrade now
+cawki upgrade now
 ```
 
 指定标签（可装旧版）：
 
 ```text
 /upgrade v0.1.1
-caw-agent upgrade v0.1.1
+cawki upgrade v0.1.1
 ```
 
-下载时显示字节与百分比；校验 SHA256；装完跑 `--version`，对不上会恢复 `.bak`。默认读公开仓 `noxrick91/caw-agent-hub`。可用 `CAW_GITHUB=owner/name` 覆盖。
+下载时显示字节与百分比；校验 SHA256；装完跑 `--version`，对不上会恢复 `.bak`。默认读公开仓 `noxrick91/cawki-hub`。可用 `CAW_GITHUB=owner/name` 覆盖。
 
-Windows 会先把正在运行的 `caw-agent.exe` 改名为 `.bak` 再写入新文件。若改名失败，再旁路写入并提示关掉所有窗口。装完请新开终端，用 `caw-agent --version` 确认；若 PATH 上还有另一份旧程序，以 `%USERPROFILE%\.caw-agent\bin\caw-agent.exe` 为准。
+Windows 会先把正在运行的 `cawki.exe` 改名为 `.bak` 再写入新文件。若改名失败，再旁路写入并提示关掉所有窗口。装完请新开终端，用 `cawki --version` 确认；若 PATH 上还有另一份旧程序，以 `%USERPROFILE%\.cawki\bin\cawki.exe` 为准。
 
 ### 卸载
 
 没有单独的卸载器。删掉安装目录即可，配置、密钥和 MCP 包会一起去掉：
 
 ```bash
-rm -rf ~/.caw-agent
+rm -rf ~/.cawki
 ```
 
 ```powershell
-Remove-Item -Recurse -Force $HOME\.caw-agent
+Remove-Item -Recurse -Force $HOME\.cawki
 ```
 
-再手工清 PATH：Linux / macOS 删掉 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里 `# >>> caw-agent >>>` 到 `# <<< caw-agent <<<` 那几行；Windows 从用户 PATH 去掉 `%USERPROFILE%\.caw-agent\bin`。项目目录里的 `.caw-agent/` 不会动。
+再手工清 PATH：Linux / macOS 删掉 `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish` 里 `# >>> cawki >>>` 到 `# <<< cawki <<<` 那几行；Windows 从用户 PATH 去掉 `%USERPROFILE%\.cawki\bin`。项目目录里的 `.cawki/` 不会动。
 
 ### 从源码安装
 
-源码仓不公开。有权限的开发者在私有 `caw-agent` 仓库里：
+源码仓不公开。有权限的开发者在私有 `cawki` 仓库里：
 
 ```bash
-./scripts/install.sh          # cargo install → ~/.caw-agent/bin
-cargo run -p caw-agent -- --workdir .
+./scripts/install.sh          # cargo install → ~/.cawki/bin
+cargo run -p cawki -- --workdir .
 ```
 
 **Linux 编译依赖：** `pkg-config`、`libxcb1-dev`、`libxrandr-dev`（X11 截图）。Wayland 截图优先 `grim`；computer-use 优先 `ydotool`。
@@ -156,9 +151,9 @@ cargo run -p caw-agent -- --workdir .
 ## 快速开始
 
 ```bash
-caw-agent --workdir .
+cawki --workdir .
 # 简写
-caw-agent -w .
+cawki -w .
 ```
 
 首次进入未完成引导的工作区会打开向导：选主题，确认工作区。之后可用 `/theme` 再改。
@@ -186,10 +181,10 @@ caw-agent -w .
 ## 命令行
 
 ```text
-caw-agent [选项] [--print 提示词…]
-caw-agent upgrade [--check] [now|latest|vX.Y.Z]
-caw-agent rewind
-caw-agent serve [--listen 127.0.0.1:4150] [--token TOKEN] [--workdir DIR]
+cawki [选项] [--print 提示词…]
+cawki upgrade [--check] [now|latest|vX.Y.Z]
+cawki rewind
+cawki serve [--listen 127.0.0.1:4150] [--token TOKEN] [--workdir DIR]
 ```
 
 | 选项 | 说明 |
@@ -212,20 +207,20 @@ caw-agent serve [--listen 127.0.0.1:4150] [--token TOKEN] [--workdir DIR]
 | `--allowed-tools` / `--allowed-tools-file` | `--print` 自动批准的工具 glob |
 | `--deny-tools` | 始终拒绝的工具 glob |
 | `--max-turns` | `--print` 最大 LLM 轮数 |
-| `-V, --version` | 打印 `caw-agent x.y.z` |
+| `-V, --version` | 打印 `cawki x.y.z` |
 
 `--print` 默认权限模式是 **auto**，避免无人值守卡在每次写入。需要闸门时显式传 `--permission-mode default`。网络、屏幕、MCP 仍默认失败，除非 `--dangerously-skip-permissions`。
 
 ```bash
-caw-agent --print -w . "summarize this repo"
-caw-agent --print --output-format stream-json --on-approval deny -w . "list public API"
-caw-agent --print --on-ask first --on-plan approve -w . "propose a plan then implement"
-caw-agent --print --continue -w . "keep going"
+cawki --print -w . "summarize this repo"
+cawki --print --output-format stream-json --on-approval deny -w . "list public API"
+cawki --print --on-ask first --on-plan approve -w . "propose a plan then implement"
+cawki --print --continue -w . "keep going"
 ```
 
-`--print` 会把会话写到 `.caw-agent/sessions/`（含 `/cost` 用的 token 合计），并在 stderr 打印 resume id。Ctrl+C / SIGTERM 先保存再退出（130）。本工作区没有已存会话时 `--continue` 会报错。
+`--print` 会把会话写到 `.cawki/sessions/`（含 `/cost` 用的 token 合计），并在 stderr 打印 resume id。Ctrl+C / SIGTERM 先保存再退出（130）。本工作区没有已存会话时 `--continue` 会报错。
 
-### `caw-agent serve`
+### `cawki serve`
 
 本机 REST / SSE 控制面，默认 `http://127.0.0.1:4150`。非回环监听必须 `--token` 或环境变量 `CAW_SERVE_TOKEN`（`Authorization: Bearer …`）。
 
@@ -257,7 +252,7 @@ caw-agent --print --continue -w . "keep going"
 /context                 上下文用量估计
 /cost                    本会话花费估计（随会话持久化）
 /cost limit <usd>|off    达到上限则在下一次 LLM 前停住
-/export [md|json] [path] 脱敏笔录（默认 .caw-agent/exports/）
+/export [md|json] [path] 脱敏笔录（默认 .cawki/exports/）
 /upgrade [now|vX.Y.Z]    检查或安装 GitHub Release + hub MCP
 /notify on|off           后台标签或 --print 结束时桌面通知
 /copy [N]                复制倒数第 N 条助手回复
@@ -312,7 +307,7 @@ caw-agent --print --continue -w . "keep going"
 /model add anthropic           原生 Messages API
 /model add deepseek            以及 qwen、qwen-intl、glm、glm-coding、ollama
 /model add myapi https://…/v1 mid    第三方 / OpenAI 兼容网关
-/model key openai sk-...       写入 ~/.caw-agent/secrets.json（所有工作区）
+/model key openai sk-...       写入 ~/.cawki/secrets.json（所有工作区）
 /model key <provider> clear
 /model url https://.../v1
 /model name gpt-4o-mini
@@ -341,7 +336,7 @@ NewAPI、OneAPI 以及各类「OpenAI 兼容」中转站，不要改 `openai` / 
 
 **原生 Messages：** 仅当配置使用其官方端点时走 `/v1/messages`；其他地址均按兼容接口处理。支持 `/chat/completions` 网关，密钥可用环境变量或 `/model key` 配置。
 
-查找顺序（当前供应商）：环境变量（该供应商的 `api_key_env`，例如 OpenRouter 用 `OPENROUTER_API_KEY`；`CAW_API_KEY` 作为兜底）→ 可选的项目 `.caw-agent/secrets.json` → **`~/.caw-agent/secrets.json`** → 配置里的内联密钥。`use_keyring` 为 true 时（全局配置默认）优先系统钥匙串；钥匙串不可用时密钥会留在 `secrets.json`，不会被内存 mock 清掉。
+查找顺序（当前供应商）：环境变量（该供应商的 `api_key_env`，例如 OpenRouter 用 `OPENROUTER_API_KEY`；`CAW_API_KEY` 作为兜底）→ 可选的项目 `.cawki/secrets.json` → **`~/.cawki/secrets.json`** → 配置里的内联密钥。`use_keyring` 为 true 时（全局配置默认）优先系统钥匙串；钥匙串不可用时密钥会留在 `secrets.json`，不会被内存 mock 清掉。
 
 可选：`OPENAI_ORG_ID`、`OPENAI_PROJECT_ID`。
 
@@ -353,9 +348,9 @@ NewAPI、OneAPI 以及各类「OpenAI 兼容」中转站，不要改 `openai` / 
 
 ## 工作区与全局目录
 
-每个项目有自己的 `.caw-agent/`；跨项目数据在 `~/.caw-agent/`。
+每个项目有自己的 `.cawki/`；跨项目数据在 `~/.cawki/`。
 
-### `~/.caw-agent/`
+### `~/.cawki/`
 
 | 路径 | 用途 |
 |------|------|
@@ -372,7 +367,7 @@ NewAPI、OneAPI 以及各类「OpenAI 兼容」中转站，不要改 `openai` / 
 | `mcp/` | 已安装的 MCP 包 |
 | `languages.toml` | 额外语言栈 / LSP / 调试映射（仍走内置 `analyze` / `lsp` / `debug`） |
 
-### 项目 `.caw-agent/`
+### 项目 `.cawki/`
 
 | 路径 | 用途 |
 |------|------|
@@ -405,7 +400,7 @@ NewAPI、OneAPI 以及各类「OpenAI 兼容」中转站，不要改 `openai` / 
 |------|------|
 | `default` | 读可自动；写 / exec / MCP / 网络 / 截图要问 |
 | `acceptEdits` | 文件写入与安全文件系统命令自动过；MCP / 网络 / 其它 `run` 仍问 |
-| `plan` | 只调研。写 `.caw-agent/plan.md` 后 `ExitPlanMode`；架构类计划会带图；批准后进 auto（或 ask first），Plan 本身不作为启动默认档 |
+| `plan` | 只调研。写 `.cawki/plan.md` 后 `ExitPlanMode`；架构类计划会带图；批准后进 auto（或 ask first），Plan 本身不作为启动默认档 |
 | `auto` | accept-edits + `analyze` / 检查测试 lint + git **只读检查**。改 git、裸 `make`、网络、屏幕、MCP、安装仍问 |
 | `bypassPermissions`（界面：**full access**） | 跳过全部提示（含截图）。离开 full access 会清掉 session 授权 |
 
@@ -431,13 +426,13 @@ NewAPI、OneAPI 以及各类「OpenAI 兼容」中转站，不要改 `openai` / 
 
 默认：jail **开**（Windows 除外）、exec 网络 **关**、超时 120s。`/settings sandbox` 可关 jail。每次沙箱失败的 `run` 会附 `<sandbox_violations>`。`dangerouslyDisableSandbox: true` 是单次逃生（`/settings unsandbox`）。
 
-硬拦截包括 fork-bomb、`rm -rf /`、管道进 shell、以及读写 `.caw-agent/secrets.json` / `config.json`。
+硬拦截包括 fork-bomb、`rm -rf /`、管道进 shell、以及读写 `.cawki/secrets.json` / `config.json`。
 
 ### LSP 独立 jail
 
-语言服务器按“工作区 + server id”持久复用，但使用独立的 OS jail 策略：默认断网、工作区源码只读，只有 `.caw-agent/lsp/<server>/` 缓存目录可写；工具链和包缓存只读，SSH、云凭证、钥匙串与 caw-agent 密钥不可见。关闭或切换策略时会回收整棵服务器进程树，LSP 消息队列也有固定上限。
+语言服务器按“工作区 + server id”持久复用，但使用独立的 OS jail 策略：默认断网、工作区源码只读，只有 `.cawki/lsp/<server>/` 缓存目录可写；工具链和包缓存只读，SSH、云凭证、钥匙串与 Cawki 密钥不可见。关闭或切换策略时会回收整棵服务器进程树，LSP 消息队列也有固定上限。
 
-项目 `.caw-agent/languages.toml` 定义的服务器属于仓库控制的可执行代码。每次启动新进程前都会显示解析后的程序、参数、隔离策略和配置指纹，并要求 **Start server / Cancel**；auto、Full access 和旧授权都不能跳过。配置或命令变化后指纹随即失效。
+项目 `.cawki/languages.toml` 定义的服务器属于仓库控制的可执行代码。每次启动新进程前都会显示解析后的程序、参数、隔离策略和配置指纹，并要求 **Start server / Cancel**；auto、Full access 和旧授权都不能跳过。配置或命令变化后指纹随即失效。
 
 `/settings lsp-sandbox` 切换 LSP jail，`/settings lsp-writes` 控制是否允许写整个工作区，`/settings lsp-network` 控制宿主网络。修改任一项都会先停止现有语言服务器。原生 Windows 尚无 OS jail，建议在 WSL2 下运行；项目自定义服务器仍会强制确认。
 
@@ -447,10 +442,10 @@ NewAPI、OneAPI 以及各类「OpenAI 兼容」中转站，不要改 `openai` / 
 
 | 层 | 路径 | 谁写 | 用途 |
 |----|------|------|------|
-| 全局规则 | `~/.caw-agent/rules/*.md` | 你 | 所有工作区的固定说明 |
-| 全局记忆 | `~/.caw-agent/memory/` | agent + 你 | 跨仓库的机器级坑 |
+| 全局规则 | `~/.cawki/rules/*.md` | 你 | 所有工作区的固定说明 |
+| 全局记忆 | `~/.cawki/memory/` | agent + 你 | 跨仓库的机器级坑 |
 | 项目规则 | `CAW.md` | 你 | 本仓库说明 |
-| 项目记忆 | `.caw-agent/memory/` | agent + 你 | 架构、构建命令、仓库怪癖 |
+| 项目记忆 | `.cawki/memory/` | agent + 你 | 架构、构建命令、仓库怪癖 |
 | 会话交接 | session JSON `handoff` | `/pause` 或工具 | 停在哪里 |
 
 失败恢复后若没写记忆，回合结束会催一次。同一回合两次失败未读记忆会打断并要求先打开 index / `debugging.md`。空转有熔断：多次同一错误后停 `run` / 编辑 / 安装，并弹出继续 / 换思路 / 换模型。
@@ -485,13 +480,13 @@ NewAPI、OneAPI 以及各类「OpenAI 兼容」中转站，不要改 `openai` / 
 | `screenshot` / `computer` | 截图与键鼠 | Screen。computer-use **默认关**，`/settings computer-use` |
 | `extract_archive` | zip / tar / gz… | Write |
 | `install_program` | 自动探测当前系统包管理器；支持 winget/choco/scoop/apt/dnf/pacman/brew/pip/便携安装 | 每次安装都弹出“立即安装 / 取消” |
-| `Task` | 子代理。`worktree: true` 时 jail 绑到 `.caw-agent/worktrees/<id>/` | — |
+| `Task` | 子代理。`worktree: true` 时 jail 绑到 `.cawki/worktrees/<id>/` | — |
 | `Worktree` | `list` / `merge` / `abandon` | — |
 | `exit` | 用户告别或要求离开时结束进程（仅主代理） | 自动 |
 
 `auto` 下 git **只检查**：`git_status` / `git_conflicts` / `git status|diff|log|show` / `git stash list|show`。变基仍走 `run`。
 
-截图只写到 jail 内（默认 `.caw-agent/media/`）。全屏会尽量遮住本终端。macOS 用 ScreenCaptureKit，失败回退 CoreGraphics。
+截图只写到 jail 内（默认 `.cawki/media/`）。全屏会尽量遮住本终端。macOS 用 ScreenCaptureKit，失败回退 CoreGraphics。
 
 Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒绝。浏览器建议 `/mcp install browser`，不要用 computer 去点网页。
 
@@ -512,11 +507,11 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 
 全局已安装包和启用的插件由用户管理，可正常加载。仓库内 `.mcp.json` 默认视为不可信并忽略；只对你信任的仓库开启 `/settings mcp-workspace`，关闭后会立即卸载这些工作区服务器。
 
-官方包装在公开仓 `mcp/`（[目录](https://github.com/noxrick91/caw-agent-hub/tree/master/mcp)）：browser、doc、image、ocr、speech、freecad、blender。`/mcp install <name>` 从 GitHub 下载到 `~/.caw-agent/mcp/<name>/`。也可以装任意 GitHub 包：`/mcp install owner/repo` 或仓库 URL。工作区里的 `./mcp/<name>`、文件夹、zip 仍然可用。`/mcp install browser` 之后用 `mcp__browser__*`。
+官方包装在公开仓 `mcp/`（[目录](https://github.com/noxrick91/cawki-hub/tree/master/mcp)）：browser、doc、image、ocr、speech、freecad、blender。`/mcp install <name>` 从 GitHub 下载到 `~/.cawki/mcp/<name>/`。也可以装任意 GitHub 包：`/mcp install owner/repo` 或仓库 URL。工作区里的 `./mcp/<name>`、文件夹、zip 仍然可用。`/mcp install browser` 之后用 `mcp__browser__*`。
 
 附加音频只是路径，**不会**自动转写。用户明确要求转写时再用 speech 包。
 
-默认技能打在二进制里：`review`、`fix`、`commit`、`doctor`、`verify`、`code-review`、`simplify`、`batch`、`pr`。可用 `~/.caw-agent/skills/`、工作区 `skills/` 覆盖。`/mcp install` 会把该包的 skills 拷进全局 skills（带 `.mcp-pack` 戳）；卸载只删带戳的。
+默认技能打在二进制里：`review`、`fix`、`commit`、`doctor`、`verify`、`code-review`、`simplify`、`batch`、`pr`。可用 `~/.cawki/skills/`、工作区 `skills/` 覆盖。`/mcp install` 会把该包的 skills 拷进全局 skills（带 `.mcp-pack` 戳）；卸载只删带戳的。
 
 ```text
 /skills
@@ -543,7 +538,7 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 
 ## 配置片段
 
-`.caw-agent/config.json` 常见项：
+`.cawki/config.json` 常见项：
 
 ```json
 {
@@ -569,7 +564,7 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 }
 ```
 
-`languages.toml` 示例（`~/.caw-agent/` 或项目 `.caw-agent/`）：
+`languages.toml` 示例（`~/.cawki/` 或项目 `.cawki/`）：
 
 全局文件由用户管理；项目文件中的 `commands` 每次创建服务器进程都会触发带指纹的启动确认。
 
@@ -598,7 +593,7 @@ extensions = ["acme"]
 
 | 现象 | 处理 |
 |------|------|
-| 升级 HTTP 404 | 该 tag 还没有 Release，或私有仓还没把产物推到 hub。看 [Releases](https://github.com/noxrick91/caw-agent-hub/releases) |
+| 升级 HTTP 404 | 该 tag 还没有 Release，或私有仓还没把产物推到 hub。看 [Releases](https://github.com/noxrick91/cawki-hub/releases) |
 | 没有本平台资产 | 矩阵只有上表列出的目标 |
 | GitHub 403 / 429 | 设置 `GH_TOKEN` 或 `CAW_GITHUB_TOKEN` |
 | SHA256 不符 | 重新下；不要混用不同 tag 的 sums 与二进制 |
@@ -608,9 +603,9 @@ extensions = ["acme"]
 | `--print` 退出码 2 | 默认 `fail`：权限 / 提问 / 计划需要人。改 `--on-approval` / `--on-ask` / `--on-plan` |
 | Windows `irm …/install.ps1` 报错或没有真正执行 | GitHub Pages 把 `.ps1` 标成二进制。改用 `irm https://agent.noxcaw.com/install.txt \| iex`，或 `iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))` |
 | Windows 提示 TLS / secure channel | 用 Windows PowerShell 5.1+ 或 PowerShell 7；安装器会强制 TLS 1.2 |
-| 已有损坏的 `caw-agent.exe` 无法重装 | 关掉所有 caw-agent 窗口后再跑安装器，或删掉 `%USERPROFILE%\.caw-agent\bin\caw-agent.exe` |
-| Windows 重装/更新后仍是旧版本 | 旧安装器会把「已安装」交给 `caw-agent upgrade now`，文件锁或 GitHub API 失败时不会换包。关掉窗口后重新跑 `irm https://agent.noxcaw.com/install.txt \| iex`，再新开终端执行 `caw-agent --version`。用 `Get-Command caw-agent` 确认不是别的目录里的旧 exe |
-| 找不到命令 | `source ~/.caw-agent/env` 或新开终端；安装器会写 rc hook。Windows 新开一个终端以加载用户 PATH |
+| 已有损坏的 `cawki.exe` 无法重装 | 关掉所有 Cawki 窗口后再跑安装器，或删掉 `%USERPROFILE%\.cawki\bin\cawki.exe` |
+| Windows 重装/更新后仍是旧版本 | 旧安装器会把「已安装」交给 `cawki upgrade now`，文件锁或 GitHub API 失败时不会换包。关掉窗口后重新跑 `irm https://agent.noxcaw.com/install.txt \| iex`，再新开终端执行 `cawki --version`。用 `Get-Command cawki` 确认不是别的目录里的旧 exe |
+| 找不到命令 | `source ~/.cawki/env` 或新开终端；安装器会写 rc hook。Windows 新开一个终端以加载用户 PATH |
 | `serve` 拒绝监听 | 非 `127.0.0.1` / `::1` 必须 `--token` 或 `CAW_SERVE_TOKEN` |
 | Ollama 仍要密钥 | 用 `/model add ollama`，不要走需要 key 的 OpenAI 兼容网关 |
 | 中转站 401 / 模型不存在 | 用中转站自己的 Base URL、密钥和模型名；不要改 `openai` / `anthropic` 预设地址。见 [模型与密钥](#/models) |
