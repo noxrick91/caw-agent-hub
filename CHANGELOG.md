@@ -1,10 +1,24 @@
 # Changelog
 
-Notable user-facing changes to caw-agent are recorded here. Implementation details remain in the source history.
+Notable user-facing changes to Cawki are recorded here. Implementation details remain in the source history.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions match Git tags.
 
 ## [Unreleased]
+
+## [0.1.19] - 2026-08-19
+
+### Changed
+
+- Published the complete Cawki distribution under the `cawki` command, package, release-asset, data-directory, and Hub names.
+- Serialized Windows ARM64 SDK downloads and added visible heartbeats, hard timeouts, and cache-preserving retries for the China-hosted release runner.
+
+## [0.1.18] - 2026-08-19
+
+### Changed
+
+- Renamed the product, Cargo package, executable, release assets, commands, and local data directories to `cawki` without a legacy compatibility layer.
+- Rebranded the public website, documentation, installers, MCP packs, and release workflows as Cawki and moved their repository references to `noxrick91/cawki-hub`.
 
 ## [0.1.17] - 2026-08-19
 
