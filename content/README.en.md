@@ -27,10 +27,14 @@ Start with [Install](#/install) and [Quick start](#/quick-start). Slash commands
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.19** — 2026-08-19
+**What's new in v0.1.20** — 2026-08-19
 
-- Published the complete Cawki distribution under the `cawki` command, package, release-asset, data-directory, and Hub names.
-- Serialized Windows ARM64 SDK downloads and added visible heartbeats, hard timeouts, and cache-preserving retries for the China-hosted release runner.
+- Added visible MCP pack installation phases, duplicate-operation protection, and a persistent custom-source action in the MCP catalog.
+- Made MCP dependency installation explicit and on demand instead of silently installing every package's Python requirements.
+- Staged and validated MCP pack updates before activation, preserving the previous version when installation or registration fails.
+- Restricted automatic bridge setup to official Hub packs and documented which external dependencies and application add-ons remain after uninstall.
+- Prevented MCP installs from appearing permanently stuck during hidden dependency setup and bounded official bridge setup with a hard timeout.
+- Surfaced post-install warnings in the MCP menu and cleaned temporary download, extraction, and staging directories after failures.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
@@ -507,11 +511,11 @@ Computer-use has a machine-level lock, an app allowlist, and hard denies for pas
 
 Global installed packs and enabled plugins are user-managed and load normally. A repository's `.mcp.json` is ignored as untrusted by default; enable `/settings mcp-workspace` only for a repository you trust. Turning it off unloads those workspace servers immediately.
 
-Official packs live in the public repo under `mcp/` ([catalog](https://github.com/noxrick91/cawki-hub/tree/master/mcp)): browser, doc, image, ocr, speech, freecad, blender. `/mcp install <name>` downloads from GitHub into `~/.cawki/mcp/<name>/`. Any GitHub pack works: `/mcp install owner/repo` or a repo URL. Workspace `./mcp/<name>`, a folder, or a zip still work. After `/mcp install browser`, use `mcp__browser__*`.
+Official packs live in the public repo under `mcp/` ([catalog](https://github.com/noxrick91/cawki-hub/tree/master/mcp)): browser, doc, image, ocr, speech, freecad, blender. `/mcp install <name>` downloads from GitHub into `~/.cawki/mcp/<name>/`. Any GitHub pack works: `/mcp install owner/repo` or a repo URL. Workspace `./mcp/<name>`, a folder, or a zip still work. Installs switch from a validated staging directory and preserve the old version on failure. Heavy Python dependencies from `requirements.txt` are not installed implicitly; call the pack's `*_install_deps` tool on demand after it connects. After `/mcp install browser`, use `mcp__browser__*`.
 
 Attached audio is only a path — it is **not** transcribed automatically. Use the speech pack when the user asks.
 
-Default skills are baked in: `review`, `fix`, `commit`, `doctor`, `verify`, `code-review`, `simplify`, `batch`, `pr`. Override with `~/.cawki/skills/` or workspace `skills/`. `/mcp install` copies that pack’s skills into global skills (stamped `.mcp-pack`); uninstall removes only stamped copies.
+Default skills are baked in: `review`, `fix`, `commit`, `doctor`, `verify`, `code-review`, `simplify`, `batch`, `pr`. Override with `~/.cawki/skills/` or workspace `skills/`. `/mcp install` copies that pack’s skills into global skills (stamped `.mcp-pack`). Uninstall removes the pack directory, registry entry, and stamped skills; it does not remove global Python dependencies or external Blender/FreeCAD-style add-ons.
 
 ```text
 /skills
