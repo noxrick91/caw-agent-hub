@@ -1,17 +1,12 @@
 {
-  "tag": "v0.1.17",
-  "version": "0.1.17",
+  "tag": "v0.1.19",
+  "version": "0.1.19",
   "date": "2026-08-19",
-  "title": "What's new in v0.1.17",
+  "title": "What's new in v0.1.19",
   "notes": [
-    "Redesigned the Router menu with Provider and Model pickers for Fast, Default, Strong, and the dedicated classifier model.",
-    "Made Router escalation gradual from Fast to Default to Strong, with working controls for stall and verification-failure escalation.",
-    "Expanded Router decision feedback with classification source, score, confidence, fallback, vision requirements, and routing reasons.",
-    "Clarified when Hybrid and LLM classification can add an extra model request and cost.",
-    "Kept the selected Welcome theme visible when the terminal is too short to show the complete theme list.",
-    "Prevented selecting a Router tier from silently clearing its configured model.",
-    "Warned when a visual request falls back to a model that is not vision-capable."
+    "Published the complete Cawki distribution under the `cawki` command, package, release-asset, data-directory, and Hub names.",
+    "Serialized Windows ARM64 SDK downloads and added visible heartbeats, hard timeouts, and cache-preserving retries for the China-hosted release runner."
   ],
-  "body": "### Changed\n\n- Redesigned the Router menu with Provider and Model pickers for Fast, Default, Strong, and the dedicated classifier model.\n- Made Router escalation gradual from Fast to Default to Strong, with working controls for stall and verification-failure escalation.\n- Expanded Router decision feedback with classification source, score, confidence, fallback, vision requirements, and routing reasons.\n- Clarified when Hybrid and LLM classification can add an extra model request and cost.\n\n### Fixed\n\n- Kept the selected Welcome theme visible when the terminal is too short to show the complete theme list.\n- Prevented selecting a Router tier from silently clearing its configured model.\n- Warned when a visual request falls back to a model that is not vision-capable.",
+  "body": "### Changed\n\n- Published the complete Cawki distribution under the `cawki` command, package, release-asset, data-directory, and Hub names.\n- Serialized Windows ARM64 SDK downloads and added visible heartbeats, hard timeouts, and cache-preserving retries for the China-hosted release runner.",
   "url": "./CHANGELOG.md"
 }
