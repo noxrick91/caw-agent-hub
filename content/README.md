@@ -27,10 +27,14 @@ Cawki 是跑在你终端里的编程助手：读代码、改文件、跑测试�
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.19** — 2026-08-19
+**What's new in v0.1.20** — 2026-08-19
 
-- Published the complete Cawki distribution under the `cawki` command, package, release-asset, data-directory, and Hub names.
-- Serialized Windows ARM64 SDK downloads and added visible heartbeats, hard timeouts, and cache-preserving retries for the China-hosted release runner.
+- Added visible MCP pack installation phases, duplicate-operation protection, and a persistent custom-source action in the MCP catalog.
+- Made MCP dependency installation explicit and on demand instead of silently installing every package's Python requirements.
+- Staged and validated MCP pack updates before activation, preserving the previous version when installation or registration fails.
+- Restricted automatic bridge setup to official Hub packs and documented which external dependencies and application add-ons remain after uninstall.
+- Prevented MCP installs from appearing permanently stuck during hidden dependency setup and bounded official bridge setup with a hard timeout.
+- Surfaced post-install warnings in the MCP menu and cleaned temporary download, extraction, and staging directories after failures.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
@@ -507,11 +511,11 @@ Computer-use 有机器级锁、应用白名单与密码管理器/银行等硬拒
 
 全局已安装包和启用的插件由用户管理，可正常加载。仓库内 `.mcp.json` 默认视为不可信并忽略；只对你信任的仓库开启 `/settings mcp-workspace`，关闭后会立即卸载这些工作区服务器。
 
-官方包装在公开仓 `mcp/`（[目录](https://github.com/noxrick91/cawki-hub/tree/master/mcp)）：browser、doc、image、ocr、speech、freecad、blender。`/mcp install <name>` 从 GitHub 下载到 `~/.cawki/mcp/<name>/`。也可以装任意 GitHub 包：`/mcp install owner/repo` 或仓库 URL。工作区里的 `./mcp/<name>`、文件夹、zip 仍然可用。`/mcp install browser` 之后用 `mcp__browser__*`。
+官方包装在公开仓 `mcp/`（[目录](https://github.com/noxrick91/cawki-hub/tree/master/mcp)）：browser、doc、image、ocr、speech、freecad、blender。`/mcp install <name>` 从 GitHub 下载到 `~/.cawki/mcp/<name>/`。也可以装任意 GitHub 包：`/mcp install owner/repo` 或仓库 URL。工作区里的 `./mcp/<name>`、文件夹、zip 仍然可用。安装采用 staging 后切换，失败时保留旧版本；不会隐式安装 `requirements.txt` 中的重型 Python 依赖，连接后按需调用包提供的 `*_install_deps`。`/mcp install browser` 之后用 `mcp__browser__*`。
 
 附加音频只是路径，**不会**自动转写。用户明确要求转写时再用 speech 包。
 
-默认技能打在二进制里：`review`、`fix`、`commit`、`doctor`、`verify`、`code-review`、`simplify`、`batch`、`pr`。可用 `~/.cawki/skills/`、工作区 `skills/` 覆盖。`/mcp install` 会把该包的 skills 拷进全局 skills（带 `.mcp-pack` 戳）；卸载只删带戳的。
+默认技能打在二进制里：`review`、`fix`、`commit`、`doctor`、`verify`、`code-review`、`simplify`、`batch`、`pr`。可用 `~/.cawki/skills/`、工作区 `skills/` 覆盖。`/mcp install` 会把该包的 skills 拷进全局 skills（带 `.mcp-pack` 戳）；卸载只删包目录、注册项和带戳技能，不会自动移除全局 Python 依赖或 Blender/FreeCAD 等外部应用插件。
 
 ```text
 /skills
