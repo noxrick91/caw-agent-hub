@@ -1,12 +1,12 @@
-# caw-agent user guide
+# Cawki user guide
 
-caw-agent is a coding partner that lives in your terminal. It reads code, edits files, and runs tests in the project you opened. Before every write or command, it stops and waits for your OK. The UI provides a permission broker, sandbox, MCP, sessions, and memory.
+Cawki is a coding partner that lives in your terminal. It reads code, edits files, and runs tests in the current workspace. File tools stay in the workspace by default; writes and commands ask by default, and permissions can be tightened or relaxed per project. The UI provides a permission broker, sandbox, MCP, sessions, and memory.
 
-Prebuilt binaries install from this site’s [GitHub Releases](https://github.com/noxrick91/caw-agent-hub/releases) into `~/.caw-agent/bin`. The source repo is private.
+Prebuilt binaries install from this site’s [GitHub Releases](https://github.com/noxrick91/cawki-hub/releases) into `~/.cawki/bin`. The source repo is private.
 
 ### What it does
 
-- Stays inside the workspace you opened; every read, edit, and run shows up in the terminal
+- Keeps file tools in the workspace by default; every read, edit, and run shows up in the terminal
 - Asks before writing files or running commands; you can tighten or loosen permissions per project
 - Remembers project habits across sessions; MCP servers and skills plug in when you need them
 - Works with official APIs, local Ollama, and third-party OpenAI-compatible gateways
@@ -27,15 +27,10 @@ Start with [Install](#/install) and [Quick start](#/quick-start). Slash commands
 
 This page lists changes in the **current public release**.
 
-**What's new in v0.1.17** — 2026-08-19
+**What's new in v0.1.19** — 2026-08-19
 
-- Redesigned the Router menu with Provider and Model pickers for Fast, Default, Strong, and the dedicated classifier model.
-- Made Router escalation gradual from Fast to Default to Strong, with working controls for stall and verification-failure escalation.
-- Expanded Router decision feedback with classification source, score, confidence, fallback, vision requirements, and routing reasons.
-- Clarified when Hybrid and LLM classification can add an extra model request and cost.
-- Kept the selected Welcome theme visible when the terminal is too short to show the complete theme list.
-- Prevented selecting a Router tier from silently clearing its configured model.
-- Warned when a visual request falls back to a model that is not vision-capable.
+- Published the complete Cawki distribution under the `cawki` command, package, release-asset, data-directory, and Hub names.
+- Serialized Windows ARM64 SDK downloads and added visible heartbeats, hard timeouts, and cache-preserving retries for the China-hosted release runner.
 
 Full history: [CHANGELOG.md](./CHANGELOG.md).
 
@@ -69,28 +64,28 @@ Do not use `irm …/install.ps1`: GitHub Pages serves `.ps1` as `application/oct
 iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))
 ```
 
-The script picks the asset for your OS/ARCH (Linux x64/arm64 or Windows x64/ARM64), checks `SHA256SUMS` from the same Release, and installs into `~/.caw-agent/bin`. Windows ARM64 prefers the native build and falls back to x64 emulation for older Releases without an ARM64 asset. macOS prebuilt packages are temporarily unavailable. Running the installer again re-downloads and replaces the current file (on Windows it renames a running exe to `.bak` first). The installer writes `~/.caw-agent/env` and adds a hook in `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`, then `source`s that env. `curl | bash` cannot update the shell you already have open — open a new terminal, or run `source ~/.caw-agent/env`. Set `CAW_NO_PATH=1` to skip the rc hook.
+The script picks the asset for your OS/ARCH (Linux x64/arm64 or Windows x64/ARM64), checks `SHA256SUMS` from the same Release, and installs into `~/.cawki/bin`. Windows ARM64 prefers the native build and falls back to x64 emulation for older Releases without an ARM64 asset. macOS prebuilt packages are temporarily unavailable. Running the installer again re-downloads and replaces the current file (on Windows it renames a running exe to `.bak` first). The installer writes `~/.cawki/env` and adds a hook in `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`, then `source`s that env. `curl | bash` cannot update the shell you already have open — open a new terminal, or run `source ~/.cawki/env`. Set `CAW_NO_PATH=1` to skip the rc hook.
 
 If Pages is not live yet:
 
 ```bash
-curl -fsS https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install | bash
+curl -fsS https://raw.githubusercontent.com/noxrick91/cawki-hub/master/install | bash
 ```
 
 ```powershell
-irm https://raw.githubusercontent.com/noxrick91/caw-agent-hub/master/install.ps1 | iex
+irm https://raw.githubusercontent.com/noxrick91/cawki-hub/master/install.ps1 | iex
 ```
 
 ### Website / manual download
 
-Open the homepage, download the latest asset for your platform, put it in `~/.caw-agent/bin` (Windows: `%USERPROFILE%\.caw-agent\bin\caw-agent.exe`), and check `SHA256SUMS`. The homepage “this build / all time” counts come from each GitHub Release asset’s `download_count`: one-line install, `caw-agent upgrade`, and browser downloads all increment it. Fetching the `install` script from Pages does not; `SHA256SUMS` is counted separately (each install downloads the checksum file first). `upgrade --check` only hits the API.
+Open the homepage, download the latest asset for your platform, put it in `~/.cawki/bin` (Windows: `%USERPROFILE%\.cawki\bin\cawki.exe`), and check `SHA256SUMS`. The homepage “this build / all time” counts come from each GitHub Release asset’s `download_count`: one-line install, `cawki upgrade`, and browser downloads all increment it. Fetching the `install` script from Pages does not; `SHA256SUMS` is counted separately (each install downloads the checksum file first). `upgrade --check` only hits the API.
 
 | Platform | Asset |
 |----------|--------|
-| Linux x86_64 | `caw-agent-x86_64-unknown-linux-gnu` |
-| Linux aarch64 | `caw-agent-aarch64-unknown-linux-gnu` |
-| Windows x64 | `caw-agent-x86_64-pc-windows-gnu.exe` |
-| Windows ARM64 | `caw-agent-aarch64-pc-windows-msvc.exe` |
+| Linux x86_64 | `cawki-x86_64-unknown-linux-gnu` |
+| Linux aarch64 | `cawki-aarch64-unknown-linux-gnu` |
+| Windows x64 | `cawki-x86_64-pc-windows-gnu.exe` |
+| Windows ARM64 | `cawki-aarch64-pc-windows-msvc.exe` |
 
 Unsupported combos (Linux musl, 32-bit Windows) have no prebuilt — build from source.
 
@@ -100,49 +95,49 @@ A bare command **only checks**; it does not download:
 
 ```text
 /upgrade
-caw-agent upgrade
-caw-agent upgrade --check
+cawki upgrade
+cawki upgrade --check
 ```
 
 Install latest (only when newer than the current binary):
 
 ```text
 /upgrade now
-caw-agent upgrade now
+cawki upgrade now
 ```
 
 Pin a tag (can install an older build):
 
 ```text
 /upgrade v0.1.1
-caw-agent upgrade v0.1.1
+cawki upgrade v0.1.1
 ```
 
-Downloads show bytes and percent, verify SHA256, then run `--version`. A mismatch restores the `.bak`. Default hub is `noxrick91/caw-agent-hub`. Override with `CAW_GITHUB=owner/name`.
+Downloads show bytes and percent, verify SHA256, then run `--version`. A mismatch restores the `.bak`. Default hub is `noxrick91/cawki-hub`. Override with `CAW_GITHUB=owner/name`.
 
-On Windows the installer renames a running `caw-agent.exe` to `.bak` and then writes the new file. If the rename fails, it writes beside the exe and asks you to close every window. Open a new terminal and run `caw-agent --version`. If PATH still points at another copy, use `%USERPROFILE%\.caw-agent\bin\caw-agent.exe`.
+On Windows the installer renames a running `cawki.exe` to `.bak` and then writes the new file. If the rename fails, it writes beside the exe and asks you to close every window. Open a new terminal and run `cawki --version`. If PATH still points at another copy, use `%USERPROFILE%\.cawki\bin\cawki.exe`.
 
 ### Uninstall
 
 There is no separate uninstaller. Delete the install directory; that also removes config, keys, and MCP packs:
 
 ```bash
-rm -rf ~/.caw-agent
+rm -rf ~/.cawki
 ```
 
 ```powershell
-Remove-Item -Recurse -Force $HOME\.caw-agent
+Remove-Item -Recurse -Force $HOME\.cawki
 ```
 
-Then clean PATH by hand: on Linux / macOS remove the `# >>> caw-agent >>>` … `# <<< caw-agent <<<` block from `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`; on Windows remove `%USERPROFILE%\.caw-agent\bin` from the user PATH. Per-project `.caw-agent/` folders are left alone.
+Then clean PATH by hand: on Linux / macOS remove the `# >>> cawki >>>` … `# <<< cawki <<<` block from `.bashrc` / `.zshrc` / `.bash_profile` / fish `config.fish`; on Windows remove `%USERPROFILE%\.cawki\bin` from the user PATH. Per-project `.cawki/` folders are left alone.
 
 ### Install from source
 
-The source repo is not public. Developers with access, in the private `caw-agent` repo:
+The source repo is not public. Developers with access, in the private `cawki` repo:
 
 ```bash
-./scripts/install.sh          # cargo install → ~/.caw-agent/bin
-cargo run -p caw-agent -- --workdir .
+./scripts/install.sh          # cargo install → ~/.cawki/bin
+cargo run -p cawki -- --workdir .
 ```
 
 **Linux build deps:** `pkg-config`, `libxcb1-dev`, `libxrandr-dev` (X11 screenshots). Wayland screenshots prefer `grim`; computer-use prefers `ydotool`.
@@ -156,9 +151,9 @@ cargo run -p caw-agent -- --workdir .
 ## Quick start
 
 ```bash
-caw-agent --workdir .
+cawki --workdir .
 # short
-caw-agent -w .
+cawki -w .
 ```
 
 The first visit to a workspace that has not finished onboarding opens a wizard: pick a theme, confirm the workspace. Change the theme later with `/theme`.
@@ -186,10 +181,10 @@ With several models, `/router` sends simple turns to fast and harder work to def
 ## CLI
 
 ```text
-caw-agent [options] [--print prompt…]
-caw-agent upgrade [--check] [now|latest|vX.Y.Z]
-caw-agent rewind
-caw-agent serve [--listen 127.0.0.1:4150] [--token TOKEN] [--workdir DIR]
+cawki [options] [--print prompt…]
+cawki upgrade [--check] [now|latest|vX.Y.Z]
+cawki rewind
+cawki serve [--listen 127.0.0.1:4150] [--token TOKEN] [--workdir DIR]
 ```
 
 | Option | Meaning |
@@ -212,20 +207,20 @@ caw-agent serve [--listen 127.0.0.1:4150] [--token TOKEN] [--workdir DIR]
 | `--allowed-tools` / `--allowed-tools-file` | Tool globs auto-approved in `--print` |
 | `--deny-tools` | Tool globs always denied |
 | `--max-turns` | Max LLM rounds in `--print` |
-| `-V, --version` | Print `caw-agent x.y.z` |
+| `-V, --version` | Print `cawki x.y.z` |
 
 `--print` defaults to permission mode **auto** so unattended runs are not stuck on every write. Pass `--permission-mode default` when you want the gate. Network, screen, and MCP still fail closed unless `--dangerously-skip-permissions`.
 
 ```bash
-caw-agent --print -w . "summarize this repo"
-caw-agent --print --output-format stream-json --on-approval deny -w . "list public API"
-caw-agent --print --on-ask first --on-plan approve -w . "propose a plan then implement"
-caw-agent --print --continue -w . "keep going"
+cawki --print -w . "summarize this repo"
+cawki --print --output-format stream-json --on-approval deny -w . "list public API"
+cawki --print --on-ask first --on-plan approve -w . "propose a plan then implement"
+cawki --print --continue -w . "keep going"
 ```
 
-`--print` writes the session under `.caw-agent/sessions/` (including token totals for `/cost`) and prints a resume id on stderr. Ctrl+C / SIGTERM save first, then exit 130. `--continue` errors if this workspace has no stored session.
+`--print` writes the session under `.cawki/sessions/` (including token totals for `/cost`) and prints a resume id on stderr. Ctrl+C / SIGTERM save first, then exit 130. `--continue` errors if this workspace has no stored session.
 
-### `caw-agent serve`
+### `cawki serve`
 
 Local REST / SSE control plane, default `http://127.0.0.1:4150`. A non-loopback listen requires `--token` or `CAW_SERVE_TOKEN` (`Authorization: Bearer …`).
 
@@ -257,7 +252,7 @@ Local REST / SSE control plane, default `http://127.0.0.1:4150`. A non-loopback 
 /context                 context-use estimate
 /cost                    estimated spend this session (persisted)
 /cost limit <usd>|off    stop before the next LLM call at the cap
-/export [md|json] [path] redacted transcript (default .caw-agent/exports/)
+/export [md|json] [path] redacted transcript (default .cawki/exports/)
 /upgrade [now|vX.Y.Z]    check or install a GitHub Release + hub MCP
 /notify on|off           desktop toast when a background tab or --print finishes
 /copy [N]                copy the Nth last assistant reply
@@ -312,7 +307,7 @@ The default provider is `openai` → `https://api.openai.com/v1` (`gpt-5.6`).
 /model add anthropic           native Messages API
 /model add deepseek            also qwen, qwen-intl, glm, glm-coding, ollama
 /model add myapi https://…/v1 mid    third-party / OpenAI-compatible gateway
-/model key openai sk-...       write ~/.caw-agent/secrets.json (all workspaces)
+/model key openai sk-...       write ~/.cawki/secrets.json (all workspaces)
 /model key <provider> clear
 /model url https://.../v1
 /model name gpt-4o-mini
@@ -341,7 +336,7 @@ Gateway traffic uses `/v1/chat/completions`. The native Messages protocol is use
 
 **Native Messages:** `/v1/messages` is used only with the official endpoint; every other address uses the compatible API. `/chat/completions` gateways are supported, and keys can be configured through an environment variable or `/model key`.
 
-Lookup order (active provider): env (`api_key_env` for that provider — OpenRouter is `OPENROUTER_API_KEY`; `CAW_API_KEY` is a last resort) → optional project `.caw-agent/secrets.json` → **`~/.caw-agent/secrets.json`** → inline key in config. When `use_keyring` is true (the global default), the OS keyring is tried first. If the keyring backend is not durable, the key stays in `secrets.json` instead of being wiped by an in-memory mock.
+Lookup order (active provider): env (`api_key_env` for that provider — OpenRouter is `OPENROUTER_API_KEY`; `CAW_API_KEY` is a last resort) → optional project `.cawki/secrets.json` → **`~/.cawki/secrets.json`** → inline key in config. When `use_keyring` is true (the global default), the OS keyring is tried first. If the keyring backend is not durable, the key stays in `secrets.json` instead of being wiped by an in-memory mock.
 
 Optional: `OPENAI_ORG_ID`, `OPENAI_PROJECT_ID`.
 
@@ -353,9 +348,9 @@ Optional: `OPENAI_ORG_ID`, `OPENAI_PROJECT_ID`.
 
 ## Workspace and home
 
-Each project has its own `.caw-agent/`; cross-project data lives in `~/.caw-agent/`.
+Each project has its own `.cawki/`; cross-project data lives in `~/.cawki/`.
 
-### `~/.caw-agent/`
+### `~/.cawki/`
 
 | Path | Use |
 |------|-----|
@@ -372,7 +367,7 @@ Each project has its own `.caw-agent/`; cross-project data lives in `~/.caw-agen
 | `mcp/` | Installed MCP packs |
 | `languages.toml` | Extra stack / LSP / debug maps (still the built-in `analyze` / `lsp` / `debug` tools) |
 
-### Project `.caw-agent/`
+### Project `.cawki/`
 
 | Path | Use |
 |------|-----|
@@ -405,7 +400,7 @@ Write project notes in `CAW.md` at the workspace root. Workspace MCP servers may
 |------|----------|
 | `default` | Reads may auto-allow; write / exec / MCP / network / screenshot ask |
 | `acceptEdits` | File writes and safe filesystem commands auto-pass; MCP / network / other `run` still ask |
-| `plan` | Research only. After writing `.caw-agent/plan.md`, `ExitPlanMode`; architecture plans include diagrams; approve to implement in auto (or ask first). Plan itself is not the startup default |
+| `plan` | Research only. After writing `.cawki/plan.md`, `ExitPlanMode`; architecture plans include diagrams; approve to implement in auto (or ask first). Plan itself is not the startup default |
 | `auto` | accept-edits + `analyze` / check-test-lint + git **read-only checks**. Mutating git, bare `make`, network, screen, MCP, and installs still ask |
 | `bypassPermissions` (UI: **full access**) | Skip every prompt (including screenshots). Leaving full access clears session grants |
 
@@ -431,13 +426,13 @@ Permission sheet: `1` / Enter once · `2` this session · `3` write to config ·
 
 Defaults: jail **on** (except Windows), exec network **off**, timeout 120s. `/settings sandbox` turns the jail off. Every sandboxed `run` that fails attaches `<sandbox_violations>`. `dangerouslyDisableSandbox: true` is a one-shot escape (`/settings unsandbox`).
 
-Hard blocks include fork-bombs, `rm -rf /`, piping into a shell, and reading or writing `.caw-agent/secrets.json` / `config.json`.
+Hard blocks include fork-bombs, `rm -rf /`, piping into a shell, and reading or writing `.cawki/secrets.json` / `config.json`.
 
 ### Dedicated LSP jail
 
-Language servers persist per workspace and server id, but use a separate OS-jail policy: network is denied and workspace source is read-only by default, while only `.caw-agent/lsp/<server>/` is writable. Toolchain/package caches are read-only; SSH, cloud credentials, keyrings, and caw-agent secrets stay hidden. Changing policy or shutting down terminates the complete server process tree, and the LSP message queue is bounded.
+Language servers persist per workspace and server id, but use a separate OS-jail policy: network is denied and workspace source is read-only by default, while only `.cawki/lsp/<server>/` is writable. Toolchain/package caches are read-only; SSH, cloud credentials, keyrings, and Cawki secrets stay hidden. Changing policy or shutting down terminates the complete server process tree, and the LSP message queue is bounded.
 
-A server defined by project `.caw-agent/languages.toml` is repository-controlled executable code. Before every new process, caw-agent previews the resolved program, arguments, isolation policy, and configuration fingerprint and requires **Start server / Cancel**. Auto, Full access, and remembered grants cannot bypass this boundary. A command or configuration change produces a new fingerprint.
+A server defined by project `.cawki/languages.toml` is repository-controlled executable code. Before every new process, Cawki previews the resolved program, arguments, isolation policy, and configuration fingerprint and requires **Start server / Cancel**. Auto, Full access, and remembered grants cannot bypass this boundary. A command or configuration change produces a new fingerprint.
 
 Use `/settings lsp-sandbox` for the jail, `/settings lsp-writes` for full-workspace writes, and `/settings lsp-network` for host networking. Changing any option first stops running servers. Native Windows still has no OS jail, so WSL2 is recommended; workspace-defined servers still require confirmation.
 
@@ -447,10 +442,10 @@ Use `/settings lsp-sandbox` for the jail, `/settings lsp-writes` for full-worksp
 
 | Layer | Path | Who writes | Use |
 |-------|------|------------|-----|
-| Global rules | `~/.caw-agent/rules/*.md` | you | Fixed notes for every workspace |
-| Global memory | `~/.caw-agent/memory/` | agent + you | Machine-level pitfalls across repos |
+| Global rules | `~/.cawki/rules/*.md` | you | Fixed notes for every workspace |
+| Global memory | `~/.cawki/memory/` | agent + you | Machine-level pitfalls across repos |
 | Project rules | `CAW.md` | you | This repo |
-| Project memory | `.caw-agent/memory/` | agent + you | Architecture, build commands, quirks |
+| Project memory | `.cawki/memory/` | agent + you | Architecture, build commands, quirks |
 | Session handoff | session JSON `handoff` | `/pause` or a tool | Where you left off |
 
 After a failed recovery with no memory write, the turn end nags once. Two failures in the same turn without reading memory interrupt and ask you to open the index / `debugging.md` first. Idle loops trip a breaker: after the same error enough times, `run` / edit / install stop and you get continue / change approach / change model.
@@ -485,13 +480,13 @@ If background tasks or unfinished todos are still open, the first `/exit`, Ctrl+
 | `screenshot` / `computer` | Screenshot and mouse/keyboard | Screen. computer-use is **off** by default; `/settings computer-use` |
 | `extract_archive` | zip / tar / gz… | Write |
 | `install_program` | Auto-detect host package manager; winget/choco/scoop/apt/dnf/pacman/brew/pip/portable | Every install shows Install / Cancel |
-| `Task` | Subagent. `worktree: true` jails to `.caw-agent/worktrees/<id>/` | — |
+| `Task` | Subagent. `worktree: true` jails to `.cawki/worktrees/<id>/` | — |
 | `Worktree` | `list` / `merge` / `abandon` | — |
 | `exit` | Leave the process when the user says goodbye or asks to quit (parent only) | Auto |
 
 Under `auto`, git is **check-only**: `git_status` / `git_conflicts` / `git status|diff|log|show` / `git stash list|show`. Rebase still goes through `run`.
 
-Screenshots write inside the jail (default `.caw-agent/media/`). Full-screen capture tries to hide this terminal. macOS uses ScreenCaptureKit, then CoreGraphics.
+Screenshots write inside the jail (default `.cawki/media/`). Full-screen capture tries to hide this terminal. macOS uses ScreenCaptureKit, then CoreGraphics.
 
 Computer-use has a machine-level lock, an app allowlist, and hard denies for password managers / banks. For the browser, `/mcp install browser` — do not click the web with `computer`.
 
@@ -512,11 +507,11 @@ Computer-use has a machine-level lock, an app allowlist, and hard denies for pas
 
 Global installed packs and enabled plugins are user-managed and load normally. A repository's `.mcp.json` is ignored as untrusted by default; enable `/settings mcp-workspace` only for a repository you trust. Turning it off unloads those workspace servers immediately.
 
-Official packs live in the public repo under `mcp/` ([catalog](https://github.com/noxrick91/caw-agent-hub/tree/master/mcp)): browser, doc, image, ocr, speech, freecad, blender. `/mcp install <name>` downloads from GitHub into `~/.caw-agent/mcp/<name>/`. Any GitHub pack works: `/mcp install owner/repo` or a repo URL. Workspace `./mcp/<name>`, a folder, or a zip still work. After `/mcp install browser`, use `mcp__browser__*`.
+Official packs live in the public repo under `mcp/` ([catalog](https://github.com/noxrick91/cawki-hub/tree/master/mcp)): browser, doc, image, ocr, speech, freecad, blender. `/mcp install <name>` downloads from GitHub into `~/.cawki/mcp/<name>/`. Any GitHub pack works: `/mcp install owner/repo` or a repo URL. Workspace `./mcp/<name>`, a folder, or a zip still work. After `/mcp install browser`, use `mcp__browser__*`.
 
 Attached audio is only a path — it is **not** transcribed automatically. Use the speech pack when the user asks.
 
-Default skills are baked in: `review`, `fix`, `commit`, `doctor`, `verify`, `code-review`, `simplify`, `batch`, `pr`. Override with `~/.caw-agent/skills/` or workspace `skills/`. `/mcp install` copies that pack’s skills into global skills (stamped `.mcp-pack`); uninstall removes only stamped copies.
+Default skills are baked in: `review`, `fix`, `commit`, `doctor`, `verify`, `code-review`, `simplify`, `batch`, `pr`. Override with `~/.cawki/skills/` or workspace `skills/`. `/mcp install` copies that pack’s skills into global skills (stamped `.mcp-pack`); uninstall removes only stamped copies.
 
 ```text
 /skills
@@ -543,7 +538,7 @@ While busy, Enter **queues** and does not interrupt. Esc: clear the draft first;
 
 ## Config snippets
 
-Common keys in `.caw-agent/config.json`:
+Common keys in `.cawki/config.json`:
 
 ```json
 {
@@ -569,9 +564,9 @@ Common keys in `.caw-agent/config.json`:
 }
 ```
 
-`languages.toml` example (`~/.caw-agent/` or project `.caw-agent/`):
+`languages.toml` example (`~/.cawki/` or project `.cawki/`):
 
-The global file is user-managed. A project file's `commands` trigger a fingerprinted launch confirmation whenever caw-agent creates a server process.
+The global file is user-managed. A project file's `commands` trigger a fingerprinted launch confirmation whenever Cawki creates a server process.
 
 ```toml
 [[stack]]
@@ -598,7 +593,7 @@ extensions = ["acme"]
 
 | Symptom | What to do |
 |---------|------------|
-| Upgrade HTTP 404 | That tag has no Release yet, or the private repo has not pushed artifacts to the hub. See [Releases](https://github.com/noxrick91/caw-agent-hub/releases) |
+| Upgrade HTTP 404 | That tag has no Release yet, or the private repo has not pushed artifacts to the hub. See [Releases](https://github.com/noxrick91/cawki-hub/releases) |
 | No asset for this platform | The matrix is only the targets in the table above |
 | GitHub 403 / 429 | Set `GH_TOKEN` or `CAW_GITHUB_TOKEN` |
 | SHA256 mismatch | Download again; do not mix sums and binaries from different tags |
@@ -608,9 +603,9 @@ extensions = ["acme"]
 | `--print` exit code 2 | Default `fail`: a permission / question / plan needs a human. Change `--on-approval` / `--on-ask` / `--on-plan` |
 | Windows `irm …/install.ps1` errors or does nothing | GitHub Pages serves `.ps1` as binary. Use `irm https://agent.noxcaw.com/install.txt \| iex`, or `iex ((New-Object Net.WebClient).DownloadString('https://agent.noxcaw.com/install.ps1'))` |
 | Windows TLS / secure channel error | Use Windows PowerShell 5.1+ or PowerShell 7; the installer forces TLS 1.2 |
-| Broken leftover `caw-agent.exe` blocks reinstall | Close every caw-agent window and run the installer again, or delete `%USERPROFILE%\.caw-agent\bin\caw-agent.exe` |
-| Windows reinstall/update still shows an old version | Older installers handed an existing install to `caw-agent upgrade now`, which can leave 0.1.6 in place if the exe is locked or the GitHub API fails. Close every window, run `irm https://agent.noxcaw.com/install.txt \| iex` again, then open a new terminal and run `caw-agent --version`. Use `Get-Command caw-agent` to make sure PATH is not another old exe |
-| Command not found | `source ~/.caw-agent/env` or open a new terminal; the installer writes an rc hook. On Windows, open a new terminal so the user PATH reloads |
+| Broken leftover `cawki.exe` blocks reinstall | Close every Cawki window and run the installer again, or delete `%USERPROFILE%\.cawki\bin\cawki.exe` |
+| Windows reinstall/update still shows an old version | Older installers handed an existing install to `cawki upgrade now`, which can leave 0.1.6 in place if the exe is locked or the GitHub API fails. Close every window, run `irm https://agent.noxcaw.com/install.txt \| iex` again, then open a new terminal and run `cawki --version`. Use `Get-Command cawki` to make sure PATH is not another old exe |
+| Command not found | `source ~/.cawki/env` or open a new terminal; the installer writes an rc hook. On Windows, open a new terminal so the user PATH reloads |
 | `serve` refuses to listen | Anything other than `127.0.0.1` / `::1` needs `--token` or `CAW_SERVE_TOKEN` |
 | Ollama still asks for a key | Use `/model add ollama`, not an OpenAI-compatible gateway that requires a key |
 | Gateway 401 / unknown model | Use the relay’s own base URL, key, and model id; do not rewrite `openai` / `anthropic` presets. See [Models and keys](#/models) |
