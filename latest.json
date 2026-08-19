@@ -1,26 +1,26 @@
 {
-  "tag_name": "v0.1.17",
-  "published_at": "2026-08-18T17:18:14Z",
+  "tag_name": "v0.1.19",
+  "published_at": "2026-08-19T08:06:54Z",
   "assets": [
     {
       "name": "SHA256SUMS",
-      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.17/SHA256SUMS"
+      "browser_download_url": "https://github.com/noxrick91/cawki-hub/releases/download/v0.1.19/SHA256SUMS"
     },
     {
-      "name": "caw-agent-aarch64-pc-windows-msvc.exe",
-      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.17/caw-agent-aarch64-pc-windows-msvc.exe"
+      "name": "cawki-aarch64-pc-windows-msvc.exe",
+      "browser_download_url": "https://github.com/noxrick91/cawki-hub/releases/download/v0.1.19/cawki-aarch64-pc-windows-msvc.exe"
     },
     {
-      "name": "caw-agent-aarch64-unknown-linux-gnu",
-      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.17/caw-agent-aarch64-unknown-linux-gnu"
+      "name": "cawki-aarch64-unknown-linux-gnu",
+      "browser_download_url": "https://github.com/noxrick91/cawki-hub/releases/download/v0.1.19/cawki-aarch64-unknown-linux-gnu"
     },
     {
-      "name": "caw-agent-x86_64-pc-windows-gnu.exe",
-      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.17/caw-agent-x86_64-pc-windows-gnu.exe"
+      "name": "cawki-x86_64-pc-windows-gnu.exe",
+      "browser_download_url": "https://github.com/noxrick91/cawki-hub/releases/download/v0.1.19/cawki-x86_64-pc-windows-gnu.exe"
     },
     {
-      "name": "caw-agent-x86_64-unknown-linux-gnu",
-      "browser_download_url": "https://github.com/noxrick91/caw-agent-hub/releases/download/v0.1.17/caw-agent-x86_64-unknown-linux-gnu"
+      "name": "cawki-x86_64-unknown-linux-gnu",
+      "browser_download_url": "https://github.com/noxrick91/cawki-hub/releases/download/v0.1.19/cawki-x86_64-unknown-linux-gnu"
     }
   ]
 }
