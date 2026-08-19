@@ -4,26 +4,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta http-equiv="Cache-Control" content="no-cache">
-  <title data-i18n-title="docs">文档 — caw-agent</title>
+  <title data-i18n-title="docs">文档 — Cawki</title>
   <meta name="description" data-i18n-desc="docs" content="安装、升级、斜杠命令、权限沙箱与无头模式。">
+  <meta name="theme-color" content="#121418">
+  <link rel="canonical" href="https://agent.noxcaw.com/docs.html">
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/style.css?v=v0.1.17-1787073535">
-  <link rel="stylesheet" href="./assets/docs.css?v=v0.1.17-1787073535">
+  <link rel="stylesheet" href="./assets/style.css?v=v0.1.19-1787126853">
+  <link rel="stylesheet" href="./assets/docs.css?v=v0.1.19-1787126853">
 </head>
 <body class="docs">
   <header class="docs-top">
     <div class="docs-top-inner">
       <a class="brand" href="./" data-keep-lang>
         <img src="./assets/favicon.svg" alt="">
-        caw-agent
+        Cawki
       </a>
-      <nav class="nav">
-        <a href="./" data-keep-lang data-i18n="nav.download">下载</a>
+      <nav class="nav" aria-label="主导航">
+        <a href="./" data-keep-lang data-i18n="nav.home">首页</a>
         <a href="./docs.html#/install" aria-current="page" data-keep-lang data-i18n="nav.docs">文档</a>
-        <span class="lang">
+        <a href="https://github.com/noxrick91/cawki-hub" data-i18n="nav.github">GitHub</a>
+        <span class="lang" role="group" aria-label="语言">
           <button type="button" data-lang="zh">中文</button>
           <button type="button" data-lang="en">EN</button>
         </span>
@@ -34,13 +37,13 @@
   <div class="docs-layout">
     <aside class="docs-side" id="docs-side">
       <p class="docs-side-label" data-i18n="nav.docs">文档</p>
-      <p class="docs-product">caw-agent</p>
+      <p class="docs-product">Cawki</p>
       <nav class="docs-nav" id="docs-nav" aria-label="docs"></nav>
     </aside>
 
     <main class="docs-main">
       <div class="docs-mobile-bar">
-        <button class="docs-contents-btn" id="docs-contents-btn" type="button" data-i18n="docs.contents">目录</button>
+        <button class="docs-contents-btn" id="docs-contents-btn" type="button" aria-controls="docs-side" aria-expanded="false" data-i18n="docs.contents">目录</button>
         <button class="docs-search docs-search-compact" id="docs-search-btn-mobile" type="button" data-i18n="docs.search">搜索文档…</button>
       </div>
       <button class="docs-search" id="docs-search-btn" type="button">
@@ -61,15 +64,16 @@
   </div>
 
   <div class="docs-backdrop" id="docs-backdrop" hidden></div>
-  <div class="docs-modal" id="docs-modal" hidden>
+  <div class="docs-modal" id="docs-modal" role="dialog" aria-modal="true" aria-labelledby="docs-search-title" hidden>
     <div class="docs-modal-box">
-      <input id="docs-search-input" type="search" autocomplete="off" data-i18n-placeholder="docs.search" placeholder="搜索文档…">
-      <div id="docs-search-hits"></div>
+      <h2 class="sr-only" id="docs-search-title" data-i18n="docs.searchTitle">搜索文档</h2>
+      <input id="docs-search-input" type="search" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-expanded="true" aria-controls="docs-search-hits" autocomplete="off" data-i18n-placeholder="docs.search" placeholder="搜索文档…">
+      <div id="docs-search-hits" role="listbox" aria-live="polite"></div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
-  <script src="./assets/i18n.js?v=v0.1.17-1787073535"></script>
-  <script src="./assets/docs.js?v=v0.1.17-1787073535"></script>
+  <script src="./assets/i18n.js?v=v0.1.19-1787126853"></script>
+  <script src="./assets/docs.js?v=v0.1.19-1787126853"></script>
 </body>
 </html>
