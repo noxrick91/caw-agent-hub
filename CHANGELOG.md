@@ -6,6 +6,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.1.20] - 2026-08-19
+
+### Changed
+
+- Added visible MCP pack installation phases, duplicate-operation protection, and a persistent custom-source action in the MCP catalog.
+- Made MCP dependency installation explicit and on demand instead of silently installing every package's Python requirements.
+- Staged and validated MCP pack updates before activation, preserving the previous version when installation or registration fails.
+- Restricted automatic bridge setup to official Hub packs and documented which external dependencies and application add-ons remain after uninstall.
+
+### Fixed
+
+- Prevented MCP installs from appearing permanently stuck during hidden dependency setup and bounded official bridge setup with a hard timeout.
+- Surfaced post-install warnings in the MCP menu and cleaned temporary download, extraction, and staging directories after failures.
+
 ## [0.1.19] - 2026-08-19
 
 ### Changed
