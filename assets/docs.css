@@ -34,6 +34,8 @@ body.docs {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 176, 88, 0.38) transparent;
 }
+body.docs.modal-open,
+body.docs.nav-open { overflow: hidden; }
 
 body.docs,
 body.docs * {
@@ -209,6 +211,8 @@ body.docs *::-webkit-scrollbar-corner {
   color: var(--ivory);
 }
 .docs-main .prose h3 { font-size: 16px; margin: 24px 0 8px; }
+.docs-main .prose h2,
+.docs-main .prose h3 { scroll-margin-top: 80px; }
 
 .docs-pager {
   display: grid;
@@ -301,6 +305,10 @@ body.docs .docs-right:hover::-webkit-scrollbar-thumb {
   padding: 14px 16px;
   outline: none;
 }
+.docs-modal-box input:focus-visible {
+  outline: 2px solid var(--heading);
+  outline-offset: -2px;
+}
 .docs-hit {
   display: block;
   padding: 10px 16px;
@@ -308,7 +316,8 @@ body.docs .docs-right:hover::-webkit-scrollbar-thumb {
   text-decoration: none;
 }
 .docs-hit:hover,
-.docs-hit.on { background: rgba(255, 140, 48, 0.12); }
+.docs-hit.on,
+.docs-hit[aria-selected="true"] { background: rgba(255, 140, 48, 0.12); }
 .docs-hit small { display: block; color: var(--muted); font-size: 12px; }
 .docs-empty { padding: 16px; color: var(--muted); font-size: 14px; }
 .docs-backdrop {
